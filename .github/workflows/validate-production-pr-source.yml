@@ -1,0 +1,34 @@
+# name: Validate production PR source
+
+# on:
+#   pull_request:
+#     branches:
+#       - production
+
+# permissions:
+#   contents: read
+
+# jobs:
+#   validate-source:
+#     name: Validate source branch
+#     runs-on: ubuntu-latest
+
+#     steps:
+#       - name: Validate
+#         run: |
+#           echo "base_ref=${{ github.base_ref }}"
+#           echo "head_ref=${{ github.head_ref }}"
+
+#           if [ "${{ github.head_ref }}" = "staging" ]; then
+#             exit 0
+#           fi
+
+#           case "${{ github.head_ref }}" in
+#             hotfix/*)
+#               exit 0
+#               ;;
+#             *)
+#               echo "Only staging or hotfix/* can target production."
+#               exit 1
+#               ;;
+#           esac

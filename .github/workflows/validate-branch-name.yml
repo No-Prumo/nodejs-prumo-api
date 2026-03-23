@@ -1,0 +1,30 @@
+# name: Validate branch name
+
+# on:
+#   pull_request:
+#     branches:
+#       - develop
+#       - staging
+#       - production
+
+# permissions:
+#   contents: read
+
+# jobs:
+#   validate-branch-name:
+#     name: Validate branch name
+#     runs-on: ubuntu-latest
+
+#     steps:
+#       - name: Check branch naming
+#         run: |
+#           BRANCH="${{ github.head_ref }}"
+#           echo "Branch: $BRANCH"
+
+#           if [[ "$BRANCH" =~ ^(feature|fix|hotfix|chore)/[A-Z]+-[0-9]+-[a-z0-9-]+$ ]]; then
+#             echo "Valid branch name"
+#             exit 0
+#           fi
+
+#           echo "Invalid branch name: $BRANCH"
+#           exit 1
