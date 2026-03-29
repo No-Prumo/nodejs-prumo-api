@@ -1,0 +1,20 @@
+---
+description: Load CI policy and mechanical workflow facts when editing GitHub Actions or CI scripts
+globs:
+  - ".github/workflows/**"
+  - "scripts/ci/**"
+  - "scripts/validate-branch.*"
+  - "scripts/validate-pr.*"
+alwaysApply: false
+---
+
+# CI documentation
+
+When changing workflows or CI-related scripts:
+
+1. **Policy** — `docs/ai/ci-cd/ci-governance.md` (source of truth for branches, PR rules, required checks).
+2. **Mechanical** — `docs/ai/ci-cd/ci-operational-rules.md` (regex, job display names, commands, thresholds as implemented in YAML).
+
+If workflow behavior and governance differ, follow the conflict order defined in `ci-governance.md` unless the user overrides.
+
+After renaming jobs (`name:`) or adding checks, update `ci-operational-rules.md` so branch protection and docs stay aligned.

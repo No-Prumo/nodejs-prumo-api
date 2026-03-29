@@ -39,6 +39,7 @@ Explain the cause identified in code, flow, or configuration.
 - [ ] typecheck
 - [ ] tests
 - [ ] build
+- [ ] dependency audit (CI: Dependency audit)
 - [ ] manual validation completed
 
 ## Notes

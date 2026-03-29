@@ -1,27 +1,8 @@
 # AI Context Index
 
-Load additional documents only when the current task requires them.
+Short catalog. Routing hints (`read-when`, `do-not-read-when`, `related`, `canonical`) live in each document’s YAML frontmatter.
 
-## CI / Branch Governance
-- `docs/ai/ci-cd/ci-governance.md`
-  - Read when editing:
-    - `.github/workflows/**`
-    - branch validation scripts
-    - pull request validation logic
-    - merge policy
-    - release flow
-    - branch naming enforcement
-  - Skip when:
-    - changing only application business logic
-    - changing only UI
-    - changing backend features unrelated to CI
-
-- `docs/ai/ci-cd/ci-operational-rules.md`
-  - Read when:
-    - implementing branch name validation
-    - implementing pull request flow validation
-    - writing regex-based CI rules
-    - enforcing required pull request checks
-  - Skip when:
-    - changing only CI documentation
-    - changing only application code unrelated to CI
+| Document | Role |
+|----------|------|
+| [`docs/ai/ci-cd/ci-governance.md`](ci-cd/ci-governance.md) | Policy, source of truth |
+| [`docs/ai/ci-cd/ci-operational-rules.md`](ci-cd/ci-operational-rules.md) | Mechanical: regex, jobs, thresholds as in YAML |
