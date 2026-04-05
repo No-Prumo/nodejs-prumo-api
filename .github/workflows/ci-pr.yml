@@ -5,7 +5,7 @@ on:
     branches:
       - developer
       - staging
-      - main
+      - master
     types:
       - opened
       - synchronize
@@ -44,17 +44,17 @@ jobs:
             is_valid_temp_branch=true
           fi
 
-          if [[ "$HEAD" == "developer" || "$HEAD" == "staging" || "$HEAD" == "main" ]]; then
+          if [[ "$HEAD" == "developer" || "$HEAD" == "staging" || "$HEAD" == "master" ]]; then
             is_valid_protected_branch=true
           fi
 
-          if [[ "$BASE" == "developer" || "$BASE" == "staging" || "$BASE" == "main" ]]; then
+          if [[ "$BASE" == "developer" || "$BASE" == "staging" || "$BASE" == "master" ]]; then
             is_valid_target=true
           fi
 
           if [[ "$is_valid_target" == "false" ]]; then
             echo "Invalid target branch: $BASE"
-            echo "Allowed targets: developer, staging, main"
+            echo "Allowed targets: developer, staging, master"
             exit 1
           fi
 
@@ -68,7 +68,7 @@ jobs:
             echo "  rc/KAN-654-release-candidate"
             echo "  developer"
             echo "  staging"
-            echo "  main"
+            echo "  master"
             exit 1
           fi
 

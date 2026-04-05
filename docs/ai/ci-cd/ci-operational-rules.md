@@ -26,40 +26,40 @@ Mechanical facts from repository workflows. Normative policy lives in `ci-govern
 
 ## Active PR workflow
 
-| Item | Value |
-|------|--------|
-| File | `.github/workflows/ci-pr.yml` |
-| Workflow name | `CI PR` |
-| Node (jobs) | `22` |
-| Package manager | `npm` (`npm ci`) |
+| Item            | Value                         |
+| --------------- | ----------------------------- |
+| File            | `.github/workflows/ci-pr.yml` |
+| Workflow name   | `CI PR`                       |
+| Node (jobs)     | `22`                          |
+| Package manager | `npm` (`npm ci`)              |
 
 ### PR event branches (`on.pull_request.branches`)
 
 - `developer`
 - `staging`
-- `main`
+- `master`
 
 ### Job IDs and display names (required check labels)
 
-| Job ID | `name:` (GitHub UI / branch protection) |
-|--------|----------------------------------------|
-| `governance` | Governance |
-| `quality` | Quality |
-| `test` | Test |
-| `build` | Build |
-| `security` | Dependency audit |
+| Job ID       | `name:` (GitHub UI / branch protection) |
+| ------------ | --------------------------------------- |
+| `governance` | Governance                              |
+| `quality`    | Quality                                 |
+| `test`       | Test                                    |
+| `build`      | Build                                   |
+| `security`   | Dependency audit                        |
 
 Dependency order: `quality`, `test`, `build`, and `security` each `needs: governance`.
 
 ### Commands run
 
-| Job | Step | Command |
-|-----|------|---------|
-| Quality | Lint | `npm run lint:ci` |
-| Quality | Typecheck | `npm run typecheck` |
-| Test | Tests | `npm run test:ci` |
-| Build | Build | `npm run build` |
-| Security | Audit | `npm audit --audit-level=moderate` |
+| Job      | Step      | Command                            |
+| -------- | --------- | ---------------------------------- |
+| Quality  | Lint      | `npm run lint:ci`                  |
+| Quality  | Typecheck | `npm run typecheck`                |
+| Test     | Tests     | `npm run test:ci`                  |
+| Build    | Build     | `npm run build`                    |
+| Security | Audit     | `npm audit --audit-level=moderate` |
 
 ## Regex and branch logic (Governance job)
 
@@ -73,25 +73,27 @@ Allowed source branches that skip the temp-branch regex (exact match):
 
 - `developer`
 - `staging`
-- `main`
+- `master`
 
-Target validation: `BASE` must be one of `developer`, `staging`, `main`. There is no per-target promotion `case`; the same source rules apply to all targets.
+Target validation: `BASE` must be one of `developer`, `staging`, `master`. There is no per-target promotion `case`; the same source rules apply to all targets.
 
 ## GitHub branch protection (manual)
 
-Configure rulesets or branch protection on `developer`, `staging`, and `main` to match policy in `ci-governance.md`. Required status checks should include the job display names above (`Governance`, `Quality`, `Test`, `Build`, `Dependency audit`) so merges are blocked until CI passes.
+Set the repository default branch to `master` (GitHub: Settings → General → Default branch) so clones and PR defaults align with policy.
+
+Configure rulesets or branch protection on `developer`, `staging`, and `master` to match policy in `ci-governance.md`. Required status checks should include the job display names above (`Governance`, `Quality`, `Test`, `Build`, `Dependency audit`) so merges are blocked until CI passes.
 
 ## Other workflow files
 
-| File | Status |
-|------|--------|
-| `.github/workflows/validate-branch-name.yml` | Commented out (inactive) |
-| `.github/workflows/validate-production-pr-source.yml` | Commented out (inactive) |
-| `.github/workflows/ci-push-guard.yml` | Commented out (inactive) |
-| `.github/workflows/security.yml` | Commented out (inactive); duplicate of audit logic in `ci-pr.yml` |
+| File                                                  | Status                                                            |
+| ----------------------------------------------------- | ----------------------------------------------------------------- |
+| `.github/workflows/validate-branch-name.yml`          | Commented out (inactive)                                          |
+| `.github/workflows/validate-production-pr-source.yml` | Commented out (inactive)                                          |
+| `.github/workflows/ci-push-guard.yml`                 | Commented out (inactive)                                          |
+| `.github/workflows/security.yml`                      | Commented out (inactive); duplicate of audit logic in `ci-pr.yml` |
 
 ## Thresholds
 
-| Check | Active in repo | Notes |
-|-------|----------------|--------|
-| Dependency audit | Yes | `npm audit --audit-level=moderate` — job fails on moderate or higher (see `ci-pr.yml` security job). |
+| Check            | Active in repo | Notes                                                                                                |
+| ---------------- | -------------- | ---------------------------------------------------------------------------------------------------- |
+| Dependency audit | Yes            | `npm audit --audit-level=moderate` — job fails on moderate or higher (see `ci-pr.yml` security job). |

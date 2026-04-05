@@ -9,6 +9,10 @@ related:
 use-together-with:
   - docs/ai/ci-cd/ci-operational-rules.md
 scope: github-actions, pull-requests, branch-policy
+protected-branches:
+  - developer
+  - staging
+  - master
 read-when:
   - editing files under .github/workflows
   - changing CI validation logic
@@ -43,7 +47,7 @@ Protected branches:
 
 - `developer`
 - `staging`
-- `main`
+- `master`
 
 Technical baseline:
 
@@ -59,7 +63,7 @@ The following rules apply to:
 
 - `developer`
 - `staging`
-- `main`
+- `master`
 
 Rules:
 
@@ -104,13 +108,13 @@ Examples of invalid names:
 
 ## Pull request policy
 
-Any pull request targeting `developer`, `staging`, or `main` is allowed only if the source branch name is valid.
+Any pull request targeting `developer`, `staging`, or `master` is allowed only if the source branch name is valid.
 
 Allowed PR targets:
 
 - `developer`
 - `staging`
-- `main`
+- `master`
 
 Allowed PR sources:
 
@@ -121,13 +125,13 @@ Allowed PR sources:
 - `rc/*`
 - `developer`
 - `staging`
-- `main`
+- `master`
 
 Rules:
 
 - source branch must match the naming convention or be one of the protected branches
 - target branch must be one of the protected branches
-- the same source rules apply to every protected target (`developer`, `staging`, and `main`); there is no separate “promotion-only” path exclusive to `main`
+- the same source rules apply to every protected target (`developer`, `staging`, and `master`); there is no separate “promotion-only” path exclusive to `master`
 - pull requests from invalid branch names must fail
 - squash merge only
 
@@ -160,7 +164,7 @@ CI must enforce:
    - fail if source branch name is invalid
 
 2. Pull request target validation
-   - fail if target branch is not `developer`, `staging`, or `main`
+   - fail if target branch is not `developer`, `staging`, or `master`
 
 3. Pull request title validation
    - fail if PR title does not follow the expected pattern when enabled
@@ -204,7 +208,7 @@ If there is a conflict, follow this order:
 
 These rules must not be relaxed unless explicitly requested:
 
-- `developer`, `staging`, and `main` do not allow direct push
+- `developer`, `staging`, and `master` do not allow direct push
 - pull requests to protected branches require valid source branch names
 - required validation includes lint, typecheck, tests, and build
 - CI changes must not silently weaken governance
