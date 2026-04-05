@@ -1,0 +1,164 @@
+name: CI PR
+
+on:
+  pull_request:
+    branches:
+      - developer
+      - staging
+      - main
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - edited
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-pr-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  governance:
+    name: Governance
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Validate branch naming and PR target
+        run: |
+          HEAD="${{ github.head_ref }}"
+          BASE="${{ github.base_ref }}"
+
+          echo "Source branch: $HEAD"
+          echo "Target branch: $BASE"
+
+          TEMP_BRANCH_REGEX='^(feature|fix|hotfix|chore|rc)/KAN-[0-9]+-[a-z0-9]+(-[a-z0-9]+)*$'
+
+          is_valid_temp_branch=false
+          is_valid_protected_branch=false
+          is_valid_target=false
+
+          if [[ "$HEAD" =~ $TEMP_BRANCH_REGEX ]]; then
+            is_valid_temp_branch=true
+          fi
+
+          if [[ "$HEAD" == "developer" || "$HEAD" == "staging" || "$HEAD" == "main" ]]; then
+            is_valid_protected_branch=true
+          fi
+
+          if [[ "$BASE" == "developer" || "$BASE" == "staging" || "$BASE" == "main" ]]; then
+            is_valid_target=true
+          fi
+
+          if [[ "$is_valid_target" == "false" ]]; then
+            echo "Invalid target branch: $BASE"
+            echo "Allowed targets: developer, staging, main"
+            exit 1
+          fi
+
+          if [[ "$is_valid_temp_branch" == "false" && "$is_valid_protected_branch" == "false" ]]; then
+            echo "Invalid source branch name: $HEAD"
+            echo "Allowed examples:"
+            echo "  feature/KAN-123-create-login-flow"
+            echo "  fix/KAN-456-correct-timeout"
+            echo "  hotfix/KAN-789-fix-production-crash"
+            echo "  chore/KAN-321-update-ci"
+            echo "  rc/KAN-654-release-candidate"
+            echo "  developer"
+            echo "  staging"
+            echo "  main"
+            exit 1
+          fi
+
+  quality:
+    name: Quality
+    runs-on: ubuntu-latest
+    needs: governance
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint:ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    needs: governance
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm run test:ci
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    needs: governance
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+  security:
+    name: Dependency audit
+    runs-on: ubuntu-latest
+    needs: governance
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Audit dependencies
+        run: npm audit --audit-level=moderate
