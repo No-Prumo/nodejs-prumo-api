@@ -4,6 +4,7 @@ Short catalog. Routing hints (`read-when`, `do-not-read-when`, `related`, `canon
 
 | Document                                                                                   | Role                                           |
 | ------------------------------------------------------------------------------------------ | ---------------------------------------------- |
+| [`docs/ai/api/zod-swagger-foundation.md`](api/zod-swagger-foundation.md)                   | API validation and Swagger baseline            |
 | [`docs/ai/config/configuration-foundation.md`](config/configuration-foundation.md)         | Backend config baseline, source of truth       |
 | [`docs/ai/config/typescript-module-resolution.md`](config/typescript-module-resolution.md) | TypeScript/Nest module resolution decision     |
 | [`docs/ai/ci-cd/ci-governance.md`](ci-cd/ci-governance.md)                                 | Policy, source of truth                        |

@@ -108,10 +108,18 @@ Owns:
 
 - bootstrap consumption of typed `app` config
 - `host`, `port`, and optional `globalPrefix`
+- orchestration of small bootstrap helpers for platform concerns such as docs
 
 Rule:
 
 - never read `process.env` here
+- keep `main.ts` as the orchestration layer, not as the place for detailed integration logic
+
+Bootstrap organization rule:
+
+- while there are only one or two small platform concerns, prefer local helper functions inside `main.ts`
+- move helpers to `src/bootstrap/` only when bootstrap starts accumulating multiple global concerns such as CORS, versioning, helmet, filters, interceptors, logger, or observability
+- avoid creating several bootstrap files too early
 
 ## Supported domains
 
