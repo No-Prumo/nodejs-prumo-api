@@ -131,13 +131,19 @@ Purpose:
 
 Current shape:
 
+- `environment`
 - `nodeEnv`
+- `version`
 - `host`
 - `port`
 - `globalPrefix`
-- `isProduction`
-- `isDevelopment`
-- `isTest`
+- `isDevelopmentRuntime`
+- `isTestRuntime`
+- `isProductionRuntime`
+- `isLocalEnvironment`
+- `isTestEnvironment`
+- `isStagingEnvironment`
+- `isProductionEnvironment`
 
 ### `database`
 
@@ -202,6 +208,8 @@ Current env contract:
 
 ```env
 NODE_ENV=development
+APP_ENV=local
+APP_VERSION=0.0.1
 PORT=3000
 APP_HOST=0.0.0.0
 APP_GLOBAL_PREFIX=
@@ -213,7 +221,7 @@ POSTGRES_HOST=localhost
 POSTGRES_PORT=5432
 DATABASE_URL=postgresql://postgres:no-prumo@localhost:5432/no-prumo
 
-LOG_LEVEL=log
+LOG_LEVEL=debug
 LOG_PRETTY=true
 DOCS_ENABLED=true
 DOCS_PATH=docs
@@ -224,6 +232,8 @@ OBSERVABILITY_SERVICE_NAME=nodejs-prumo-api
 Notes:
 
 - `expandVariables: true` allows composed values in `.env`
+- `APP_ENV` separates local/staging/production intent from `NODE_ENV`
+- `APP_VERSION` may be omitted and falls back to `package.json`
 - `DATABASE_URL` is validated as URL text
 - booleans accept `true/false`, `1/0`, `yes/no`, `on/off`
 - ports are coerced to integers and validated in range `1..65535`
