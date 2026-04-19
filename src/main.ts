@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { Logger, LoggerErrorInterceptor } from 'nestjs-pino';
 import { cleanupOpenApiDoc } from 'nestjs-zod';
 import { AppModule } from './app.module';
 import {
@@ -33,8 +34,18 @@ function setupDocs(app: NestExpressApplication, docs: DocsConfig) {
   );
 }
 
+function setupLogger(app: NestExpressApplication) {
+  app.useLogger(app.get(Logger));
+  app.useGlobalInterceptors(new LoggerErrorInterceptor());
+}
+
 async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
+    bufferLogs: true,
+  });
+
+  setupLogger(app);
+
   const { host, port, globalPrefix } = app.get<AppConfig>(appConfig.KEY);
   const docsSettings = app.get<DocsConfig>(docsConfig.KEY);
 

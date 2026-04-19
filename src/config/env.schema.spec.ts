@@ -3,6 +3,8 @@ import { validateEnv } from './env.schema';
 describe('validateEnv', () => {
   it('coerces env values and applies defaults', () => {
     const env = validateEnv({
+      APP_ENV: 'staging',
+      APP_VERSION: '1.2.3',
       DATABASE_URL: 'postgresql://postgres:no-prumo@localhost:5432/no-prumo',
       POSTGRES_HOST: 'localhost',
       POSTGRES_PORT: '5432',
@@ -15,6 +17,8 @@ describe('validateEnv', () => {
     });
 
     expect(env.NODE_ENV).toBe('development');
+    expect(env.APP_ENV).toBe('staging');
+    expect(env.APP_VERSION).toBe('1.2.3');
     expect(env.PORT).toBe(4000);
     expect(env.POSTGRES_PORT).toBe(5432);
     expect(env.LOG_PRETTY).toBe(false);

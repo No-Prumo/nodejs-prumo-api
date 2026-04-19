@@ -1,17 +1,22 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
-import { ZodSerializerInterceptor, createZodValidationPipe } from 'nestjs-zod';
+import { LoggerModule } from 'nestjs-pino';
+import { createZodValidationPipe, ZodSerializerInterceptor } from 'nestjs-zod';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import {
   appConfig,
+  type AppConfig,
   databaseConfig,
   docsConfig,
   loggerConfig,
+  type LoggerConfig,
   observabilityConfig,
+  type ObservabilityConfig,
   validateEnv,
 } from './config';
+import { createPinoLoggerOptions } from './logging/pino-logger.factory';
 
 const AppZodValidationPipe = createZodValidationPipe({
   strictSchemaDeclaration: true,
@@ -31,6 +36,20 @@ const AppZodValidationPipe = createZodValidationPipe({
         docsConfig,
         observabilityConfig,
       ],
+    }),
+    LoggerModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [appConfig.KEY, loggerConfig.KEY, observabilityConfig.KEY],
+      useFactory: (
+        appSettings: AppConfig,
+        loggerSettings: LoggerConfig,
+        observabilitySettings: ObservabilityConfig,
+      ) =>
+        createPinoLoggerOptions(
+          appSettings,
+          loggerSettings,
+          observabilitySettings,
+        ),
     }),
   ],
   controllers: [AppController],

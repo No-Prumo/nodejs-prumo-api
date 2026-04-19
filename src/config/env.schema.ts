@@ -1,4 +1,9 @@
 import { z } from 'zod';
+import { appEnvironmentValues, nodeEnvironmentValues } from './app-environment';
+import { loggerLevelInputValues } from './logger-level';
+import { getPackageMetadata } from './package-metadata';
+
+const packageMetadata = getPackageMetadata();
 
 const booleanFromEnv = z.preprocess((value) => {
   if (typeof value === 'boolean') {
@@ -25,9 +30,9 @@ const booleanFromEnv = z.preprocess((value) => {
 const portFromEnv = z.coerce.number().int().min(1).max(65535);
 
 export const envSchema = z.object({
-  NODE_ENV: z
-    .enum(['development', 'test', 'production'])
-    .default('development'),
+  NODE_ENV: z.enum(nodeEnvironmentValues).default('development'),
+  APP_ENV: z.enum(appEnvironmentValues).optional(),
+  APP_VERSION: z.string().trim().min(1).optional(),
   PORT: portFromEnv.default(3000),
   APP_HOST: z.string().trim().min(1).default('0.0.0.0'),
   APP_GLOBAL_PREFIX: z.string().trim().default(''),
@@ -37,10 +42,8 @@ export const envSchema = z.object({
   POSTGRES_USER: z.string().trim().min(1),
   POSTGRES_PASSWORD: z.string().min(1),
   POSTGRES_DB: z.string().trim().min(1),
-  LOG_LEVEL: z
-    .enum(['fatal', 'error', 'warn', 'log', 'debug', 'verbose'])
-    .default('log'),
-  LOG_PRETTY: booleanFromEnv.default(true),
+  LOG_LEVEL: z.enum(loggerLevelInputValues).optional(),
+  LOG_PRETTY: booleanFromEnv.optional(),
   DOCS_ENABLED: booleanFromEnv.default(true),
   DOCS_PATH: z.string().trim().min(1).default('docs'),
   OBSERVABILITY_ENABLED: booleanFromEnv.default(false),
@@ -48,7 +51,7 @@ export const envSchema = z.object({
     .string()
     .trim()
     .min(1)
-    .default('nodejs-prumo-api'),
+    .default(packageMetadata.name),
 });
 
 export type Env = z.infer<typeof envSchema>;
