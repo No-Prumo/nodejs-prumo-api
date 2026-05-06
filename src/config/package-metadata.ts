@@ -7,7 +7,7 @@ type PackageMetadata = {
 };
 
 const defaultPackageMetadata: PackageMetadata = {
-  name: 'nodejs-prumo-api',
+  name: 'sandicts-api',
   version: '0.0.1',
 };
 

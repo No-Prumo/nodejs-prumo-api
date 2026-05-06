@@ -17,7 +17,7 @@ function setupDocs(app: NestExpressApplication, docs: DocsConfig) {
   }
 
   const openApiConfig = new DocumentBuilder()
-    .setTitle('No Prumo API')
+    .setTitle('Sandicts API')
     .setDescription(
       'API documentation generated from Nest controllers and Zod schemas.',
     )
