@@ -2,10 +2,10 @@ import { validateEnv } from './env.schema';
 import { buildLoggerConfig } from './logger.config';
 
 const baseEnv = {
-  DATABASE_URL: 'postgresql://postgres:no-prumo@localhost:5432/no-prumo',
-  POSTGRES_DB: 'no-prumo',
+  DATABASE_URL: 'postgresql://postgres:sandicts@localhost:5432/sandicts',
+  POSTGRES_DB: 'sandicts',
   POSTGRES_HOST: 'localhost',
-  POSTGRES_PASSWORD: 'no-prumo',
+  POSTGRES_PASSWORD: 'sandicts',
   POSTGRES_PORT: '5432',
   POSTGRES_USER: 'postgres',
 };

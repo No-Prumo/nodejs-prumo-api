@@ -30,7 +30,7 @@ const loggerSettings = {
 
 const observabilitySettings = {
   enabled: false,
-  serviceName: 'nodejs-prumo-api',
+  serviceName: 'sandicts-api',
 } as const;
 
 function getPinoHttpOptions(): Options {
@@ -154,7 +154,7 @@ describe('pino-http integration', () => {
       response: {
         statusCode: 200,
       },
-      service: 'nodejs-prumo-api',
+      service: 'sandicts-api',
       spanId: '00f067aa0ba902b7',
       traceId: '4bf92f3577b34da6a3ce929d0e0e4736',
       version: '1.2.3',

@@ -215,18 +215,18 @@ APP_HOST=0.0.0.0
 APP_GLOBAL_PREFIX=
 
 POSTGRES_USER=postgres
-POSTGRES_PASSWORD=no-prumo
-POSTGRES_DB=no-prumo
+POSTGRES_PASSWORD=sandicts
+POSTGRES_DB=sandicts
 POSTGRES_HOST=localhost
 POSTGRES_PORT=5432
-DATABASE_URL=postgresql://postgres:no-prumo@localhost:5432/no-prumo
+DATABASE_URL=postgresql://postgres:sandicts@localhost:5432/sandicts
 
 LOG_LEVEL=debug
 LOG_PRETTY=true
 DOCS_ENABLED=true
 DOCS_PATH=docs
 OBSERVABILITY_ENABLED=false
-OBSERVABILITY_SERVICE_NAME=nodejs-prumo-api
+OBSERVABILITY_SERVICE_NAME=sandicts-api
 ```
 
 Notes:

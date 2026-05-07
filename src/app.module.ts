@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
+import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { LoggerModule } from 'nestjs-pino';
 import { createZodValidationPipe, ZodSerializerInterceptor } from 'nestjs-zod';
 import { AppController } from './app.controller';
@@ -16,6 +16,7 @@ import {
   type ObservabilityConfig,
   validateEnv,
 } from './config';
+import { GlobalExceptionFilter } from './filters/global-exception.filter';
 import { createPinoLoggerOptions } from './logging/pino-logger.factory';
 
 const AppZodValidationPipe = createZodValidationPipe({
@@ -62,6 +63,10 @@ const AppZodValidationPipe = createZodValidationPipe({
     {
       provide: APP_INTERCEPTOR,
       useClass: ZodSerializerInterceptor,
+    },
+    {
+      provide: APP_FILTER,
+      useClass: GlobalExceptionFilter,
     },
   ],
 })

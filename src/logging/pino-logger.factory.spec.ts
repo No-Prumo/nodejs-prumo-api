@@ -26,7 +26,7 @@ const loggerSettings = {
 
 const observabilitySettings = {
   enabled: false,
-  serviceName: 'nodejs-prumo-api',
+  serviceName: 'sandicts-api',
 } as const;
 
 describe('createPinoLoggerOptions', () => {

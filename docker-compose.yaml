@@ -1,7 +1,7 @@
 services:
   postgres:
     image: bitnami/postgresql:16
-    container_name: no-prumo-postgres
+    container_name: sandicts-postgres
     restart: unless-stopped
     env_file:
       - .env
@@ -21,4 +21,4 @@ services:
 
 volumes:
   postgres_data:
-    name: no-prumo-postgres-data
+    name: sandicts-postgres-data
