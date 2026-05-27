@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Jira PR Commit Writer'
+  short_description: 'Generate Jira task drafts, PR descriptions, and commit messages.'
+  default_prompt: 'Generate the Jira task draft, pull request description, and commit message for the current Sandicts API change.'

@@ -71,6 +71,10 @@ Partners can:
 - create tournaments and events
 - manage basic financial reports
 
+### Admin
+
+Admins are internal Sandicts operators and should be introduced only when a real operational flow requires manual review, support, moderation, or controlled status changes.
+
 ## Main Product Areas
 
 ### Discovery
@@ -168,4 +172,3 @@ Avoid early overengineering:
 - advanced rankings before real usage exists
 - blockchain-first architecture for non-blockchain flows
 - multi-service decomposition before domain boundaries are proven
-

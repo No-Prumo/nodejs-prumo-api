@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Sandicts Business Rules'
+  short_description: 'Maintain Sandicts business rules from repo-owned docs.'
+  default_prompt: 'Use the Sandicts business rules skill to update or review backend/product rules from the repository docs.'

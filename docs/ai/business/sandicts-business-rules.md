@@ -44,6 +44,7 @@ Recommended first-pass domain vocabulary:
 - `Tournament`: partner-created competition or event
 - `Payment`: system record of money status for reservations, memberships, and tournaments
 - `Membership`: recurring relationship between player and partner or school
+- `Achievement`: optional future reward/status record for player participation, progression, or tournaments
 
 ## Availability And Reservations
 
@@ -183,4 +184,3 @@ Rules:
 - core booking, payment, and tournament logic must work without blockchain
 - achievements can be modeled internally first, then minted or mirrored later
 - avoid storing irreversible blockchain assumptions in core reservation tables
-
