@@ -1,0 +1,4 @@
+interface:
+  display_name: 'Sandicts Project Context'
+  short_description: 'Use the Sandicts API project AI context.'
+  default_prompt: 'Use the Sandicts project context before changing architecture, API contracts, logging, config, CI/CD, or business rules.'
