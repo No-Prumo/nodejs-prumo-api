@@ -47,6 +47,42 @@ Each product capability lives in a Nest feature module. The module can contain i
 
 This keeps deployment simple now and preserves the option to extract a module later if the domain proves it needs independent scaling, ownership, or release cadence.
 
+## Source Layout
+
+Default top-level layout:
+
+```txt
+src/
+  bootstrap/
+  config/
+  generated/
+  infra/
+  modules/
+  shared/
+
+prisma/
+prisma.config.ts
+```
+
+Responsibilities:
+
+- `bootstrap`: create and configure the Nest application instance
+- `config`: validate env and expose typed configuration domains
+- `generated`: generated code such as the Prisma client; generated files are not committed
+- `infra`: shared platform modules such as HTTP platform setup, logging, Prisma, cache, queues, or external SDK clients
+- `modules`: product capability modules such as accounts, establishments, reservations, billing, and finance
+- `prisma`: Prisma schema and future migrations
+- `shared`: framework-neutral primitives and cross-cutting application types
+
+Rules:
+
+- keep product modules out of `infra`
+- keep feature-specific adapters inside their owning product module
+- use `infra` for shared platform concerns only
+- keep the shared Prisma client lifecycle in `src/infra/prisma`
+- keep Prisma repository implementations inside the owning product module
+- do not create empty feature folders before a real feature needs them
+
 ## Dependency Direction
 
 Default dependency direction:

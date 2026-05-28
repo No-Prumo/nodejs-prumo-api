@@ -57,6 +57,16 @@ Rules:
 
 ## Adapter Location
 
+Shared Prisma infrastructure lives in:
+
+```txt
+src/infra/prisma/
+  prisma.module.ts
+  prisma.service.ts
+```
+
+The shared module owns the Prisma client lifecycle and database adapter wiring.
+
 Place Prisma implementation in infrastructure:
 
 ```txt
@@ -124,11 +134,13 @@ Keep Prisma client and Prisma-generated types out of controllers and use cases w
 Acceptable:
 
 - Prisma types inside Prisma repositories
+- injecting `PrismaService` into Prisma repository adapters
 - internal mapping from Prisma records to application records
 - Prisma unique constraints as final protection against race conditions
 
 Avoid:
 
+- injecting `PrismaService` into controllers or use cases
 - returning raw Prisma records with sensitive fields to controllers
 - requiring use cases to pass Prisma `where` objects
 - leaking `Prisma.TransactionClient` into use case signatures

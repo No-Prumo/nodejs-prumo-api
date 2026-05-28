@@ -25,6 +25,13 @@ Default language:
 - Follow the repository PR template exactly for PR descriptions.
 - Follow the Jira task template in this skill exactly for Jira descriptions.
 
+Copy/paste formatting:
+
+- When the user asks for PR text, a PR description, a commit message, a Jira description, or any similar paste-ready artifact, return the requested artifact inside a fenced code block.
+- Use `md` for PR and Jira descriptions, and `text` for commit messages.
+- If returning multiple artifacts, keep the section labels outside the fences and put each artifact in its own fenced block.
+- Do not add explanatory prose inside the fenced artifact unless it belongs in the artifact itself.
+
 ## Jira Task
 
 Do not claim that a Jira issue was created unless a Jira connector/tool actually created it. When no Jira key exists, provide a draft that can be pasted into Jira.

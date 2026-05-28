@@ -4,11 +4,15 @@ export {
   resolveAppEnvironment,
   type AppEnvironment,
   type NodeEnvironment,
-} from './app-environment';
-export { appConfig, buildAppConfig, type AppConfig } from './app.config';
-export { databaseConfig, type DatabaseConfig } from './database.config';
-export { docsConfig, type DocsConfig } from './docs.config';
-export { envSchema, getEnv, validateEnv, type Env } from './env.schema';
+} from './app/app-environment';
+export { appConfig, buildAppConfig, type AppConfig } from './app/app.config';
+export { ConfigurationModule } from './configuration.module';
+export {
+  databaseConfig,
+  type DatabaseConfig,
+} from './database/database.config';
+export { docsConfig, type DocsConfig } from './docs/docs.config';
+export { envSchema, getEnv, validateEnv, type Env } from './env/env.schema';
 export {
   getDefaultLogLevel,
   loggerLevelInputValues,
@@ -16,13 +20,13 @@ export {
   pinoLevelValues,
   type LoggerLevelInput,
   type PinoLogLevel,
-} from './logger-level';
+} from './logger/logger-level';
 export {
   buildLoggerConfig,
   loggerConfig,
   type LoggerConfig,
-} from './logger.config';
+} from './logger/logger.config';
 export {
   observabilityConfig,
   type ObservabilityConfig,
-} from './observability.config';
+} from './observability/observability.config';

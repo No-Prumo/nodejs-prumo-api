@@ -1,5 +1,5 @@
 import { buildAppConfig } from './app.config';
-import { validateEnv } from './env.schema';
+import { validateEnv } from '../env/env.schema';
 
 const baseEnv = {
   DATABASE_URL: 'postgresql://postgres:sandicts@localhost:5432/sandicts',

@@ -1,7 +1,10 @@
 import { z } from 'zod';
-import { appEnvironmentValues, nodeEnvironmentValues } from './app-environment';
-import { loggerLevelInputValues } from './logger-level';
-import { getPackageMetadata } from './package-metadata';
+import {
+  appEnvironmentValues,
+  nodeEnvironmentValues,
+} from '../app/app-environment';
+import { getPackageMetadata } from '../app/package-metadata';
+import { loggerLevelInputValues } from '../logger/logger-level';
 
 const packageMetadata = getPackageMetadata();
 

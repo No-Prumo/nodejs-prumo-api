@@ -7,7 +7,7 @@ import type { Request, Response } from 'express';
 import { PinoLogger } from 'nestjs-pino';
 import { ZodSerializationException, ZodValidationException } from 'nestjs-zod';
 import { z } from 'zod';
-import { AppError } from '../shared/errors/app-error';
+import { AppError } from '../../../shared/errors/app-error';
 import { GlobalExceptionFilter } from './global-exception.filter';
 
 type MockHttpResponse = {

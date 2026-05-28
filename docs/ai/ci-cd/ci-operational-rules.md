@@ -33,6 +33,10 @@ Mechanical facts from repository workflows. Normative policy lives in `ci-govern
 | Node (jobs)     | `22`                          |
 | Package manager | `npm` (`npm ci`)              |
 
+### Workflow environment
+
+The workflow defines `DATABASE_URL` with a non-secret local PostgreSQL URL so Prisma client generation can run during typecheck, tests, and build without connecting to a database.
+
 ### PR event branches (`on.pull_request.branches`)
 
 - `developer`
@@ -60,6 +64,10 @@ Dependency order: `quality`, `test`, `build`, and `security` each `needs: govern
 | Test     | Tests     | `npm run test:ci`                  |
 | Build    | Build     | `npm run build`                    |
 | Security | Audit     | `npm audit --audit-level=moderate` |
+
+Notes:
+
+- `npm run lint:ci`, `npm run typecheck`, `npm run test:ci`, and `npm run build` each run `npm run prisma:generate` first.
 
 ## Regex and branch logic (Governance job)
 

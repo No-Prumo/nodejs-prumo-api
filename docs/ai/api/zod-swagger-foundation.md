@@ -44,7 +44,7 @@ This project uses one contract source for HTTP endpoints:
 
 ## Global setup
 
-### `src/app.module.ts`
+### `src/infra/http/http-platform.module.ts`
 
 Global validation and response serialization are enabled with:
 
@@ -56,11 +56,11 @@ Why `strictSchemaDeclaration: true` matters:
 - it prevents accidental unvalidated controller inputs
 - if a controller parameter is declared without a nestjs-zod DTO, the app surfaces that mistake immediately
 
-### `src/main.ts`
+### `src/bootstrap/setup-docs.ts`
 
 Swagger is bootstrapped with:
 
-- a local `setupDocs()` helper
+- a focused `setupDocs()` helper
 - `SwaggerModule.createDocument(...)`
 - `cleanupOpenApiDoc(...)`
 
@@ -68,9 +68,9 @@ Swagger is bootstrapped with:
 
 Current bootstrap decision:
 
-- keep Swagger setup extracted as a local helper inside `main.ts`
-- do not create `src/bootstrap/setup-docs.ts` yet
-- promote bootstrap helpers to dedicated files only after multiple global platform concerns exist
+- keep Swagger setup outside `main.ts`
+- keep Swagger setup as a bootstrap helper, not a Nest module, because it configures the created app instance
+- keep global Zod validation and serialization in `HttpPlatformModule`, because they are dependency-injected global providers
 
 ## DTO pattern
 

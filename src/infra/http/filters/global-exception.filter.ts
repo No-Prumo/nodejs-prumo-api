@@ -12,8 +12,11 @@ import {
   ZodSerializationException,
   ZodValidationException,
 } from 'nestjs-zod';
-import { AppError } from '../shared/errors/app-error';
-import { type ErrorCode, isErrorCode } from '../shared/errors/error-codes';
+import { AppError } from '../../../shared/errors/app-error';
+import {
+  type ErrorCode,
+  isErrorCode,
+} from '../../../shared/errors/error-codes';
 
 type ErrorResponseBody = {
   code: ErrorCode;
