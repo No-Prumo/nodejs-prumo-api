@@ -1,7 +1,7 @@
 import { ConfigType, registerAs } from '@nestjs/config';
 import { resolveAppEnvironment } from './app-environment';
-import type { Env } from './env.schema';
-import { getEnv } from './env.schema';
+import type { Env } from '../env/env.schema';
+import { getEnv } from '../env/env.schema';
 import { getPackageMetadata } from './package-metadata';
 
 const packageMetadata = getPackageMetadata();

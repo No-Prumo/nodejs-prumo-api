@@ -31,6 +31,11 @@ This project uses:
 - one normalized HTTP error payload
 - `nestjs-pino` as the primary logging stack
 
+Implementation location:
+
+- `src/infra/http/filters/global-exception.filter.ts`
+- global registration through `src/infra/http/http-platform.module.ts`
+
 ## Design goals
 
 - keep domain and application free from `HttpException`

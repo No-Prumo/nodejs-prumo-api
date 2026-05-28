@@ -59,6 +59,12 @@ The Nest app must bootstrap with:
 - `app.useLogger(app.get(Logger))`
 - `LoggerErrorInterceptor` as the official `nestjs-pino` error enrichment hook
 
+Module wiring:
+
+- `src/infra/logging/logging.module.ts` owns `LoggerModule.forRootAsync(...)`
+- `src/infra/logging/pino-logger.factory.ts` owns the Pino option factory
+- `src/bootstrap/setup-logger.ts` owns the created-app logger hookup
+
 Reason:
 
 - Nest internal logs and application logs go through the same logger

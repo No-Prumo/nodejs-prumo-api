@@ -1,7 +1,7 @@
 import { ConfigType, registerAs } from '@nestjs/config';
-import { resolveAppEnvironment } from './app-environment';
-import { getEnv } from './env.schema';
-import type { Env } from './env.schema';
+import { resolveAppEnvironment } from '../app/app-environment';
+import { getEnv } from '../env/env.schema';
+import type { Env } from '../env/env.schema';
 import { getDefaultLogLevel, normalizeLogLevel } from './logger-level';
 
 export function buildLoggerConfig(env: Env) {

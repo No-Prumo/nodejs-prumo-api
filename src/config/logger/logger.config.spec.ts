@@ -1,4 +1,4 @@
-import { validateEnv } from './env.schema';
+import { validateEnv } from '../env/env.schema';
 import { buildLoggerConfig } from './logger.config';
 
 const baseEnv = {

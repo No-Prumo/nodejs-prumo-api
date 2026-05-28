@@ -46,19 +46,58 @@ If future code conflicts with this document, prefer this document unless the use
 
 ```text
 src/
+  bootstrap/
+    bootstrap.ts
+    setup-docs.ts
+    setup-global-prefix.ts
+    setup-logger.ts
+    setup-shutdown-hooks.ts
+
   config/
     index.ts
-    env.schema.ts
-    app.config.ts
-    database.config.ts
-    logger.config.ts
-    docs.config.ts
-    observability.config.ts
+    configuration.module.ts
+    app/
+      app.config.ts
+      app-environment.ts
+      package-metadata.ts
+    database/
+      database.config.ts
+    docs/
+      docs.config.ts
+    env/
+      env.schema.ts
+    logger/
+      logger.config.ts
+      logger-level.ts
+    observability/
+      observability.config.ts
+
+  infra/
+    prisma/
+      prisma.module.ts
+      prisma.service.ts
+
+prisma/
+  schema.prisma
+
+prisma.config.ts
 ```
 
 ## Responsibilities by file
 
-### `src/config/env.schema.ts`
+### `src/config/index.ts`
+
+Owns:
+
+- public exports for config domains and config types
+- hiding the internal config folder layout from application consumers
+
+Rules:
+
+- modules outside `src/config` should prefer importing from `../config` or `../../config`
+- do not make feature modules import from deep config paths unless there is a clear reason
+
+### `src/config/env/env.schema.ts`
 
 Owns:
 
@@ -74,7 +113,7 @@ Rules:
 - every new env var must be added here first
 - defaults should live here, not scattered across consumers
 
-### `src/config/*.config.ts`
+### `src/config/<domain>/*.config.ts`
 
 Owns:
 
@@ -87,7 +126,15 @@ Rules:
 - do not add framework-specific logic here beyond config mapping
 - do not couple to concrete adapters prematurely
 
-### `src/app.module.ts`
+Current domain folders:
+
+- `app`: runtime app settings, app environment resolution, package metadata
+- `database`: database connection metadata without ORM coupling
+- `docs`: OpenAPI/docs toggles and pathing
+- `logger`: neutral logging settings and level normalization
+- `observability`: neutral observability toggles and service identity
+
+### `src/config/configuration.module.ts`
 
 Owns:
 
@@ -102,24 +149,61 @@ Current setup:
 - `expandVariables: true`
 - `validate: validateEnv`
 
-### `src/main.ts`
+### `prisma.config.ts`
+
+Owns:
+
+- Prisma CLI configuration
+- Prisma schema path
+- Prisma migrations path
+- loading `.env` with expansion support for CLI commands
+
+Rules:
+
+- application runtime must still consume database settings through `src/config`
+- `prisma.config.ts` exists for Prisma CLI commands only
+- do not duplicate application config parsing in Prisma adapters
+
+### `src/app.module.ts`
+
+Owns:
+
+- root Nest module composition
+- importing `ConfigurationModule`
+- importing platform infrastructure modules such as logging and HTTP platform setup
+- importing product feature modules as they are created
+
+Rules:
+
+- do not place detailed logger, Swagger, validation, or persistence setup here
+- keep product modules under `src/modules/`, not under `src/infra/`
+- keep platform infrastructure modules small and focused
+
+### `src/bootstrap/bootstrap.ts`
 
 Owns:
 
 - bootstrap consumption of typed `app` config
 - `host`, `port`, and optional `globalPrefix`
-- orchestration of small bootstrap helpers for platform concerns such as docs
+- orchestration of bootstrap helpers for platform concerns such as logger, docs, global prefix, and shutdown hooks
 
 Rule:
 
 - never read `process.env` here
-- keep `main.ts` as the orchestration layer, not as the place for detailed integration logic
+- keep bootstrap orchestration here, not in `main.ts`
+- keep detailed setup in focused helper files under `src/bootstrap/`
+
+### `src/main.ts`
+
+Owns:
+
+- importing and invoking `bootstrap()`
 
 Bootstrap organization rule:
 
-- while there are only one or two small platform concerns, prefer local helper functions inside `main.ts`
-- move helpers to `src/bootstrap/` only when bootstrap starts accumulating multiple global concerns such as CORS, versioning, helmet, filters, interceptors, logger, or observability
-- avoid creating several bootstrap files too early
+- `main.ts` stays minimal
+- bootstrap helpers live in `src/bootstrap/` once global platform concerns exist
+- Nest modules are used only for concerns that participate in dependency injection
 
 ## Supported domains
 
@@ -149,7 +233,7 @@ Current shape:
 
 Purpose:
 
-- database connection metadata without coupling to any ORM
+- database connection metadata consumed by infrastructure adapters
 
 Current shape:
 
@@ -162,8 +246,9 @@ Current shape:
 
 Guideline:
 
-- ORM modules may consume this domain later
-- ORM-specific options should not be added here unless they are truly cross-cutting
+- `PrismaService` consumes this domain for the PostgreSQL connection URL
+- keep this domain free of Prisma-specific options unless they are truly cross-cutting
+- ORM-specific behavior belongs in `src/infra/prisma`
 
 ### `logger`
 
@@ -277,13 +362,13 @@ Rules:
 - do not read `process.env` outside `src/config`
 - do not create one provider per env variable
 - do not add a custom config service wrapper unless there is a real repeated need
-- do not couple `database` config to Prisma, TypeORM, Drizzle, or another ORM yet
+- do not add Prisma-specific behavior to `database` config
 - do not spread defaults across modules
 
 ## How to add a new env var
 
-1. Add the variable to `src/config/env.schema.ts`
-2. Choose the correct domain config file and expose it there
+1. Add the variable to `src/config/env/env.schema.ts`
+2. Choose the correct domain folder and expose it through that domain config file
 3. Export the domain/type from `src/config/index.ts` if needed
 4. Consume the typed domain in the module/service that needs it
 5. Add or update tests if parsing, coercion, or required-ness changed
@@ -293,19 +378,20 @@ Rules:
 
 Current coverage:
 
-- unit tests for env parsing and validation in `src/config/env.schema.spec.ts`
+- unit tests for env parsing and validation in `src/config/env/env.schema.spec.ts`
 
 Why this is enough for now:
 
 - the critical risk is invalid env and wrong coercion
 - domain config files are thin mappings over validated env
-- no integration-specific adapters exist yet
+- Prisma client generation and application build validate the shared Prisma adapter wiring
 
 Add more tests when:
 
 - a domain starts deriving non-trivial values
 - config begins driving conditional module wiring
 - environment-specific behavior becomes more complex
+- Prisma-specific runtime options are added beyond the database URL
 
 ## Extension guidance
 
@@ -325,7 +411,7 @@ Good reasons to add a new domain:
 Bad reasons to add a new domain:
 
 - a single one-off variable with no real grouping yet
-- an ORM-specific config before ORM adoption
+- ORM-specific options that only one infrastructure adapter needs
 
 ## Invariants
 
@@ -333,6 +419,6 @@ These rules should continue to hold:
 
 - `ConfigModule` stays global
 - env validation happens at startup
-- `process.env` access stays restricted to `src/config`
+- application runtime `process.env` access stays restricted to `src/config`
 - config remains grouped by small domains
-- `database` remains persistence-tool-agnostic until a real persistence decision exists
+- `database` remains Prisma-option-neutral; Prisma-specific behavior belongs in `src/infra/prisma`

@@ -6,7 +6,11 @@ import type {
 } from 'node:http';
 import type { Params } from 'nestjs-pino';
 import { stdSerializers, stdTimeFunctions } from 'pino';
-import type { AppConfig, LoggerConfig, ObservabilityConfig } from '../config';
+import type {
+  AppConfig,
+  LoggerConfig,
+  ObservabilityConfig,
+} from '../../config';
 
 const REQUEST_ID_HEADER = 'x-request-id';
 const CORRELATION_ID_HEADER = 'x-correlation-id';

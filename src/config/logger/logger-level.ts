@@ -1,4 +1,4 @@
-import type { AppEnvironment } from './app-environment';
+import type { AppEnvironment } from '../app/app-environment';
 
 export const loggerLevelInputValues = [
   'silent',
