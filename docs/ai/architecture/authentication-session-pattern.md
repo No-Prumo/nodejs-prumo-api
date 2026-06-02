@@ -41,16 +41,16 @@ The goal is a secure but practical authentication model:
 
 ## Recommended Auth Methods
 
-Use these three methods for MVP:
+Use these two methods for the passwordless web MVP:
 
-- email and password
 - email magic link
 - Google sign-in
 
-Do not add SMS login, Facebook, Apple, passkeys, or MFA in the first implementation unless product direction changes.
+Do not add password login, SMS login, Facebook, Apple, passkeys, or MFA in the first implementation unless product direction changes.
 
 Future candidates:
 
+- email and password if product direction changes after the passwordless MVP
 - Apple sign-in when the mobile app enters the roadmap
 - passkeys when the product has enough adoption to justify the UX and support work
 - MFA for partner admins and financial actions
@@ -62,7 +62,6 @@ Avoid SMS OTP as a primary method. It adds cost, operational complexity, carrier
 All sign-in methods must create the same internal session.
 
 ```txt
-password sign-in
 magic link sign-in
 Google sign-in
   -> resolve or create account
@@ -78,10 +77,11 @@ Do not create separate session logic per auth method.
 Recommended conceptual model:
 
 - `Account`: login identity shared by player, partner user, or staff user
-- `Credential`: password credential for an account
 - `ExternalIdentity`: provider identity such as Google
 - `AuthSession`: refresh-token-backed internal session
 - `MagicLinkChallenge`: one-time email login challenge
+
+Do not add a password credential table for the passwordless web MVP. Add `Credential` later only if password login becomes part of the product direction.
 
 Domain-specific profiles should remain separate:
 
@@ -191,9 +191,11 @@ Add explicit CSRF token protection when:
 - cookies are sent with `SameSite=None`
 - admin or financial workflows become sensitive enough to require defense in depth
 
-## Password Sign-Up
+## Future Password Sign-Up
 
-Endpoint shape:
+Password sign-up is not part of the passwordless web MVP.
+
+Future endpoint shape if product direction changes:
 
 ```txt
 POST /auth/password/sign-up
@@ -223,12 +225,14 @@ Response:
 
 Email verification:
 
-- for MVP, magic link sign-in can double as proof that the user controls the email
+- magic link sign-in can double as proof that the user controls the email
 - if password sign-up allows immediate access before email verification, restrict sensitive flows until verified
 
-## Password Sign-In
+## Future Password Sign-In
 
-Endpoint shape:
+Password sign-in is not part of the passwordless web MVP.
+
+Future endpoint shape if product direction changes:
 
 ```txt
 POST /auth/password/sign-in
@@ -409,8 +413,6 @@ Avoid provider-specific messages in public responses.
 Recommended first implementation set:
 
 ```txt
-POST /auth/password/sign-up
-POST /auth/password/sign-in
 POST /auth/magic-link/request
 POST /auth/magic-link/consume
 POST /auth/google/sign-in
@@ -424,6 +426,7 @@ GET  /auth/me
 
 Do not add now:
 
+- password sign-up or password sign-in for the passwordless web MVP
 - SMS login
 - Facebook login
 - Apple login before mobile need

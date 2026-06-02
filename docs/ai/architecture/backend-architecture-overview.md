@@ -61,6 +61,7 @@ src/
   shared/
 
 prisma/
+  models/
 prisma.config.ts
 ```
 
@@ -71,7 +72,7 @@ Responsibilities:
 - `generated`: generated code such as the Prisma client; generated files are not committed
 - `infra`: shared platform modules such as HTTP platform setup, logging, Prisma, cache, queues, or external SDK clients
 - `modules`: product capability modules such as accounts, establishments, reservations, billing, and finance
-- `prisma`: Prisma schema and future migrations
+- `prisma`: Prisma schema configuration, domain-grouped model files, and future migrations
 - `shared`: framework-neutral primitives and cross-cutting application types
 
 Rules:
@@ -80,6 +81,8 @@ Rules:
 - keep feature-specific adapters inside their owning product module
 - use `infra` for shared platform concerns only
 - keep the shared Prisma client lifecycle in `src/infra/prisma`
+- keep `prisma/schema.prisma` as the main Prisma file for generator and datasource blocks
+- group Prisma models by domain under `prisma/models/*.prisma` instead of placing every model in one large schema file
 - keep Prisma repository implementations inside the owning product module
 - do not create empty feature folders before a real feature needs them
 
