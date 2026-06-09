@@ -24,6 +24,7 @@ describe('buildLoggerConfig', () => {
     const env = validateEnv({
       ...baseEnv,
       APP_ENV: 'staging',
+      AUTH_ACCESS_TOKEN_SECRET: 'production-secret-with-enough-length',
       NODE_ENV: 'production',
     });
 
