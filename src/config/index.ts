@@ -6,7 +6,11 @@ export {
   type NodeEnvironment,
 } from './app/app-environment';
 export { appConfig, buildAppConfig, type AppConfig } from './app/app.config';
-export { ConfigurationModule } from './configuration.module';
+export {
+  authConfig,
+  buildAuthConfig,
+  type AuthConfig,
+} from './auth/auth.config';
 export {
   databaseConfig,
   type DatabaseConfig,

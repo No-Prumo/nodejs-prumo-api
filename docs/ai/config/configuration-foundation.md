@@ -96,6 +96,7 @@ Rules:
 
 - modules outside `src/config` should prefer importing from `../config` or `../../config`
 - do not make feature modules import from deep config paths unless there is a clear reason
+- do not re-export `ConfigurationModule` from this barrel; import it directly from `src/config/configuration.module.ts` so importing config types or domains does not trigger environment validation in unit tests
 
 ### `src/config/env/env.schema.ts`
 

@@ -5,6 +5,7 @@ import { ConfigurationModule } from './config/configuration.module';
 import { HttpPlatformModule } from './infra/http/http-platform.module';
 import { LoggingModule } from './infra/logging/logging.module';
 import { PrismaModule } from './infra/prisma/prisma.module';
+import { AuthModule } from './modules/auth/auth.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { PrismaModule } from './infra/prisma/prisma.module';
     LoggingModule,
     HttpPlatformModule,
     PrismaModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],

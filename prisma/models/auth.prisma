@@ -2,14 +2,36 @@ enum AuthProvider {
   GOOGLE
 }
 
+enum AccountStatus {
+  ACTIVE
+  BLOCKED
+  DISABLED
+}
+
+enum AuthSessionStatus {
+  ACTIVE
+  REVOKED
+}
+
+enum AuthSessionCreationSource {
+  MAGIC_LINK
+  GOOGLE
+  PASSWORD
+}
+
 model Account {
-  id        String   @id @default(uuid()) @db.Uuid
-  email     String   @unique
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  id              String        @id @default(uuid()) @db.Uuid
+  email           String        @unique
+  normalizedEmail String        @unique @map("normalized_email")
+  displayName     String?       @map("display_name")
+  status          AccountStatus @default(ACTIVE)
+  createdAt       DateTime      @default(now()) @map("created_at")
+  updatedAt       DateTime      @updatedAt @map("updated_at")
 
   externalIdentities ExternalIdentity[]
-  sessions           AuthSession[]
+  authSessions       AuthSession[]
+
+  @@index([status])
 
   @@map("accounts")
 }
@@ -29,19 +51,27 @@ model ExternalIdentity {
 }
 
 model AuthSession {
-  id               String    @id @default(uuid()) @db.Uuid
-  accountId        String    @map("account_id") @db.Uuid
-  refreshTokenHash String    @unique @map("refresh_token_hash")
-  expiresAt        DateTime  @map("expires_at")
-  revokedAt        DateTime? @map("revoked_at")
-  createdAt        DateTime  @default(now()) @map("created_at")
-  updatedAt        DateTime  @updatedAt @map("updated_at")
+  id                   String                    @id @default(uuid()) @db.Uuid
+  accountId            String                    @map("account_id") @db.Uuid
+  refreshTokenHash     String                    @unique @map("refresh_token_hash")
+  refreshTokenFamilyId String                    @map("refresh_token_family_id")
+  creationSource       AuthSessionCreationSource @map("creation_source")
+  status               AuthSessionStatus         @default(ACTIVE)
+  userAgent            String?                   @map("user_agent")
+  ipAddress            String?                   @map("ip_address")
+  createdAt            DateTime                  @default(now()) @map("created_at")
+  updatedAt            DateTime                  @updatedAt @map("updated_at")
+  lastUsedAt           DateTime?                 @map("last_used_at")
+  idleExpiresAt        DateTime                  @map("idle_expires_at")
+  absoluteExpiresAt    DateTime                  @map("absolute_expires_at")
+  revokedAt            DateTime?                 @map("revoked_at")
 
   account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
 
-  @@index([accountId])
-  @@index([accountId, revokedAt, expiresAt])
-  @@index([expiresAt])
+  @@index([accountId, status])
+  @@index([refreshTokenFamilyId])
+  @@index([idleExpiresAt])
+  @@index([absoluteExpiresAt])
   @@map("auth_sessions")
 }
 
