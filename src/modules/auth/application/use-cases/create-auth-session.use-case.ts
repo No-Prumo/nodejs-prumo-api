@@ -1,5 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { authConfig, type AuthConfig } from '../../../../config';
+import {
+  authConfig,
+  type AuthConfig,
+} from '../../../../config/auth/auth.config';
 import { AppError } from '../../../../shared/errors/app-error';
 import type { AuthSessionCreationSource } from '../../domain/auth-session-creation-source';
 import {

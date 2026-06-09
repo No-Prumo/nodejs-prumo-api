@@ -11,7 +11,6 @@ export {
   buildAuthConfig,
   type AuthConfig,
 } from './auth/auth.config';
-export { ConfigurationModule } from './configuration.module';
 export {
   databaseConfig,
   type DatabaseConfig,

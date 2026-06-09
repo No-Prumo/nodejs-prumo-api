@@ -1,6 +1,9 @@
 import { createHmac, randomBytes, randomUUID } from 'node:crypto';
 import { Inject, Injectable } from '@nestjs/common';
-import { authConfig, type AuthConfig } from '../../../../config';
+import {
+  authConfig,
+  type AuthConfig,
+} from '../../../../config/auth/auth.config';
 
 type JsonPrimitive = string | number | boolean | null;
 type JsonValue = JsonPrimitive | JsonValue[] | { [key: string]: JsonValue };

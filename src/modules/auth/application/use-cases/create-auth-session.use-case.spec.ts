@@ -1,4 +1,4 @@
-import { buildAuthConfig } from '../../../../config';
+import { buildAuthConfig } from '../../../../config/auth/auth.config';
 import { validateEnv } from '../../../../config/env/env.schema';
 import { InMemoryAccountsRepository } from '../../infrastructure/persistence/in-memory/in-memory-accounts.repository';
 import { InMemoryAuthSessionsRepository } from '../../infrastructure/persistence/in-memory/in-memory-auth-sessions.repository';
