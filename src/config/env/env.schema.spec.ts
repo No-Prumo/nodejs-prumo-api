@@ -25,6 +25,35 @@ describe('validateEnv', () => {
     expect(env.DOCS_ENABLED).toBe(true);
     expect(env.APP_HOST).toBe('0.0.0.0');
     expect(env.DOCS_PATH).toBe('docs');
+    expect(env.AUTH_ACCESS_TOKEN_TTL_SECONDS).toBe(900);
+    expect(env.AUTH_REFRESH_TOKEN_COOKIE_PATH).toBe('/auth/refresh');
+  });
+
+  it('requires an auth access token secret in production', () => {
+    expect(() =>
+      validateEnv({
+        DATABASE_URL: 'postgresql://postgres:sandicts@localhost:5432/sandicts',
+        NODE_ENV: 'production',
+        POSTGRES_DB: 'sandicts',
+        POSTGRES_HOST: 'localhost',
+        POSTGRES_PASSWORD: 'sandicts',
+        POSTGRES_PORT: '5432',
+        POSTGRES_USER: 'postgres',
+      }),
+    ).toThrow('Invalid environment variables');
+
+    expect(() =>
+      validateEnv({
+        AUTH_ACCESS_TOKEN_SECRET: 'production-secret-with-enough-length',
+        DATABASE_URL: 'postgresql://postgres:sandicts@localhost:5432/sandicts',
+        NODE_ENV: 'production',
+        POSTGRES_DB: 'sandicts',
+        POSTGRES_HOST: 'localhost',
+        POSTGRES_PASSWORD: 'sandicts',
+        POSTGRES_PORT: '5432',
+        POSTGRES_USER: 'postgres',
+      }),
+    ).not.toThrow();
   });
 
   it('throws when required env vars are invalid', () => {
