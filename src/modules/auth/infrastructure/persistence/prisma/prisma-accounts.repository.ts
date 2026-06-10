@@ -50,6 +50,22 @@ class PrismaAccountsRepository implements AccountsRepository {
     return account ? this.mapAccount(account) : null;
   }
 
+  async resolveOrCreateByEmail(
+    data: CreateAccountData,
+  ): Promise<AccountRecord> {
+    const account = await this.prisma.account.upsert({
+      where: { normalizedEmail: data.normalizedEmail },
+      update: {},
+      create: {
+        email: data.email,
+        normalizedEmail: data.normalizedEmail,
+        displayName: data.displayName,
+      },
+    });
+
+    return this.mapAccount(account);
+  }
+
   private mapAccount(account: PrismaAccountRecord): AccountRecord {
     return {
       id: account.id,
