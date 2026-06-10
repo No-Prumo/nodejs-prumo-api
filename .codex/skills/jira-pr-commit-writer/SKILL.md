@@ -21,7 +21,8 @@ Always return these sections in this order unless the user asks for only one art
 
 Default language:
 
-- Use English for Jira task, PR description, and commit messages unless the user explicitly asks for another language.
+- Use English for all generated Jira titles, Jira descriptions, PR titles, PR descriptions, commit messages, release notes, and delivery summaries, even when the conversation is in another language.
+- Only use another language when the user explicitly requests that language in the same message.
 - Follow the repository PR template exactly for PR descriptions.
 - Follow the Jira task template in this skill exactly for Jira descriptions.
 
