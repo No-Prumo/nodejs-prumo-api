@@ -1,4 +1,4 @@
-import type { AuthConfig } from '../../../../config/auth/auth.config';
+import type { AuthConfig } from '../../../../../config';
 import { TokenService } from './token.service';
 
 const authSettings = {

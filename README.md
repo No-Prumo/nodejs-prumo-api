@@ -73,10 +73,12 @@ Implemented:
 - Prisma 7 setup with domain-grouped schema files
 - generated Prisma Client under `src/generated/prisma`
 - global HTTP platform module with Zod validation and response serialization
+- global HTTP rate limiting with stricter magic link endpoint throttles
 - Swagger/OpenAPI generated from Zod-backed DTOs
 - global exception filter with normalized public error responses
 - structured logging with request correlation
 - authentication/session domain foundation
+- public email magic link request and consume controllers
 - unit and integration coverage for configuration, logging, error handling,
   refresh token hashing, access token issuing, and session creation
 - a complete repository README and README maintenance workflow
@@ -84,12 +86,11 @@ Implemented:
 Not implemented yet:
 
 - reservation, partner, court, match, tournament, payment, and finance modules
-- public authentication HTTP controllers
+- Google sign-in, refresh, sign-out, sign-out-all, and auth/me endpoints
 - complete product API surface
 - E2E test suite
 
-Current public routes are a health/status endpoint and a sample Zod-backed
-contract endpoint used to prove the HTTP foundation.
+Current public routes are the initial email magic link authentication endpoints.
 
 ## Tech Stack
 
@@ -100,6 +101,7 @@ Runtime and framework:
 - NestJS 11
 - TypeScript
 - Express platform adapter through NestJS
+- `@nestjs/throttler` for HTTP rate limiting
 
 Data:
 
@@ -191,6 +193,7 @@ OBSERVABILITY_SERVICE_NAME=sandicts-api
 
 AUTH_ACCESS_TOKEN_SECRET=dev-only-auth-secret-minimum-32-chars-change-me
 AUTH_ACCESS_TOKEN_TTL_SECONDS=900
+AUTH_MAGIC_LINK_TTL_SECONDS=900
 AUTH_REFRESH_TOKEN_IDLE_TTL_SECONDS=1209600
 AUTH_REFRESH_TOKEN_ABSOLUTE_TTL_SECONDS=2592000
 AUTH_REFRESH_TOKEN_COOKIE_NAME=sandicts_refresh_token
@@ -249,14 +252,16 @@ If `APP_GLOBAL_PREFIX` is set, API routes use that prefix.
 ### 7. Smoke Test The API
 
 ```bash
-curl http://localhost:3000/
+curl -X POST "http://localhost:3000/auth/magic-link/request" \
+  -H "Content-Type: application/json" \
+  -d '{"email":"player@example.com"}'
 ```
 
 Expected response:
 
 ```json
 {
-  "message": "Hello World!"
+  "message": "If the email can sign in, a magic link will be sent."
 }
 ```
 
@@ -331,6 +336,7 @@ Default log levels:
 | --- | --- | --- | --- |
 | `AUTH_ACCESS_TOKEN_SECRET` | Required in production | local development fallback | HMAC secret used to sign access tokens. Must be at least 32 characters when provided. |
 | `AUTH_ACCESS_TOKEN_TTL_SECONDS` | No | `900` | Access token lifetime. |
+| `AUTH_MAGIC_LINK_TTL_SECONDS` | No | `900` | Magic link token lifetime. |
 | `AUTH_REFRESH_TOKEN_IDLE_TTL_SECONDS` | No | `1209600` | Refresh token idle lifetime, 14 days by default. |
 | `AUTH_REFRESH_TOKEN_ABSOLUTE_TTL_SECONDS` | No | `2592000` | Refresh token absolute lifetime, 30 days by default. |
 | `AUTH_REFRESH_TOKEN_COOKIE_NAME` | No | `sandicts_refresh_token` | Refresh token cookie name. |
@@ -489,6 +495,7 @@ Global HTTP setup lives in:
 Current global HTTP providers:
 
 - `APP_PIPE` using `createZodValidationPipe({ strictSchemaDeclaration: true })`
+- `APP_GUARD` using `ThrottlerGuard`
 - `APP_INTERCEPTOR` using `ZodSerializerInterceptor`
 - `APP_FILTER` using `GlobalExceptionFilter`
 
@@ -511,54 +518,69 @@ const CreateThingSchema = z
   })
   .meta({ id: 'CreateThing' });
 
-export class CreateThingDto extends createZodDto(CreateThingSchema) {}
+class CreateThingDto extends createZodDto(CreateThingSchema) {}
+
+export { CreateThingDto, CreateThingSchema };
 ```
 
 ## Current Endpoints
 
-### `GET /`
+### `POST /auth/magic-link/request`
 
-Simple API status endpoint.
-
-```bash
-curl http://localhost:3000/
-```
-
-Response:
-
-```json
-{
-  "message": "Hello World!"
-}
-```
-
-### `POST /tenants/:tenantId/greetings`
-
-Sample route that demonstrates Zod validation for params, query, body, and
-response serialization.
+Requests a one-time email magic link and always returns a generic response for
+valid email input.
 
 ```bash
-curl -X POST "http://localhost:3000/tenants/sandicts/greetings?style=upper" \
+curl -X POST "http://localhost:3000/auth/magic-link/request" \
   -H "Content-Type: application/json" \
-  -d '{"name":"Player","message":"ready to play"}'
+  -d '{"email":"player@example.com"}'
 ```
 
 Request contract:
 
 | Source | Field | Rules |
 | --- | --- | --- |
-| params | `tenantId` | string, trimmed, min 2, max 50 |
-| query | `style` | `normal` or `upper`, defaults to `normal` |
-| body | `name` | string, trimmed, min 2, max 80 |
-| body | `message` | optional string, trimmed, min 3, max 160 |
+| body | `email` | string, trimmed, lowercased, valid email |
 
 Response contract:
 
 ```json
 {
-  "tenantId": "sandicts",
-  "style": "upper",
-  "greeting": "READY TO PLAY"
+  "message": "If the email can sign in, a magic link will be sent."
+}
+```
+
+### `POST /auth/magic-link/consume`
+
+Consumes a valid one-time magic link token, creates the internal auth session,
+sets the refresh token cookie, and returns account/session access data.
+
+```bash
+curl -X POST "http://localhost:3000/auth/magic-link/consume" \
+  -H "Content-Type: application/json" \
+  -d '{"token":"magic-link-token-from-email"}'
+```
+
+Request contract:
+
+| Source | Field | Rules |
+| --- | --- | --- |
+| body | `token` | string, trimmed, min 32, max 256 |
+
+Response contract:
+
+```json
+{
+  "account": {
+    "id": "account-id",
+    "email": "player@example.com",
+    "displayName": null
+  },
+  "session": {
+    "id": "session-id"
+  },
+  "accessToken": "access.token.signature",
+  "accessTokenExpiresAt": "2026-01-01T00:15:00.000Z"
 }
 ```
 
@@ -633,13 +655,13 @@ Current files include:
 
 - `src/modules/auth/auth.module.ts`
 - `src/modules/auth/domain/*`
-- `src/modules/auth/application/use-cases/create-auth-session.use-case.ts`
-- `src/modules/auth/application/services/token.service.ts`
-- `src/modules/auth/application/services/refresh-token-hasher.ts`
+- `src/modules/auth/application/use-cases/<action>/*`
+- `src/modules/auth/application/services/tokens/*`
 - `src/modules/auth/application/ports/*`
 - `src/modules/auth/infrastructure/persistence/prisma/*`
 - `src/modules/auth/infrastructure/persistence/in-memory/*`
-- `src/modules/auth/presentation/http/auth-cookie.helper.ts`
+- `src/modules/auth/presentation/http/<action>/*`
+- `src/modules/auth/presentation/http/shared/*`
 
 Current capabilities:
 
@@ -650,7 +672,9 @@ Current capabilities:
 - opaque refresh token generation
 - refresh token hashing
 - access token issuing
+- public magic link request and consume endpoints
 - refresh token cookie option helpers
+- IP-based HTTP rate limiting through `@nestjs/throttler`
 
 MVP authentication direction:
 
@@ -663,11 +687,16 @@ MVP authentication direction:
 - refresh token rotation on every refresh
 - revocation by session, account, and token family
 
-Planned first HTTP endpoints:
+Current HTTP endpoints:
 
 ```txt
 POST /auth/magic-link/request
 POST /auth/magic-link/consume
+```
+
+Planned next HTTP endpoints:
+
+```txt
 POST /auth/google/sign-in
 POST /auth/refresh
 POST /auth/sign-out
@@ -675,7 +704,7 @@ POST /auth/sign-out-all
 GET  /auth/me
 ```
 
-These auth HTTP routes are not exposed yet. The source-of-truth design is
+The source-of-truth design is
 `docs/ai/architecture/authentication-session-pattern.md`.
 
 Security rules:
@@ -687,6 +716,8 @@ Security rules:
   login for the passwordless web MVP unless product direction changes.
 - If cookies become cross-site with `SameSite=None`, revisit CSRF protection
   before public launch.
+- Move rate-limit storage to a distributed backend and add normalized-email
+  tracking before running multiple API instances in production.
 
 ## Logging
 
@@ -765,6 +796,7 @@ Normalized error codes:
 
 - `bad_request`
 - `validation_error`
+- `rate_limited`
 - `unauthorized`
 - `forbidden`
 - `resource_not_found`
@@ -777,6 +809,7 @@ Mapping highlights:
 - `ZodValidationException` -> `400 validation_error`
 - `ZodSerializationException` -> `500 internal_error`
 - `ZodSchemaDeclarationException` -> `500 internal_error`
+- throttled HTTP requests -> `429 rate_limited`
 - `AppError('unauthorized')` -> `401`
 - `AppError('forbidden')` -> `403`
 - `AppError('resource_not_found')` -> `404`

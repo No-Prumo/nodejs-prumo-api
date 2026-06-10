@@ -6,7 +6,7 @@ import { getPackageMetadata } from './package-metadata';
 
 const packageMetadata = getPackageMetadata();
 
-export function buildAppConfig(env: Env) {
+function buildAppConfig(env: Env) {
   const environment = resolveAppEnvironment(env);
 
   return {
@@ -26,6 +26,9 @@ export function buildAppConfig(env: Env) {
   };
 }
 
-export const appConfig = registerAs('app', () => buildAppConfig(getEnv()));
+const appConfig = registerAs('app', () => buildAppConfig(getEnv()));
 
-export type AppConfig = ConfigType<typeof appConfig>;
+type AppConfig = ConfigType<typeof appConfig>;
+
+export { appConfig, buildAppConfig };
+export type { AppConfig };

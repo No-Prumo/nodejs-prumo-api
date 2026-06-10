@@ -81,7 +81,9 @@ const CreateThingSchema = z.object({
   name: z.string().min(2),
 });
 
-export class CreateThingDto extends createZodDto(CreateThingSchema) {}
+class CreateThingDto extends createZodDto(CreateThingSchema) {}
+
+export { CreateThingDto, CreateThingSchema };
 ```
 
 Rules:
@@ -127,18 +129,16 @@ Do not:
 - duplicate the same contract in class-validator DTOs
 - document request/response separately from the Zod schemas
 
-## Current example route
+## Current reference route
 
 Reference route:
 
-- `POST /tenants/:tenantId/greetings?style=upper`
+- `POST /auth/magic-link/request`
 
 Contracts:
 
-- params: `tenantId`
-- query: `style`
-- body: `name`, optional `message`
-- response: `tenantId`, `style`, `greeting`
+- body: `email`
+- response: `message`
 
 ## Invariants
 

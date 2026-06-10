@@ -1,7 +1,7 @@
 import { ConfigType, registerAs } from '@nestjs/config';
 import { getEnv } from '../env/env.schema';
 
-export const observabilityConfig = registerAs('observability', () => {
+const observabilityConfig = registerAs('observability', () => {
   const env = getEnv();
 
   return {
@@ -10,4 +10,7 @@ export const observabilityConfig = registerAs('observability', () => {
   };
 });
 
-export type ObservabilityConfig = ConfigType<typeof observabilityConfig>;
+type ObservabilityConfig = ConfigType<typeof observabilityConfig>;
+
+export { observabilityConfig };
+export type { ObservabilityConfig };

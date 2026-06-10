@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
-import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { createZodValidationPipe, ZodSerializerInterceptor } from 'nestjs-zod';
 import { GlobalExceptionFilter } from './filters/global-exception.filter';
 
@@ -8,7 +9,22 @@ const AppZodValidationPipe = createZodValidationPipe({
 });
 
 @Module({
+  imports: [
+    ThrottlerModule.forRoot({
+      throttlers: [
+        {
+          name: 'default',
+          ttl: 60 * 1000,
+          limit: 120,
+        },
+      ],
+    }),
+  ],
   providers: [
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
     {
       provide: APP_PIPE,
       useClass: AppZodValidationPipe,
@@ -23,4 +39,6 @@ const AppZodValidationPipe = createZodValidationPipe({
     },
   ],
 })
-export class HttpPlatformModule {}
+class HttpPlatformModule {}
+
+export { HttpPlatformModule };

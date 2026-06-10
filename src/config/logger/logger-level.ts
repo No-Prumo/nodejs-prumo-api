@@ -1,6 +1,6 @@
 import type { AppEnvironment } from '../app/app-environment';
 
-export const loggerLevelInputValues = [
+const loggerLevelInputValues = [
   'silent',
   'fatal',
   'error',
@@ -12,9 +12,9 @@ export const loggerLevelInputValues = [
   'verbose',
 ] as const;
 
-export type LoggerLevelInput = (typeof loggerLevelInputValues)[number];
+type LoggerLevelInput = (typeof loggerLevelInputValues)[number];
 
-export const pinoLevelValues = [
+const pinoLevelValues = [
   'silent',
   'fatal',
   'error',
@@ -24,7 +24,7 @@ export const pinoLevelValues = [
   'trace',
 ] as const;
 
-export type PinoLogLevel = (typeof pinoLevelValues)[number];
+type PinoLogLevel = (typeof pinoLevelValues)[number];
 
 const loggerLevelAliasMap: Record<LoggerLevelInput, PinoLogLevel> = {
   silent: 'silent',
@@ -45,12 +45,18 @@ const defaultLogLevelByEnvironment: Record<AppEnvironment, PinoLogLevel> = {
   production: 'info',
 };
 
-export function normalizeLogLevel(
-  level?: LoggerLevelInput,
-): PinoLogLevel | undefined {
+function normalizeLogLevel(level?: LoggerLevelInput): PinoLogLevel | undefined {
   return level ? loggerLevelAliasMap[level] : undefined;
 }
 
-export function getDefaultLogLevel(environment: AppEnvironment): PinoLogLevel {
+function getDefaultLogLevel(environment: AppEnvironment): PinoLogLevel {
   return defaultLogLevelByEnvironment[environment];
 }
+
+export {
+  getDefaultLogLevel,
+  loggerLevelInputValues,
+  normalizeLogLevel,
+  pinoLevelValues,
+};
+export type { LoggerLevelInput, PinoLogLevel };

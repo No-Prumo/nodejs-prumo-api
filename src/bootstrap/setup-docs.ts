@@ -3,7 +3,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { cleanupOpenApiDoc } from 'nestjs-zod';
 import type { DocsConfig } from '../config';
 
-export function setupDocs(app: NestExpressApplication, docs: DocsConfig) {
+function setupDocs(app: NestExpressApplication, docs: DocsConfig) {
   if (!docs.enabled) {
     return;
   }
@@ -25,3 +25,5 @@ export function setupDocs(app: NestExpressApplication, docs: DocsConfig) {
     cleanupOpenApiDoc(openApiDocument, { version: '3.1' }),
   );
 }
+
+export { setupDocs };

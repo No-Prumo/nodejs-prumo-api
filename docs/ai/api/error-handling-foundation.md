@@ -63,6 +63,7 @@ Current normalized codes are:
 
 - `bad_request`
 - `validation_error`
+- `rate_limited`
 - `unauthorized`
 - `forbidden`
 - `resource_not_found`
@@ -75,6 +76,7 @@ Rules:
 - `validation_error` is for HTTP validation failures, especially Zod input parsing
 - domain and application should prefer `business_rule_violation` for expected business failures
 - `internal_error` is reserved for unexpected or internal-only failures
+- `rate_limited` is for HTTP throttling failures such as auth endpoint abuse
 
 ### Logging policy
 
@@ -172,6 +174,7 @@ Default status mapping:
 - `403` -> `forbidden`
 - `404` -> `resource_not_found`
 - `409` -> `conflict`
+- `429` -> `rate_limited`
 - `422` -> `business_rule_violation`
 - `500+` -> `internal_error`
 

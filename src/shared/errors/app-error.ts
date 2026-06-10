@@ -1,11 +1,11 @@
 import type { AppErrorCode } from './error-codes';
 
-export type AppErrorOptions = {
+type AppErrorOptions = {
   cause?: unknown;
   details?: unknown;
 };
 
-export class AppError extends Error {
+class AppError extends Error {
   readonly code: AppErrorCode;
   readonly details?: unknown;
 
@@ -27,3 +27,6 @@ export class AppError extends Error {
     }
   }
 }
+
+export { AppError };
+export type { AppErrorOptions };

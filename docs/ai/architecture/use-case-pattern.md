@@ -74,7 +74,7 @@ type CreateReservationUseCaseResponse = {
 };
 
 @Injectable()
-export class CreateReservationUseCase {
+class CreateReservationUseCase {
   constructor(
     @Inject(RESERVATIONS_REPOSITORY)
     private readonly reservationsRepository: ReservationsRepository,
@@ -86,6 +86,12 @@ export class CreateReservationUseCase {
     // business workflow here
   }
 }
+
+export { CreateReservationUseCase };
+export type {
+  CreateReservationUseCaseRequest,
+  CreateReservationUseCaseResponse,
+};
 ```
 
 Rules:

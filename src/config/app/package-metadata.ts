@@ -13,7 +13,7 @@ const defaultPackageMetadata: PackageMetadata = {
 
 let cachedPackageMetadata: PackageMetadata | undefined;
 
-export function getPackageMetadata(): PackageMetadata {
+function getPackageMetadata(): PackageMetadata {
   if (cachedPackageMetadata) {
     return cachedPackageMetadata;
   }
@@ -41,3 +41,5 @@ export function getPackageMetadata(): PackageMetadata {
 
   return cachedPackageMetadata;
 }
+
+export { getPackageMetadata };

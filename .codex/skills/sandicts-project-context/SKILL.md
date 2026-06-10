@@ -19,6 +19,7 @@ The canonical project context lives in `docs/ai/index.md` and the documents link
 4. If code and `docs/ai/` disagree, surface the conflict and update the relevant document in the same change when the task changes the project rule.
 5. When a change alters behavior, setup, commands, environment variables, API contracts, architecture, database models, auth/session behavior, logging, CI/CD, or docs links that `README.md` explicitly describes, update `README.md` in the same change or state why no README change is needed.
 6. Keep `.codex/skills/` for Codex operating instructions and `docs/ai/` for durable project context and decisions.
+7. When changing repository skills, validate the edited skill folder with the skill validation script when available.
 
 ## Boundaries
 
@@ -37,11 +38,22 @@ The canonical project context lives in `docs/ai/index.md` and the documents link
 
 - `docs/ai/api/error-handling-foundation.md`
 - `docs/ai/api/zod-swagger-foundation.md`
+- `docs/ai/architecture/authentication-session-pattern.md`
+- `docs/ai/architecture/backend-architecture-overview.md`
+- `docs/ai/architecture/controller-pattern.md`
+- `docs/ai/architecture/external-integrations-pattern.md`
+- `docs/ai/architecture/module-pattern.md`
+- `docs/ai/architecture/repository-pattern.md`
+- `docs/ai/architecture/use-case-pattern.md`
 - `docs/ai/business/sandicts-business-rules.md`
-- `docs/ai/config/configuration-foundation.md`
-- `docs/ai/config/typescript-module-resolution.md`
 - `docs/ai/ci-cd/ci-governance.md`
 - `docs/ai/ci-cd/ci-operational-rules.md`
 - `docs/ai/logging/logging-foundation.md`
-- `docs/ai/product/sandicts-product-context.md`
 - `docs/ai/codex-skills-strategy.md`
+- `docs/ai/config/configuration-foundation.md`
+- `docs/ai/config/typescript-module-resolution.md`
+- `docs/ai/product/sandicts-mvp-scope.md`
+- `docs/ai/product/sandicts-product-context.md`
+- `docs/ai/product/sandicts-scope-checklist.md`
+- `docs/ai/product/sandicts-v2-backlog.md`
+- `docs/ai/product/shared-documentation-strategy.md`

@@ -1,14 +1,11 @@
 import { Inject, Injectable } from '@nestjs/common';
-import {
-  authConfig,
-  type AuthConfig,
-} from '../../../../config/auth/auth.config';
-import { EMAIL_GATEWAY, type EmailGateway } from '../ports/email-gateway';
+import { authConfig, type AuthConfig } from '../../../../../config';
+import { EMAIL_GATEWAY, type EmailGateway } from '../../ports/email-gateway';
 import {
   MAGIC_LINK_CHALLENGES_REPOSITORY,
   type MagicLinkChallengesRepository,
-} from '../ports/magic-link-challenges.repository';
-import { MagicLinkTokenService } from '../services/magic-link-token.service';
+} from '../../ports/magic-link-challenges.repository';
+import { MagicLinkTokenService } from '../../services/tokens/magic-link-token.service';
 
 const magicLinkRequestMessage =
   'If the email can sign in, a magic link will be sent.';

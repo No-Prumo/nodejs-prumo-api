@@ -1,6 +1,5 @@
-import { buildAuthConfig } from '../../../../config/auth/auth.config';
-import { validateEnv } from '../../../../config/env/env.schema';
-import type { ConsumeMagicLinkUseCaseResponse } from '../../application/use-cases/consume-magic-link.use-case';
+import { buildAuthConfig, validateEnv } from '../../../../../config';
+import type { ConsumeMagicLinkUseCaseResponse } from '../../../application/use-cases/consume-magic-link/consume-magic-link.use-case';
 import { ConsumeMagicLinkController } from './consume-magic-link.controller';
 
 const authSettings = buildAuthConfig(
@@ -28,19 +27,6 @@ describe('ConsumeMagicLinkController', () => {
       },
       session: {
         id: 'session-id',
-        accountId: 'account-id',
-        refreshTokenHash: 'refresh-token-hash',
-        refreshTokenFamilyId: 'family-id',
-        creationSource: 'magic_link',
-        status: 'active',
-        userAgent: null,
-        ipAddress: null,
-        createdAt: new Date('2026-01-01T00:00:00.000Z'),
-        updatedAt: new Date('2026-01-01T00:00:00.000Z'),
-        lastUsedAt: null,
-        idleExpiresAt: new Date('2026-01-02T00:00:00.000Z'),
-        absoluteExpiresAt: new Date('2026-01-31T00:00:00.000Z'),
-        revokedAt: null,
       },
       accessToken: 'access.token.signature',
       accessTokenExpiresAt: new Date('2026-01-01T00:15:00.000Z'),

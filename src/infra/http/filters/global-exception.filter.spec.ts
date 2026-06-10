@@ -1,5 +1,7 @@
 import {
   BadRequestException,
+  HttpException,
+  HttpStatus,
   UnauthorizedException,
   type ArgumentsHost,
 } from '@nestjs/common';
@@ -220,6 +222,32 @@ describe('GlobalExceptionFilter', () => {
       path: '/orders',
       requestId: 'req-123',
       statusCode: 400,
+    });
+    expect(typeof body.timestamp).toBe('string');
+    expect(logger.error).not.toHaveBeenCalled();
+  });
+
+  it('maps throttled requests to rate_limited', () => {
+    const logger = createLogger();
+    const filter = new GlobalExceptionFilter(logger.logger);
+    const request = createRequest('/auth/magic-link/request');
+    const mockResponse = createResponse();
+    const host = createArgumentsHost(request, mockResponse.response);
+
+    filter.catch(
+      new HttpException('Too many requests', HttpStatus.TOO_MANY_REQUESTS),
+      host,
+    );
+
+    expect(mockResponse.statusCode).toBe(429);
+    const body = getResponseBody(mockResponse);
+
+    expect(body).toMatchObject({
+      code: 'rate_limited',
+      message: 'Too many requests',
+      path: '/auth/magic-link/request',
+      requestId: 'req-123',
+      statusCode: 429,
     });
     expect(typeof body.timestamp).toBe('string');
     expect(logger.error).not.toHaveBeenCalled();

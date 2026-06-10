@@ -4,7 +4,7 @@ import { getEnv } from '../env/env.schema';
 import type { Env } from '../env/env.schema';
 import { getDefaultLogLevel, normalizeLogLevel } from './logger-level';
 
-export function buildLoggerConfig(env: Env) {
+function buildLoggerConfig(env: Env) {
   const environment = resolveAppEnvironment(env);
 
   return {
@@ -13,8 +13,9 @@ export function buildLoggerConfig(env: Env) {
   };
 }
 
-export const loggerConfig = registerAs('logger', () =>
-  buildLoggerConfig(getEnv()),
-);
+const loggerConfig = registerAs('logger', () => buildLoggerConfig(getEnv()));
 
-export type LoggerConfig = ConfigType<typeof loggerConfig>;
+type LoggerConfig = ConfigType<typeof loggerConfig>;
+
+export { buildLoggerConfig, loggerConfig };
+export type { LoggerConfig };

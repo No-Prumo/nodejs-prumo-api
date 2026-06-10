@@ -1,21 +1,17 @@
-export const nodeEnvironmentValues = [
-  'development',
-  'test',
-  'production',
-] as const;
+const nodeEnvironmentValues = ['development', 'test', 'production'] as const;
 
-export type NodeEnvironment = (typeof nodeEnvironmentValues)[number];
+type NodeEnvironment = (typeof nodeEnvironmentValues)[number];
 
-export const appEnvironmentValues = [
+const appEnvironmentValues = [
   'local',
   'test',
   'staging',
   'production',
 ] as const;
 
-export type AppEnvironment = (typeof appEnvironmentValues)[number];
+type AppEnvironment = (typeof appEnvironmentValues)[number];
 
-export function resolveAppEnvironment(env: {
+function resolveAppEnvironment(env: {
   NODE_ENV: NodeEnvironment;
   APP_ENV?: AppEnvironment | undefined;
 }): AppEnvironment {
@@ -32,3 +28,6 @@ export function resolveAppEnvironment(env: {
       return 'production';
   }
 }
+
+export { appEnvironmentValues, nodeEnvironmentValues, resolveAppEnvironment };
+export type { AppEnvironment, NodeEnvironment };

@@ -1,10 +1,9 @@
-import { buildAuthConfig } from '../../../../config/auth/auth.config';
-import { validateEnv } from '../../../../config/env/env.schema';
-import { InMemoryAccountsRepository } from '../../infrastructure/persistence/in-memory/in-memory-accounts.repository';
-import { InMemoryAuthSessionsRepository } from '../../infrastructure/persistence/in-memory/in-memory-auth-sessions.repository';
-import type { AccountRecord } from '../ports/accounts.repository';
-import { RefreshTokenHasher } from '../services/refresh-token-hasher';
-import { TokenService } from '../services/token.service';
+import { buildAuthConfig, validateEnv } from '../../../../../config';
+import { InMemoryAccountsRepository } from '../../../infrastructure/persistence/in-memory/in-memory-accounts.repository';
+import { InMemoryAuthSessionsRepository } from '../../../infrastructure/persistence/in-memory/in-memory-auth-sessions.repository';
+import type { AccountRecord } from '../../ports/accounts.repository';
+import { RefreshTokenHasher } from '../../services/tokens/refresh-token-hasher';
+import { TokenService } from '../../services/tokens/token.service';
 import { CreateAuthSessionUseCase } from './create-auth-session.use-case';
 
 const account: AccountRecord = {
@@ -69,7 +68,9 @@ describe('CreateAuthSessionUseCase', () => {
     );
     expect(createdSession.refreshTokenHash).not.toBe(result.refreshToken);
     expect(result.accessToken).toContain('.');
-    expect(result.session.creationSource).toBe('magic_link');
+    expect(result.session).toEqual({
+      id: createdSession.id,
+    });
   });
 
   it('rejects blocked accounts', async () => {
