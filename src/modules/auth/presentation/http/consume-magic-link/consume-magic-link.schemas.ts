@@ -3,7 +3,7 @@ import { z } from 'zod';
 import {
   AuthAccountResponseSchema,
   AuthSessionResponseSchema,
-} from './auth-session-response.schemas';
+} from '../shared/auth-session-response.schemas';
 
 const ConsumeMagicLinkBodySchema = z
   .object({

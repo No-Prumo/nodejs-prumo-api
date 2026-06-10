@@ -9,14 +9,12 @@ import {
   Res,
 } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import type { Response } from 'express';
 import { ZodResponse } from 'nestjs-zod';
-import {
-  authConfig,
-  type AuthConfig,
-} from '../../../../config/auth/auth.config';
-import { ConsumeMagicLinkUseCase } from '../../application/use-cases/consume-magic-link.use-case';
-import { buildRefreshTokenCookieOptions } from './auth-cookie.helper';
+import { authConfig, type AuthConfig } from '../../../../../config';
+import { ConsumeMagicLinkUseCase } from '../../../application/use-cases/consume-magic-link/consume-magic-link.use-case';
+import { buildRefreshTokenCookieOptions } from '../shared/auth-cookie.helper';
 import {
   ConsumeMagicLinkBodyDto,
   ConsumeMagicLinkResponseDto,
@@ -33,6 +31,7 @@ class ConsumeMagicLinkController {
 
   @Post('consume')
   @HttpCode(200)
+  @Throttle({ default: { limit: 10, ttl: 15 * 60 * 1000 } })
   @ApiOperation({
     summary: 'Consume magic link',
     description: 'Consumes a one-time token and creates an auth session.',

@@ -1,19 +1,18 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { AppError } from '../../../../shared/errors/app-error';
+import { AppError } from '../../../../../shared/errors/app-error';
 import {
   ACCOUNTS_REPOSITORY,
-  type AccountRecord,
   type AccountsRepository,
-} from '../ports/accounts.repository';
+} from '../../ports/accounts.repository';
 import {
   MAGIC_LINK_CHALLENGES_REPOSITORY,
   type MagicLinkChallengesRepository,
-} from '../ports/magic-link-challenges.repository';
-import { MagicLinkTokenService } from '../services/magic-link-token.service';
+} from '../../ports/magic-link-challenges.repository';
+import { MagicLinkTokenService } from '../../services/tokens/magic-link-token.service';
 import {
   CreateAuthSessionUseCase,
   type CreateAuthSessionUseCaseResponse,
-} from './create-auth-session.use-case';
+} from '../create-auth-session/create-auth-session.use-case';
 
 type ConsumeMagicLinkUseCaseRequest = {
   token: string;
@@ -22,7 +21,7 @@ type ConsumeMagicLinkUseCaseRequest = {
 };
 
 type ConsumeMagicLinkUseCaseResponse = {
-  account: AccountRecord;
+  account: CreateAuthSessionUseCaseResponse['account'];
   session: CreateAuthSessionUseCaseResponse['session'];
   accessToken: string;
   accessTokenExpiresAt: Date;

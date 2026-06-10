@@ -1,7 +1,7 @@
 import { ConfigType, registerAs } from '@nestjs/config';
 import { getEnv } from '../env/env.schema';
 
-export const docsConfig = registerAs('docs', () => {
+const docsConfig = registerAs('docs', () => {
   const env = getEnv();
 
   return {
@@ -10,4 +10,7 @@ export const docsConfig = registerAs('docs', () => {
   };
 });
 
-export type DocsConfig = ConfigType<typeof docsConfig>;
+type DocsConfig = ConfigType<typeof docsConfig>;
+
+export { docsConfig };
+export type { DocsConfig };

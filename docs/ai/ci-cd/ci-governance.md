@@ -84,12 +84,18 @@ Allowed branch formats:
 - `feature/KAN-123-short-description`
 - `fix/KAN-123-short-description`
 - `hotfix/KAN-123-short-description`
+- `docs/KAN-123-short-description`
+- `refactor/KAN-123-short-description`
+- `test/KAN-123-short-description`
+- `ci/KAN-123-short-description`
+- `build/KAN-123-short-description`
+- `perf/KAN-123-short-description`
 - `chore/KAN-123-short-description`
 - `rc/KAN-123-short-description`
 
 Rules:
 
-- prefix must be one of: `feature`, `fix`, `hotfix`, `chore`, `rc`
+- prefix must be one of: `feature`, `fix`, `hotfix`, `docs`, `refactor`, `test`, `ci`, `build`, `perf`, `chore`, `rc`
 - Jira key must be uppercase
 - Jira key format must be `KAN-<number>`
 - slug must be lowercase kebab-case
@@ -121,6 +127,12 @@ Allowed PR sources:
 - `feature/*`
 - `fix/*`
 - `hotfix/*`
+- `docs/*`
+- `refactor/*`
+- `test/*`
+- `ci/*`
+- `build/*`
+- `perf/*`
 - `chore/*`
 - `rc/*`
 - `developer`

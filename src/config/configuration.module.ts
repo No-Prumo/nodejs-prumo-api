@@ -27,4 +27,6 @@ import { observabilityConfig } from './observability/observability.config';
   ],
   exports: [ConfigModule],
 })
-export class ConfigurationModule {}
+class ConfigurationModule {}
+
+export { ConfigurationModule };

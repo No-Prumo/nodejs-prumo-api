@@ -30,4 +30,6 @@ import { createPinoLoggerOptions } from './pino-logger.factory';
   ],
   exports: [LoggerModule],
 })
-export class LoggingModule {}
+class LoggingModule {}
+
+export { LoggingModule };

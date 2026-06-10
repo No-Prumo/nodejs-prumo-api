@@ -185,7 +185,7 @@ const httpLogSerializers = {
   [HTTP_LOG_ATTRIBUTE_KEYS.res]: serializeResponse,
 };
 
-export function createPinoLoggerOptions(
+function createPinoLoggerOptions(
   appSettings: AppConfig,
   loggerSettings: LoggerConfig,
   observabilitySettings: ObservabilityConfig,
@@ -229,3 +229,5 @@ export function createPinoLoggerOptions(
     },
   };
 }
+
+export { createPinoLoggerOptions };

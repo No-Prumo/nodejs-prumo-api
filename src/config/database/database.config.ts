@@ -1,7 +1,7 @@
 import { ConfigType, registerAs } from '@nestjs/config';
 import { getEnv } from '../env/env.schema';
 
-export const databaseConfig = registerAs('database', () => {
+const databaseConfig = registerAs('database', () => {
   const env = getEnv();
 
   return {
@@ -14,4 +14,7 @@ export const databaseConfig = registerAs('database', () => {
   };
 });
 
-export type DatabaseConfig = ConfigType<typeof databaseConfig>;
+type DatabaseConfig = ConfigType<typeof databaseConfig>;
+
+export { databaseConfig };
+export type { DatabaseConfig };

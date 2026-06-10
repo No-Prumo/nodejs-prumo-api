@@ -39,13 +39,16 @@ modules/reservations/application/ports/reservations.repository.ts
 Pattern:
 
 ```ts
-export const RESERVATIONS_REPOSITORY = Symbol('RESERVATIONS_REPOSITORY');
+const RESERVATIONS_REPOSITORY = Symbol('RESERVATIONS_REPOSITORY');
 
-export type ReservationsRepository = {
+type ReservationsRepository = {
   create(data: CreateReservationData): Promise<ReservationRecord>;
   findById(id: string): Promise<ReservationRecord | null>;
   findActiveByCourtAndRange(params: CourtRange): Promise<ReservationRecord[]>;
 };
+
+export { RESERVATIONS_REPOSITORY };
+export type { ReservationsRepository };
 ```
 
 Rules:
@@ -78,7 +81,7 @@ Pattern:
 
 ```ts
 @Injectable()
-export class PrismaReservationsRepository implements ReservationsRepository {
+class PrismaReservationsRepository implements ReservationsRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async findById(id: string) {
@@ -87,6 +90,8 @@ export class PrismaReservationsRepository implements ReservationsRepository {
     });
   }
 }
+
+export { PrismaReservationsRepository };
 ```
 
 ## Method Semantics

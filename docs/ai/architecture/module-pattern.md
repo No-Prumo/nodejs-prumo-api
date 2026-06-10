@@ -54,13 +54,28 @@ src/modules/reservations/
   reservations.module.ts
 
   presentation/http/
-    reservations.controller.ts
-    reservations.schemas.ts
+    create-reservation/
+      create-reservation.controller.ts
+      create-reservation.controller.spec.ts
+      create-reservation.schemas.ts
+    cancel-reservation/
+      cancel-reservation.controller.ts
+      cancel-reservation.controller.spec.ts
+      cancel-reservation.schemas.ts
+    shared/
+      reservation-response.schemas.ts
 
   application/
     use-cases/
-      create-reservation.use-case.ts
-      cancel-reservation.use-case.ts
+      create-reservation/
+        create-reservation.use-case.ts
+        create-reservation.use-case.spec.ts
+      cancel-reservation/
+        cancel-reservation.use-case.ts
+        cancel-reservation.use-case.spec.ts
+    services/
+      pricing/
+        reservation-price-calculator.ts
     ports/
       reservations.repository.ts
       payment-gateway.ts
@@ -75,6 +90,12 @@ src/modules/reservations/
       prisma-reservations.repository.ts
 ```
 
+Use one folder per action when the module has more than one controller or use
+case, especially when tests and schemas live beside the implementation. Shared
+HTTP fragments can live under `presentation/http/shared/`. Group reusable
+application services by capability, such as `services/tokens/` or
+`services/pricing/`, when more than one file shares the same vocabulary.
+
 This layout can stay small. Do not create empty folders before they are needed.
 
 ## Provider Wiring
@@ -84,7 +105,7 @@ Use Nest dependency injection instead of manual factories.
 Pattern:
 
 ```ts
-export const RESERVATIONS_REPOSITORY = Symbol('RESERVATIONS_REPOSITORY');
+const RESERVATIONS_REPOSITORY = Symbol('RESERVATIONS_REPOSITORY');
 
 @Module({
   controllers: [ReservationsController],
@@ -97,7 +118,9 @@ export const RESERVATIONS_REPOSITORY = Symbol('RESERVATIONS_REPOSITORY');
     },
   ],
 })
-export class ReservationsModule {}
+class ReservationsModule {}
+
+export { RESERVATIONS_REPOSITORY, ReservationsModule };
 ```
 
 Rules:

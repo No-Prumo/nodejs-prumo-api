@@ -383,6 +383,13 @@ Never log:
 
 Auth endpoints need rate limiting before public launch.
 
+Current foundation:
+
+- `@nestjs/throttler` is wired globally in `HttpPlatformModule`
+- the default IP-based throttle is broad and protects every HTTP route
+- magic link request and consume endpoints override the default with stricter
+  per-IP limits
+
 Minimum targets:
 
 - password sign-in
@@ -392,6 +399,12 @@ Minimum targets:
 - Google sign-in failures
 
 Rate-limit responses should stay generic.
+
+Before multi-instance production:
+
+- use distributed throttler storage, such as Redis-backed storage
+- add tracking by normalized email for magic link request attempts
+- keep public 429 responses generic and avoid revealing account existence
 
 ## Error Semantics
 

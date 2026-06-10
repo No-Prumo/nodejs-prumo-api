@@ -53,7 +53,7 @@ Controllers do not own:
 ```ts
 @ApiTags('Reservations')
 @Controller('reservations')
-export class ReservationsController {
+class ReservationsController {
   constructor(private readonly createReservation: CreateReservationUseCase) {}
 
   @Post()
@@ -68,6 +68,8 @@ export class ReservationsController {
     return this.createReservation.execute(body);
   }
 }
+
+export { ReservationsController };
 ```
 
 Rules:
@@ -90,11 +92,16 @@ Recommended shape for action-heavy modules:
 
 ```txt
 presentation/http/
-  request-magic-link.controller.ts
-  request-magic-link.schemas.ts
-  consume-magic-link.controller.ts
-  consume-magic-link.schemas.ts
-  auth-session-response.schemas.ts
+  request-magic-link/
+    request-magic-link.controller.ts
+    request-magic-link.controller.spec.ts
+    request-magic-link.schemas.ts
+  consume-magic-link/
+    consume-magic-link.controller.ts
+    consume-magic-link.controller.spec.ts
+    consume-magic-link.schemas.ts
+  shared/
+    auth-session-response.schemas.ts
 ```
 
 Rules:
@@ -103,6 +110,8 @@ Rules:
 - keep route prefixes consistent with `@Controller(...)` and method decorators
 - use shared schema files only for small response fragments reused by multiple
   endpoints
+- keep each action's controller, schema, and focused controller test in the same
+  action folder once a module has more than one action
 - avoid a large controller that accumulates unrelated endpoint dependencies
 - avoid extracting endpoint functions into a central controller file; prefer
   Nest controller classes so dependency injection stays explicit
@@ -151,8 +160,8 @@ return this.createReservation.execute({
 Put route schemas near the HTTP controller:
 
 ```txt
-presentation/http/reservations.schemas.ts
-presentation/http/reservations.controller.ts
+presentation/http/create-reservation/create-reservation.schemas.ts
+presentation/http/create-reservation/create-reservation.controller.ts
 ```
 
 Reason:
@@ -160,6 +169,8 @@ Reason:
 - schemas describe HTTP contracts
 - use cases should not depend on HTTP DTO classes
 - use cases may use inferred input types only when that does not create a framework dependency
+- reusable response fragments belong in `presentation/http/shared/`, not in the
+  application layer
 
 ## Response Shape
 

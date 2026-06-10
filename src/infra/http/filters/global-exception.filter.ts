@@ -50,7 +50,7 @@ type HttpExceptionResponseBody =
 const REQUEST_ID_HEADERS = ['X-Request-Id', 'X-Correlation-Id'] as const;
 
 @Catch()
-export class GlobalExceptionFilter implements ExceptionFilter {
+class GlobalExceptionFilter implements ExceptionFilter {
   constructor(private readonly logger: PinoLogger) {
     this.logger.setContext(GlobalExceptionFilter.name);
   }
@@ -329,12 +329,16 @@ function mapHttpStatusToErrorCode(statusCode: number): ErrorCode {
       return 'resource_not_found';
     case 409:
       return 'conflict';
+    case 429:
+      return 'rate_limited';
     case 422:
       return 'business_rule_violation';
     default:
       return statusCode >= 500 ? 'internal_error' : 'bad_request';
   }
 }
+
+export { GlobalExceptionFilter };
 
 function getIssuesFromUnknown(value: unknown) {
   return hasIssues(value) ? value.issues : undefined;

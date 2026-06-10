@@ -1,4 +1,4 @@
-import type { AuthConfig } from '../../../../config/auth/auth.config';
+import type { AuthConfig } from '../../../../../config';
 
 type RefreshTokenCookieOptions = {
   httpOnly: boolean;

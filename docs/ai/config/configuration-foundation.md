@@ -60,6 +60,8 @@ src/
       app.config.ts
       app-environment.ts
       package-metadata.ts
+    auth/
+      auth.config.ts
     database/
       database.config.ts
     docs/
@@ -130,6 +132,7 @@ Rules:
 Current domain folders:
 
 - `app`: runtime app settings, app environment resolution, package metadata
+- `auth`: token lifetimes, magic link lifetime, and refresh cookie settings
 - `database`: database connection metadata without ORM coupling
 - `docs`: OpenAPI/docs toggles and pathing
 - `logger`: neutral logging settings and level normalization
@@ -251,6 +254,25 @@ Guideline:
 - keep this domain free of Prisma-specific options unless they are truly cross-cutting
 - ORM-specific behavior belongs in `src/infra/prisma`
 
+### `auth`
+
+Purpose:
+
+- authentication and session runtime settings
+
+Current shape:
+
+- `accessTokenSecret`
+- `accessTokenTtlSeconds`
+- `magicLinkTtlSeconds`
+- `refreshTokenIdleTtlSeconds`
+- `refreshTokenAbsoluteTtlSeconds`
+- `refreshTokenCookie.name`
+- `refreshTokenCookie.path`
+- `refreshTokenCookie.sameSite`
+- `refreshTokenCookie.secure`
+- `refreshTokenCookie.httpOnly`
+
 ### `logger`
 
 Purpose:
@@ -313,6 +335,16 @@ DOCS_ENABLED=true
 DOCS_PATH=docs
 OBSERVABILITY_ENABLED=false
 OBSERVABILITY_SERVICE_NAME=sandicts-api
+
+AUTH_ACCESS_TOKEN_SECRET=dev-only-auth-secret-minimum-32-chars-change-me
+AUTH_ACCESS_TOKEN_TTL_SECONDS=900
+AUTH_MAGIC_LINK_TTL_SECONDS=900
+AUTH_REFRESH_TOKEN_IDLE_TTL_SECONDS=1209600
+AUTH_REFRESH_TOKEN_ABSOLUTE_TTL_SECONDS=2592000
+AUTH_REFRESH_TOKEN_COOKIE_NAME=sandicts_refresh_token
+AUTH_REFRESH_TOKEN_COOKIE_PATH=/auth/refresh
+AUTH_COOKIE_SAME_SITE=lax
+AUTH_COOKIE_SECURE=false
 ```
 
 Notes:
@@ -323,6 +355,11 @@ Notes:
 - `DATABASE_URL` is validated as URL text
 - booleans accept `true/false`, `1/0`, `yes/no`, `on/off`
 - ports are coerced to integers and validated in range `1..65535`
+- `AUTH_ACCESS_TOKEN_SECRET` is required in production and falls back only for
+  local/test development
+- auth lifetimes are positive integer seconds
+- `AUTH_COOKIE_SECURE` defaults to `true` in production and otherwise follows
+  the explicit env value or local default
 
 ## Consumption pattern
 
@@ -334,7 +371,7 @@ import { ConfigType } from '@nestjs/config';
 import { appConfig } from '../config';
 
 @Injectable()
-export class ExampleService {
+class ExampleService {
   constructor(
     @Inject(appConfig.KEY)
     private readonly appSettings: ConfigType<typeof appConfig>,
@@ -344,6 +381,8 @@ export class ExampleService {
     return this.appSettings.port;
   }
 }
+
+export { ExampleService };
 ```
 
 Bootstrap pattern:

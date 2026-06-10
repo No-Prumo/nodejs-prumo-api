@@ -1,11 +1,10 @@
-import { buildAuthConfig } from '../../../../config/auth/auth.config';
-import { validateEnv } from '../../../../config/env/env.schema';
-import { InMemoryMagicLinkChallengesRepository } from '../../infrastructure/persistence/in-memory/in-memory-magic-link-challenges.repository';
+import { buildAuthConfig, validateEnv } from '../../../../../config';
+import { InMemoryMagicLinkChallengesRepository } from '../../../infrastructure/persistence/in-memory/in-memory-magic-link-challenges.repository';
 import type {
   EmailGateway,
   SendMagicLinkEmailRequest,
-} from '../ports/email-gateway';
-import { MagicLinkTokenService } from '../services/magic-link-token.service';
+} from '../../ports/email-gateway';
+import { MagicLinkTokenService } from '../../services/tokens/magic-link-token.service';
 import {
   magicLinkRequestMessage,
   RequestMagicLinkUseCase,

@@ -1,22 +1,18 @@
 import { Inject, Injectable } from '@nestjs/common';
-import {
-  authConfig,
-  type AuthConfig,
-} from '../../../../config/auth/auth.config';
-import { AppError } from '../../../../shared/errors/app-error';
-import type { AuthSessionCreationSource } from '../../domain/auth-session-creation-source';
+import { authConfig, type AuthConfig } from '../../../../../config';
+import { AppError } from '../../../../../shared/errors/app-error';
+import type { AuthSessionCreationSource } from '../../../domain/auth-session-creation-source';
 import {
   ACCOUNTS_REPOSITORY,
   type AccountRecord,
   type AccountsRepository,
-} from '../ports/accounts.repository';
+} from '../../ports/accounts.repository';
 import {
   AUTH_SESSIONS_REPOSITORY,
-  type AuthSessionRecord,
   type AuthSessionsRepository,
-} from '../ports/auth-sessions.repository';
-import { RefreshTokenHasher } from '../services/refresh-token-hasher';
-import { TokenService } from '../services/token.service';
+} from '../../ports/auth-sessions.repository';
+import { RefreshTokenHasher } from '../../services/tokens/refresh-token-hasher';
+import { TokenService } from '../../services/tokens/token.service';
 
 type CreateAuthSessionUseCaseRequest = {
   accountId: string;
@@ -26,13 +22,19 @@ type CreateAuthSessionUseCaseRequest = {
 };
 
 type CreateAuthSessionUseCaseResponse = {
-  account: AccountRecord;
-  session: AuthSessionRecord;
+  account: AuthenticatedAccount;
+  session: CreatedAuthSession;
   accessToken: string;
   accessTokenExpiresAt: Date;
   refreshToken: string;
   refreshTokenIdleExpiresAt: Date;
   refreshTokenAbsoluteExpiresAt: Date;
+};
+
+type AuthenticatedAccount = Pick<AccountRecord, 'displayName' | 'email' | 'id'>;
+
+type CreatedAuthSession = {
+  id: string;
 };
 
 @Injectable()
@@ -94,8 +96,14 @@ class CreateAuthSessionUseCase {
     });
 
     return {
-      account,
-      session,
+      account: {
+        id: account.id,
+        email: account.email,
+        displayName: account.displayName,
+      },
+      session: {
+        id: session.id,
+      },
       accessToken: accessToken.token,
       accessTokenExpiresAt: accessToken.expiresAt,
       refreshToken,

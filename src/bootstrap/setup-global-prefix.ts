@@ -1,7 +1,7 @@
 import { NestExpressApplication } from '@nestjs/platform-express';
 import type { AppConfig } from '../config';
 
-export function setupGlobalPrefix(
+function setupGlobalPrefix(
   app: NestExpressApplication,
   appSettings: AppConfig,
 ) {
@@ -9,3 +9,5 @@ export function setupGlobalPrefix(
     app.setGlobalPrefix(appSettings.globalPrefix);
   }
 }
+
+export { setupGlobalPrefix };

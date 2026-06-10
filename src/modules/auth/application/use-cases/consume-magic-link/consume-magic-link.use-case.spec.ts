@@ -1,13 +1,12 @@
-import { buildAuthConfig } from '../../../../config/auth/auth.config';
-import { validateEnv } from '../../../../config/env/env.schema';
-import { InMemoryAccountsRepository } from '../../infrastructure/persistence/in-memory/in-memory-accounts.repository';
-import { InMemoryAuthSessionsRepository } from '../../infrastructure/persistence/in-memory/in-memory-auth-sessions.repository';
-import { InMemoryMagicLinkChallengesRepository } from '../../infrastructure/persistence/in-memory/in-memory-magic-link-challenges.repository';
-import { MagicLinkTokenService } from '../services/magic-link-token.service';
-import { RefreshTokenHasher } from '../services/refresh-token-hasher';
-import { TokenService } from '../services/token.service';
+import { buildAuthConfig, validateEnv } from '../../../../../config';
+import { InMemoryAccountsRepository } from '../../../infrastructure/persistence/in-memory/in-memory-accounts.repository';
+import { InMemoryAuthSessionsRepository } from '../../../infrastructure/persistence/in-memory/in-memory-auth-sessions.repository';
+import { InMemoryMagicLinkChallengesRepository } from '../../../infrastructure/persistence/in-memory/in-memory-magic-link-challenges.repository';
+import { MagicLinkTokenService } from '../../services/tokens/magic-link-token.service';
+import { RefreshTokenHasher } from '../../services/tokens/refresh-token-hasher';
+import { TokenService } from '../../services/tokens/token.service';
 import { ConsumeMagicLinkUseCase } from './consume-magic-link.use-case';
-import { CreateAuthSessionUseCase } from './create-auth-session.use-case';
+import { CreateAuthSessionUseCase } from '../create-auth-session/create-auth-session.use-case';
 
 const authSettings = buildAuthConfig(
   validateEnv({
@@ -81,9 +80,9 @@ describe('ConsumeMagicLinkUseCase', () => {
     });
 
     expect(accountsRepository.accounts).toHaveLength(1);
-    expect(result.account.normalizedEmail).toBe('user@example.com');
+    expect(result.account.email).toBe('user@example.com');
     expect(authSessionsRepository.authSessions).toHaveLength(1);
-    expect(result.session.creationSource).toBe('magic_link');
+    expect(result.session.id).toBe(authSessionsRepository.authSessions[0]?.id);
     expect(result.accessToken).toContain('.');
     expect(result.refreshToken).toBeDefined();
   });

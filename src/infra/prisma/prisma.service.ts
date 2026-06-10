@@ -9,7 +9,7 @@ import { databaseConfig, type DatabaseConfig } from '../../config';
 import { PrismaClient } from '../../generated/prisma/client';
 
 @Injectable()
-export class PrismaService
+class PrismaService
   extends PrismaClient
   implements OnModuleInit, OnModuleDestroy
 {
@@ -32,3 +32,5 @@ export class PrismaService
     await this.$disconnect();
   }
 }
+
+export { PrismaService };
