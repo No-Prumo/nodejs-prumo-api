@@ -54,9 +54,7 @@ Controllers do not own:
 @ApiTags('Reservations')
 @Controller('reservations')
 export class ReservationsController {
-  constructor(
-    private readonly createReservation: CreateReservationUseCase,
-  ) {}
+  constructor(private readonly createReservation: CreateReservationUseCase) {}
 
   @Post()
   @ZodResponse({
@@ -78,6 +76,36 @@ Rules:
 - use `@HttpCode(...)` when Nest's default status is not the desired status
 - use DTO classes created with `createZodDto()`
 - return the use case result directly when it already matches the response schema
+
+## Controller Granularity
+
+Prefer one small controller per endpoint or command when a module has many
+independent actions.
+
+This project uses one use case per business action. Keeping the matching HTTP
+controller small makes each endpoint easier to maintain, test, and review as the
+module grows.
+
+Recommended shape for action-heavy modules:
+
+```txt
+presentation/http/
+  request-magic-link.controller.ts
+  request-magic-link.schemas.ts
+  consume-magic-link.controller.ts
+  consume-magic-link.schemas.ts
+  auth-session-response.schemas.ts
+```
+
+Rules:
+
+- keep related endpoints grouped in Swagger with the same `@ApiTags(...)`
+- keep route prefixes consistent with `@Controller(...)` and method decorators
+- use shared schema files only for small response fragments reused by multiple
+  endpoints
+- avoid a large controller that accumulates unrelated endpoint dependencies
+- avoid extracting endpoint functions into a central controller file; prefer
+  Nest controller classes so dependency injection stays explicit
 
 ## Status Code Rules
 
@@ -164,4 +192,3 @@ Controllers should not catch expected application errors.
 Use cases throw `AppError`; the global exception filter maps it to the HTTP response.
 
 Only catch in controllers when the controller is handling a transport-specific concern, such as raw webhook signature extraction.
-

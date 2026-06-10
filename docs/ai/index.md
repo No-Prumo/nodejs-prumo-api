@@ -21,15 +21,28 @@ Short catalog. Routing hints (`read-when`, `do-not-read-when`, `related`, `canon
 | [`docs/ai/codex-skills-strategy.md`](codex-skills-strategy.md)                                             | Codex skills ownership and repository strategy |
 | [`docs/ai/logging/logging-foundation.md`](logging/logging-foundation.md)                                   | Logging baseline with nestjs-pino              |
 | [`docs/ai/product/sandicts-product-context.md`](product/sandicts-product-context.md)                       | Sandicts product context and MVP direction     |
+| [`docs/ai/product/sandicts-mvp-scope.md`](product/sandicts-mvp-scope.md)                                   | Approved MVP scope and explicit exclusions     |
+| [`docs/ai/product/sandicts-scope-checklist.md`](product/sandicts-scope-checklist.md)                       | Working checklist for MVP, V2, and backlog     |
+| [`docs/ai/product/sandicts-v2-backlog.md`](product/sandicts-v2-backlog.md)                                 | V2 and later product backlog                   |
+| [`docs/ai/product/shared-documentation-strategy.md`](product/shared-documentation-strategy.md)              | Shared product docs ownership decision         |
 
 ## Common AI Reading Paths
 
 For a new feature module, read:
 
 1. `docs/ai/product/sandicts-product-context.md`
-2. `docs/ai/business/sandicts-business-rules.md`
-3. `docs/ai/architecture/backend-architecture-overview.md`
-4. `docs/ai/architecture/module-pattern.md`
+2. `docs/ai/product/sandicts-mvp-scope.md`
+3. `docs/ai/business/sandicts-business-rules.md`
+4. `docs/ai/architecture/backend-architecture-overview.md`
+5. `docs/ai/architecture/module-pattern.md`
+
+For product scope decisions, read:
+
+1. `docs/ai/product/sandicts-product-context.md`
+2. `docs/ai/product/sandicts-mvp-scope.md`
+3. `docs/ai/product/sandicts-v2-backlog.md`
+4. `docs/ai/product/sandicts-scope-checklist.md`
+5. `docs/ai/business/sandicts-business-rules.md`
 
 For a new endpoint, read:
 
