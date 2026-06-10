@@ -6,6 +6,9 @@ priority: high
 canonical: docs/ai/product/sandicts-product-context.md
 related:
   - docs/ai/business/sandicts-business-rules.md
+  - docs/ai/product/sandicts-mvp-scope.md
+  - docs/ai/product/sandicts-v2-backlog.md
+  - docs/ai/product/shared-documentation-strategy.md
   - docs/ai/api/zod-swagger-foundation.md
 scope: product, marketplace, sports, sand-courts, mvp
 read-when:
@@ -51,12 +54,12 @@ Sandicts centralizes discovery, reservations, open matches, tournaments, and par
 
 Players can:
 
-- search nearby courts
+- search courts by sport, availability, and price
 - compare prices for rentals and memberships
 - join games and open matches
 - find people to play with
-- register for tournaments
-- build status and track progression as athletes
+- register for tournaments after the MVP
+- build status and track progression as athletes after the MVP
 
 ### Partner
 
@@ -79,8 +82,8 @@ Admins are internal Sandicts operators and should be introduced only when a real
 
 ### Discovery
 
-- list nearby courts by geolocation
-- filter by price, sport type, level, availability, and partner profile
+- list courts by sport, availability, price, and partner profile
+- add nearby court discovery by geolocation after the MVP
 - expose clear pricing for rental, membership, and events
 
 ### Reservations
@@ -98,17 +101,13 @@ Admins are internal Sandicts operators and should be introduced only when a real
 
 ### Tournaments
 
-- partners create tournaments
-- players register through the app
-- tournaments have participant limits and status
-- rankings and results can evolve after the MVP
+- tournament creation, registration, participant limits, rankings, and results are V2 concerns
+- do not let tournament requirements block MVP reservation and open match flows
 
 ### B2B Management
 
-- student management
-- membership control
-- payment status and delinquency visibility
-- basic partner financial reporting
+- MVP starts with partner onboarding, courts, availability, reservations, and simple payment status visibility
+- student management, membership control, teachers, classes, delinquency workflows, and richer reports are V2 concerns
 
 ## Community And Lifestyle
 
@@ -128,6 +127,15 @@ Suggested revenue streams:
 - partner subscription
 - tournament fee
 - future product and merchandise sales
+
+## Scope Documents
+
+Use these documents to decide what belongs in each delivery stage:
+
+- [`docs/ai/product/sandicts-mvp-scope.md`](sandicts-mvp-scope.md): current MVP source of truth
+- [`docs/ai/product/sandicts-v2-backlog.md`](sandicts-v2-backlog.md): V2 and later product themes
+- [`docs/ai/product/sandicts-scope-checklist.md`](sandicts-scope-checklist.md): editable working checklist used to discuss scope
+- [`docs/ai/product/shared-documentation-strategy.md`](shared-documentation-strategy.md): decision about where shared product and business documentation should live
 
 ## Web3 Layer
 
@@ -157,18 +165,22 @@ MVP rule:
 
 Prefer a useful, shippable marketplace core:
 
-1. partner onboarding and court setup
-2. availability calendar
-3. court discovery
-4. reservation request and confirmation
-5. open match creation and joining
-6. basic payment status tracking
-7. simple tournament registration
+1. player account access with Google sign-in and Google One Tap
+2. basic player profile, main sport, and simple level by sport
+3. partner onboarding and court setup
+4. availability calendar
+5. court discovery by sport, availability, price, and partner profile
+6. reservation request and confirmation
+7. open match creation and joining
+8. basic manual payment status tracking
 
 Avoid early overengineering:
 
 - complex recommendation engines
 - full ERP for partners
 - advanced rankings before real usage exists
+- full player evolution, cards, fundamentals, and overall before V2
+- geolocation before V2
+- tournament management before V2
 - blockchain-first architecture for non-blockchain flows
 - multi-service decomposition before domain boundaries are proven

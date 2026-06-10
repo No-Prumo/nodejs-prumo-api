@@ -6,9 +6,12 @@ priority: high
 canonical: docs/ai/business/sandicts-business-rules.md
 related:
   - docs/ai/product/sandicts-product-context.md
+  - docs/ai/product/sandicts-mvp-scope.md
+  - docs/ai/product/sandicts-v2-backlog.md
+  - docs/ai/product/shared-documentation-strategy.md
   - docs/ai/api/error-handling-foundation.md
   - docs/ai/api/zod-swagger-foundation.md
-scope: business-rules, backend, marketplace, reservations, matches, tournaments, payments
+scope: business-rules, backend, marketplace, reservations, matches, payments, player-evolution
 read-when:
   - implementing Sandicts domain modules
   - changing booking, payment, match, tournament, partner, or player behavior
@@ -45,6 +48,34 @@ Recommended first-pass domain vocabulary:
 - `Payment`: system record of money status for reservations, memberships, and tournaments
 - `Membership`: recurring relationship between player and partner or school
 - `Achievement`: optional future reward/status record for player participation, progression, or tournaments
+
+## Current MVP Decisions
+
+MVP includes:
+
+- player account access, including Google sign-in and Google One Tap
+- basic player profile with main sport and simple level by sport
+- partner onboarding
+- court registration and partner-controlled availability
+- court discovery by sport, availability, price, and partner profile
+- reservation request and confirmation
+- basic manual payment status tracking
+- player-created open matches
+
+MVP excludes:
+
+- geolocation and nearby-court search
+- full player evolution, player cards, fundamentals, attributes, and overall
+- tournaments
+- payment gateway integration, refunds, splits, payouts, and automated commission
+- students, memberships, teachers, classes, and full B2B school management
+- public player profile pages
+
+For scope conflicts, prefer:
+
+1. [`docs/ai/product/sandicts-mvp-scope.md`](../product/sandicts-mvp-scope.md)
+2. [`docs/ai/product/sandicts-v2-backlog.md`](../product/sandicts-v2-backlog.md)
+3. [`docs/ai/product/sandicts-scope-checklist.md`](../product/sandicts-scope-checklist.md)
 
 ## Availability And Reservations
 
@@ -115,10 +146,17 @@ Recommended payment statuses:
 
 MVP note:
 
-- payment provider integration can come later
-- until then, keep the domain model ready for provider references, but allow manual or mocked status updates in controlled admin/partner flows
+- payment provider integration comes after the MVP
+- MVP payment status can be updated manually in controlled partner or admin flows
+- keep the model ready for future provider references without coupling MVP behavior to a gateway
+- use `refunded` only when a real refund or manual refund workflow exists
 
 ## Tournaments
+
+MVP note:
+
+- tournaments are V2, not MVP
+- do not let tournament requirements block reservation, payment status, or open match delivery
 
 Rules:
 
@@ -146,17 +184,49 @@ Business failures:
 
 Rules:
 
-- partners manage their own courts, schedules, students, memberships, events, and financial visibility
+- MVP partners manage their own courts, schedules, reservations, and payment visibility
+- students, memberships, teachers, classes, events, and richer financial management are V2 concerns
 - partner users must be scoped to their partner account
 - cross-partner data leakage is a critical bug
 - financial reports should start simple and auditable
 
-MVP partner reports:
+MVP partner visibility:
+
+- pending and overdue payments
+- agenda by day or week
+- reservation status by court and time
+
+V2 partner reports:
 
 - reservations by period
 - revenue by period
-- pending and overdue payments
 - active students or members
+- delinquency summaries
+
+## Player Evolution
+
+MVP note:
+
+- player evolution is V2, not MVP
+- MVP only needs basic profile, main sport, and simple self-declared level by sport
+
+V2 direction:
+
+- each sport can define its own fundamentals, attributes, and special skills
+- futevolei fundamentals may include chapa left, chapa right, shoulder, chest, head, thigh, attack head, and defense head
+- futevolei attacks may include lobby, long diagonal, short diagonal, shark, voo da aguia, pingo, and pingo para tras
+- plastic or high-skill moves should be modeled separately from base fundamentals
+- fundamentals can evolve from low skill to high skill, for example 0 to 100
+- overall should be derived from sport-specific attributes, not manually typed as an isolated number
+- no player should be expected to max every attribute; a perfect player is a theoretical reference, not a normal product target
+- future player cards can show sport, photo, side, nationality, overall, and card color by overall range
+
+Future questions:
+
+- how scores are validated
+- whether coaches, partners, or match history can confirm progression
+- how monthly evolution differs from permanent skill level
+- how achievements, rankings, and AI suggestions relate to player evolution
 
 ## API And Error Guidance
 

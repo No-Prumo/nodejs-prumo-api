@@ -195,6 +195,32 @@ Apply SOLID where it protects clarity:
 - avoid interfaces for things that are not replaceable or not on a boundary
 - avoid inheritance-heavy designs
 
+## TypeScript Export Style
+
+Use named exports at the end of source files.
+
+Rules:
+
+- declare constants, classes, functions, and types without inline `export`
+- export all public symbols from a final export block
+- use a separate final `export type { ... }` block for type-only exports
+- avoid `export default`
+
+Example:
+
+```ts
+const THINGS_REPOSITORY = Symbol('THINGS_REPOSITORY');
+
+type ThingsRepository = {
+  findById(id: string): Promise<ThingRecord | null>;
+};
+
+class ThingService {}
+
+export { THINGS_REPOSITORY, ThingService };
+export type { ThingsRepository };
+```
+
 ## Microservice Readiness
 
 A module is easier to extract later when:
@@ -228,4 +254,3 @@ feature module
   -> port
   -> Prisma or provider adapter
 ```
-
