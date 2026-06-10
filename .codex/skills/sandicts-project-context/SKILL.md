@@ -17,7 +17,8 @@ The canonical project context lives in `docs/ai/index.md` and the documents link
 2. Read only the documents whose frontmatter `read-when` entries match the current task.
 3. Treat `docs/ai/` documents marked as `source-of-truth` as the operational project baseline.
 4. If code and `docs/ai/` disagree, surface the conflict and update the relevant document in the same change when the task changes the project rule.
-5. Keep `.codex/skills/` for Codex operating instructions and `docs/ai/` for durable project context and decisions.
+5. When a change alters behavior, setup, commands, environment variables, API contracts, architecture, database models, auth/session behavior, logging, CI/CD, or docs links that `README.md` explicitly describes, update `README.md` in the same change or state why no README change is needed.
+6. Keep `.codex/skills/` for Codex operating instructions and `docs/ai/` for durable project context and decisions.
 
 ## Boundaries
 
