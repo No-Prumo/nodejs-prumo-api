@@ -33,7 +33,7 @@ const booleanFromEnv = z.preprocess((value) => {
 const portFromEnv = z.coerce.number().int().min(1).max(65535);
 const positiveSecondsFromEnv = z.coerce.number().int().positive();
 
-export const envSchema = z
+const envSchema = z
   .object({
     NODE_ENV: z.enum(nodeEnvironmentValues).default('development'),
     APP_ENV: z.enum(appEnvironmentValues).optional(),
@@ -59,6 +59,11 @@ export const envSchema = z
       .default(packageMetadata.name),
     AUTH_ACCESS_TOKEN_SECRET: z.string().trim().min(32).optional(),
     AUTH_ACCESS_TOKEN_TTL_SECONDS: positiveSecondsFromEnv.default(900),
+    AUTH_MAGIC_LINK_TTL_SECONDS: z.coerce
+      .number()
+      .int()
+      .positive()
+      .default(900),
     AUTH_REFRESH_TOKEN_IDLE_TTL_SECONDS: positiveSecondsFromEnv.default(
       60 * 60 * 24 * 14,
     ),
@@ -91,9 +96,9 @@ export const envSchema = z
     }
   });
 
-export type Env = z.infer<typeof envSchema>;
+type Env = z.infer<typeof envSchema>;
 
-export function validateEnv(env: Record<string, unknown>): Env {
+function validateEnv(env: Record<string, unknown>): Env {
   const parsedEnv = envSchema.safeParse(env);
 
   if (parsedEnv.success) {
@@ -109,7 +114,7 @@ export function validateEnv(env: Record<string, unknown>): Env {
 
 let cachedEnv: Env | undefined;
 
-export function getEnv(env: Record<string, unknown> = process.env): Env {
+function getEnv(env: Record<string, unknown> = process.env): Env {
   if (env === process.env && cachedEnv) {
     return cachedEnv;
   }
@@ -122,3 +127,6 @@ export function getEnv(env: Record<string, unknown> = process.env): Env {
 
   return parsedEnv;
 }
+
+export { envSchema, getEnv, validateEnv };
+export type { Env };
