@@ -26,6 +26,7 @@ describe('validateEnv', () => {
     expect(env.APP_HOST).toBe('0.0.0.0');
     expect(env.DOCS_PATH).toBe('docs');
     expect(env.AUTH_ACCESS_TOKEN_TTL_SECONDS).toBe(900);
+    expect(env.AUTH_MAGIC_LINK_TTL_SECONDS).toBe(900);
     expect(env.AUTH_REFRESH_TOKEN_COOKIE_PATH).toBe('/auth/refresh');
   });
 

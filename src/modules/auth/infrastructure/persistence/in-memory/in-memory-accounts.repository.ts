@@ -39,6 +39,20 @@ class InMemoryAccountsRepository implements AccountsRepository {
       ) ?? null,
     );
   }
+
+  async resolveOrCreateByEmail(
+    data: CreateAccountData,
+  ): Promise<AccountRecord> {
+    const existingAccount = await this.findByNormalizedEmail(
+      data.normalizedEmail,
+    );
+
+    if (existingAccount) {
+      return existingAccount;
+    }
+
+    return this.create(data);
+  }
 }
 
 export { InMemoryAccountsRepository };
