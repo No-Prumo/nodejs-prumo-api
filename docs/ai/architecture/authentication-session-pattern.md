@@ -289,9 +289,10 @@ Reason for `POST` consumption:
 - email scanners and link preview tools may open links automatically
 - a frontend landing page can receive the token and then intentionally submit it
 
-## Google Sign-In
+## Google Sign-In And One Tap
 
-Google sign-in should use OpenID Connect.
+Google sign-in and Google One Tap should use Google Identity Services and
+OpenID Connect.
 
 Supported MVP approach:
 
@@ -299,7 +300,8 @@ Supported MVP approach:
 POST /auth/google/sign-in
 ```
 
-The frontend sends a Google ID token or authorization result. The backend must validate:
+The frontend sends a Google Identity Services `credential` or ID token from the
+Google Sign-In button or Google One Tap prompt. The backend must validate:
 
 - issuer
 - audience/client id
@@ -315,6 +317,8 @@ Rules:
 - store Google identity in `ExternalIdentity`
 - if the same verified email already exists locally, link Google identity according to the account-linking policy
 - create an internal Sandicts session after success
+- keep Google Sign-In and Google One Tap on the same backend endpoint unless a
+  future product reason requires separate behavior
 
 Account-linking policy:
 

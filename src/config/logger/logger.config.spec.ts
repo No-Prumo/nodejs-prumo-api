@@ -25,6 +25,7 @@ describe('buildLoggerConfig', () => {
       ...baseEnv,
       APP_ENV: 'staging',
       AUTH_ACCESS_TOKEN_SECRET: 'production-secret-with-enough-length',
+      AUTH_GOOGLE_CLIENT_ID: 'google-web-client-id.apps.googleusercontent.com',
       NODE_ENV: 'production',
     });
 

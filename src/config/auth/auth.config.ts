@@ -9,6 +9,9 @@ function buildAuthConfig(env: Env) {
   return {
     accessTokenSecret: env.AUTH_ACCESS_TOKEN_SECRET ?? localAccessTokenSecret,
     accessTokenTtlSeconds: env.AUTH_ACCESS_TOKEN_TTL_SECONDS,
+    google: {
+      clientId: env.AUTH_GOOGLE_CLIENT_ID ?? null,
+    },
     magicLinkTtlSeconds: env.AUTH_MAGIC_LINK_TTL_SECONDS,
     refreshTokenIdleTtlSeconds: env.AUTH_REFRESH_TOKEN_IDLE_TTL_SECONDS,
     refreshTokenAbsoluteTtlSeconds: env.AUTH_REFRESH_TOKEN_ABSOLUTE_TTL_SECONDS,

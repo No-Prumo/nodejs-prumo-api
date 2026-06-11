@@ -59,6 +59,7 @@ const envSchema = z
       .default(packageMetadata.name),
     AUTH_ACCESS_TOKEN_SECRET: z.string().trim().min(32).optional(),
     AUTH_ACCESS_TOKEN_TTL_SECONDS: positiveSecondsFromEnv.default(900),
+    AUTH_GOOGLE_CLIENT_ID: z.string().trim().min(1).optional(),
     AUTH_MAGIC_LINK_TTL_SECONDS: z.coerce
       .number()
       .int()
@@ -91,6 +92,17 @@ const envSchema = z
       context.addIssue({
         code: 'custom',
         path: ['AUTH_ACCESS_TOKEN_SECRET'],
+        message: 'Required in production',
+      });
+    }
+
+    if (
+      env.NODE_ENV === 'production' &&
+      env.AUTH_GOOGLE_CLIENT_ID === undefined
+    ) {
+      context.addIssue({
+        code: 'custom',
+        path: ['AUTH_GOOGLE_CLIENT_ID'],
         message: 'Required in production',
       });
     }
