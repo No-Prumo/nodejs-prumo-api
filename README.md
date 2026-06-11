@@ -79,18 +79,21 @@ Implemented:
 - structured logging with request correlation
 - authentication/session domain foundation
 - public email magic link request and consume controllers
+- Google Sign-In and Google One Tap backend authentication endpoint
 - unit and integration coverage for configuration, logging, error handling,
-  refresh token hashing, access token issuing, and session creation
+  refresh token hashing, access token issuing, session creation, and Google
+  authentication
 - a complete repository README and README maintenance workflow
 
 Not implemented yet:
 
 - reservation, partner, court, match, tournament, payment, and finance modules
-- Google sign-in, refresh, sign-out, sign-out-all, and auth/me endpoints
+- refresh, sign-out, sign-out-all, and auth/me endpoints
 - complete product API surface
 - E2E test suite
 
-Current public routes are the initial email magic link authentication endpoints.
+Current public routes are the initial email magic link and Google
+authentication endpoints.
 
 ## Tech Stack
 
@@ -193,6 +196,7 @@ OBSERVABILITY_SERVICE_NAME=sandicts-api
 
 AUTH_ACCESS_TOKEN_SECRET=dev-only-auth-secret-minimum-32-chars-change-me
 AUTH_ACCESS_TOKEN_TTL_SECONDS=900
+AUTH_GOOGLE_CLIENT_ID=your-google-web-client-id.apps.googleusercontent.com
 AUTH_MAGIC_LINK_TTL_SECONDS=900
 AUTH_REFRESH_TOKEN_IDLE_TTL_SECONDS=1209600
 AUTH_REFRESH_TOKEN_ABSOLUTE_TTL_SECONDS=2592000
@@ -210,6 +214,8 @@ Notes:
   variables shown above.
 - In production, `AUTH_ACCESS_TOKEN_SECRET` is required and must be a real
   secret with at least 32 characters.
+- In production, `AUTH_GOOGLE_CLIENT_ID` is required and must be the Google web
+  OAuth client ID used by Google Sign-In and Google One Tap.
 
 ### 3. Start PostgreSQL
 
@@ -336,6 +342,7 @@ Default log levels:
 | --- | --- | --- | --- |
 | `AUTH_ACCESS_TOKEN_SECRET` | Required in production | local development fallback | HMAC secret used to sign access tokens. Must be at least 32 characters when provided. |
 | `AUTH_ACCESS_TOKEN_TTL_SECONDS` | No | `900` | Access token lifetime. |
+| `AUTH_GOOGLE_CLIENT_ID` | Required in production | none | Google web OAuth client ID used to validate Google Sign-In and One Tap ID tokens. |
 | `AUTH_MAGIC_LINK_TTL_SECONDS` | No | `900` | Magic link token lifetime. |
 | `AUTH_REFRESH_TOKEN_IDLE_TTL_SECONDS` | No | `1209600` | Refresh token idle lifetime, 14 days by default. |
 | `AUTH_REFRESH_TOKEN_ABSOLUTE_TTL_SECONDS` | No | `2592000` | Refresh token absolute lifetime, 30 days by default. |
@@ -584,6 +591,54 @@ Response contract:
 }
 ```
 
+### `POST /auth/google/sign-in`
+
+Validates a Google Sign-In or Google One Tap ID token, resolves or creates the
+Sandicts account, stores Google `sub` as the external provider subject, creates
+the internal auth session, sets the refresh token cookie, and returns
+account/session access data.
+
+```bash
+curl -X POST "http://localhost:3000/auth/google/sign-in" \
+  -H "Content-Type: application/json" \
+  -d '{"credential":"google-identity-services-credential"}'
+```
+
+Request contract:
+
+| Source | Field | Rules |
+| --- | --- | --- |
+| body | `credential` | optional string, trimmed, min 10, max 4096; Google Identity Services credential/ID token |
+| body | `idToken` | optional string, trimmed, min 10, max 4096; accepted alias for ID token clients |
+
+At least one of `credential` or `idToken` is required. If both are provided,
+`credential` is used.
+
+Response contract:
+
+```json
+{
+  "account": {
+    "id": "account-id",
+    "email": "player@example.com",
+    "displayName": "Player Name"
+  },
+  "session": {
+    "id": "session-id"
+  },
+  "accessToken": "access.token.signature",
+  "accessTokenExpiresAt": "2026-01-01T00:15:00.000Z"
+}
+```
+
+Security behavior:
+
+- The backend validates the Google token server-side with `AUTH_GOOGLE_CLIENT_ID`.
+- Invalid tokens and unverified Google emails return `401 unauthorized`.
+- Google `sub` is the provider identity key; Google email is never used as the
+  provider identity key.
+- Google Calendar scopes are not part of sign-in.
+
 ## Database And Prisma
 
 The project uses PostgreSQL and Prisma 7.
@@ -692,12 +747,12 @@ Current HTTP endpoints:
 ```txt
 POST /auth/magic-link/request
 POST /auth/magic-link/consume
+POST /auth/google/sign-in
 ```
 
 Planned next HTTP endpoints:
 
 ```txt
-POST /auth/google/sign-in
 POST /auth/refresh
 POST /auth/sign-out
 POST /auth/sign-out-all

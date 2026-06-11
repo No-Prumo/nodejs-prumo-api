@@ -26,11 +26,12 @@ describe('validateEnv', () => {
     expect(env.APP_HOST).toBe('0.0.0.0');
     expect(env.DOCS_PATH).toBe('docs');
     expect(env.AUTH_ACCESS_TOKEN_TTL_SECONDS).toBe(900);
+    expect(env.AUTH_GOOGLE_CLIENT_ID).toBeUndefined();
     expect(env.AUTH_MAGIC_LINK_TTL_SECONDS).toBe(900);
     expect(env.AUTH_REFRESH_TOKEN_COOKIE_PATH).toBe('/auth/refresh');
   });
 
-  it('requires an auth access token secret in production', () => {
+  it('requires production auth secrets and provider client ids', () => {
     expect(() =>
       validateEnv({
         DATABASE_URL: 'postgresql://postgres:sandicts@localhost:5432/sandicts',
@@ -46,6 +47,8 @@ describe('validateEnv', () => {
     expect(() =>
       validateEnv({
         AUTH_ACCESS_TOKEN_SECRET: 'production-secret-with-enough-length',
+        AUTH_GOOGLE_CLIENT_ID:
+          'google-web-client-id.apps.googleusercontent.com',
         DATABASE_URL: 'postgresql://postgres:sandicts@localhost:5432/sandicts',
         NODE_ENV: 'production',
         POSTGRES_DB: 'sandicts',

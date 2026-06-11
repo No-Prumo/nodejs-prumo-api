@@ -264,6 +264,7 @@ Current shape:
 
 - `accessTokenSecret`
 - `accessTokenTtlSeconds`
+- `google.clientId`
 - `magicLinkTtlSeconds`
 - `refreshTokenIdleTtlSeconds`
 - `refreshTokenAbsoluteTtlSeconds`
@@ -338,6 +339,7 @@ OBSERVABILITY_SERVICE_NAME=sandicts-api
 
 AUTH_ACCESS_TOKEN_SECRET=dev-only-auth-secret-minimum-32-chars-change-me
 AUTH_ACCESS_TOKEN_TTL_SECONDS=900
+AUTH_GOOGLE_CLIENT_ID=your-google-web-client-id.apps.googleusercontent.com
 AUTH_MAGIC_LINK_TTL_SECONDS=900
 AUTH_REFRESH_TOKEN_IDLE_TTL_SECONDS=1209600
 AUTH_REFRESH_TOKEN_ABSOLUTE_TTL_SECONDS=2592000
@@ -357,6 +359,8 @@ Notes:
 - ports are coerced to integers and validated in range `1..65535`
 - `AUTH_ACCESS_TOKEN_SECRET` is required in production and falls back only for
   local/test development
+- `AUTH_GOOGLE_CLIENT_ID` is required in production and is used to validate
+  Google Sign-In and Google One Tap ID token audiences
 - auth lifetimes are positive integer seconds
 - `AUTH_COOKIE_SECURE` defaults to `true` in production and otherwise follows
   the explicit env value or local default

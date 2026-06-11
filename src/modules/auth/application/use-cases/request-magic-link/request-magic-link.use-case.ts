@@ -5,6 +5,7 @@ import {
   MAGIC_LINK_CHALLENGES_REPOSITORY,
   type MagicLinkChallengesRepository,
 } from '../../ports/magic-link-challenges.repository';
+import { normalizeEmail } from '../../services/email/normalize-email';
 import { MagicLinkTokenService } from '../../services/tokens/magic-link-token.service';
 
 const magicLinkRequestMessage =
@@ -60,10 +61,6 @@ class RequestMagicLinkUseCase {
   private addSeconds(date: Date, seconds: number): Date {
     return new Date(date.getTime() + seconds * 1000);
   }
-}
-
-function normalizeEmail(email: string): string {
-  return email.trim().toLowerCase();
 }
 
 export { RequestMagicLinkUseCase, magicLinkRequestMessage, normalizeEmail };

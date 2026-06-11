@@ -1,0 +1,81 @@
+import {
+  Body,
+  Controller,
+  Headers,
+  HttpCode,
+  Inject,
+  Ip,
+  Post,
+  Res,
+} from '@nestjs/common';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
+import type { Response } from 'express';
+import { ZodResponse } from 'nestjs-zod';
+import { authConfig, type AuthConfig } from '../../../../../config';
+import { GoogleSignInUseCase } from '../../../application/use-cases/google-sign-in/google-sign-in.use-case';
+import { buildRefreshTokenCookieOptions } from '../shared/auth-cookie.helper';
+import {
+  GoogleSignInBodyDto,
+  GoogleSignInResponseDto,
+} from './google-sign-in.schemas';
+
+@ApiTags('Auth')
+@Controller('auth/google')
+class GoogleSignInController {
+  constructor(
+    private readonly googleSignIn: GoogleSignInUseCase,
+    @Inject(authConfig.KEY)
+    private readonly authSettings: AuthConfig,
+  ) {}
+
+  @Post('sign-in')
+  @HttpCode(200)
+  @Throttle({ default: { limit: 20, ttl: 15 * 60 * 1000 } })
+  @ApiOperation({
+    summary: 'Sign in with Google',
+    description:
+      'Validates a Google Sign-In or One Tap ID token and creates an auth session.',
+  })
+  @ZodResponse({
+    status: 200,
+    description: 'Authenticated session response',
+    type: GoogleSignInResponseDto,
+  })
+  async signIn(
+    @Body() body: GoogleSignInBodyDto,
+    @Headers('user-agent') userAgent: string | undefined,
+    @Ip() ipAddress: string | undefined,
+    @Res({ passthrough: true }) response: Response,
+  ): Promise<GoogleSignInResponseDto> {
+    const result = await this.googleSignIn.execute({
+      credential: (body.credential ?? body.idToken) as string,
+      userAgent,
+      ipAddress,
+    });
+
+    response.cookie(
+      this.authSettings.refreshTokenCookie.name,
+      result.refreshToken,
+      buildRefreshTokenCookieOptions(
+        this.authSettings,
+        result.refreshTokenIdleExpiresAt,
+      ),
+    );
+
+    return {
+      account: {
+        id: result.account.id,
+        email: result.account.email,
+        displayName: result.account.displayName,
+      },
+      session: {
+        id: result.session.id,
+      },
+      accessToken: result.accessToken,
+      accessTokenExpiresAt: result.accessTokenExpiresAt.toISOString(),
+    };
+  }
+}
+
+export { GoogleSignInController };
