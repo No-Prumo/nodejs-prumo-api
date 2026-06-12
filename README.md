@@ -939,8 +939,10 @@ Jobs:
 Allowed temporary branch pattern:
 
 ```txt
-(feature|fix|hotfix|chore|rc)/KAN-123-short-description
+(feature|fix|hotfix|docs|refactor|test|ci|chore|rc|codex)/KAN-123-short-description
 ```
+
+Use `codex/KAN-123-short-description` only for AI-agent-created branches.
 
 Protected branch names allowed as PR sources:
 

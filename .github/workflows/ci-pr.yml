@@ -37,7 +37,7 @@ jobs:
           echo "Source branch: $HEAD"
           echo "Target branch: $BASE"
 
-          TEMP_BRANCH_REGEX='^(feature|fix|hotfix|docs|refactor|test|ci|build|perf|chore|rc)/KAN-[0-9]+-[a-z0-9]+(-[a-z0-9]+)*$'
+          TEMP_BRANCH_REGEX='^(feature|fix|hotfix|docs|refactor|test|ci|chore|rc|codex)/KAN-[0-9]+-[a-z0-9]+(-[a-z0-9]+)*$'
 
           is_valid_temp_branch=false
           is_valid_protected_branch=false
@@ -71,10 +71,9 @@ jobs:
             echo "  refactor/KAN-345-reorganize-auth-module"
             echo "  test/KAN-567-add-auth-coverage"
             echo "  ci/KAN-678-update-pr-checks"
-            echo "  build/KAN-890-update-build-tooling"
-            echo "  perf/KAN-901-optimize-query"
             echo "  chore/KAN-321-update-ci"
             echo "  rc/KAN-654-release-candidate"
+            echo "  codex/KAN-107-ai-doc-routing"
             echo "  developer"
             echo "  staging"
             echo "  master"

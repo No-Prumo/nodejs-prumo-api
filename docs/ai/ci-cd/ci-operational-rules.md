@@ -74,7 +74,7 @@ Notes:
 Source branch pattern for temporary branches (inline in `ci-pr.yml`):
 
 ```regex
-^(feature|fix|hotfix|docs|refactor|test|ci|build|perf|chore|rc)/KAN-[0-9]+-[a-z0-9]+(-[a-z0-9]+)*$
+^(feature|fix|hotfix|docs|refactor|test|ci|chore|rc|codex)/KAN-[0-9]+-[a-z0-9]+(-[a-z0-9]+)*$
 ```
 
 Allowed source branches that skip the temp-branch regex (exact match):

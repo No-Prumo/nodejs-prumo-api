@@ -11,6 +11,10 @@ Generate consistent Jira task drafts, pull request descriptions, and commit mess
 
 Use repository evidence first: the user request, changed files, `git diff`, `git status`, `docs/ai/index.md`, and any relevant source-of-truth document under `docs/ai/`.
 
+When finishing a task, preparing commits, opening a PR, updating a PR title, or producing a delivery summary, read `docs/ai/task-finalization-workflow.md` first.
+
+For Jira roadmap, backlog, Epic, Story, Task, Subtask, Bug, or issue-planning requests, read `docs/ai/product/sandicts-jira-planning-workflow.md` first. When frontend or fullstack Jira work is involved, also read `docs/frontend/sandicts-frontend-planning.md`; read `docs/frontend/sandicts-page-functional-spec.md` only when the issue depends on page, route, permission, or user-flow details. When the user asks for backlog planning instead of a single delivery artifact, follow that workflow and do not force PR description or commit message sections unless the user asks for them.
+
 ## Output Contract
 
 Always return these sections in this order unless the user asks for only one artifact:
@@ -93,6 +97,22 @@ Rules:
 ## PR Description
 
 Always inspect and follow `.github/pull_request_template.md` before writing the PR description. Preserve the section names and order from the template exactly.
+
+## PR Title
+
+Use this format:
+
+```text
+[KAN-123] <type>(<scope>): <short summary>
+```
+
+Rules:
+
+- Put the primary Jira key first.
+- Use the same type vocabulary as commit messages.
+- Use a scope when it improves scanning.
+- If multiple Jira tasks are included, put the primary key in the title and list related keys in the PR body.
+- Example: `[KAN-108] docs(process): define task finalization workflow`.
 
 Current default project template:
 
@@ -182,7 +202,8 @@ Rules:
 
 - Use imperative mood.
 - Keep the first line under 72 characters when practical.
-- Do not include a Jira key unless the user provides one or it is visible in the branch/issue context.
+- The PR title carries the Jira key by default.
+- Do not include a Jira key in a commit unless the user explicitly asks for it, the key is part of the requested commit style, or the commit will be consumed outside the PR context.
 
 ## Evidence Checklist
 

@@ -88,18 +88,18 @@ Allowed branch formats:
 - `refactor/KAN-123-short-description`
 - `test/KAN-123-short-description`
 - `ci/KAN-123-short-description`
-- `build/KAN-123-short-description`
-- `perf/KAN-123-short-description`
 - `chore/KAN-123-short-description`
 - `rc/KAN-123-short-description`
+- `codex/KAN-123-short-description`
 
 Rules:
 
-- prefix must be one of: `feature`, `fix`, `hotfix`, `docs`, `refactor`, `test`, `ci`, `build`, `perf`, `chore`, `rc`
+- prefix must be one of: `feature`, `fix`, `hotfix`, `docs`, `refactor`, `test`, `ci`, `chore`, `rc`, `codex`
 - Jira key must be uppercase
 - Jira key format must be `KAN-<number>`
 - slug must be lowercase kebab-case
 - slug must not be empty
+- use `codex` only for AI-agent-created work branches; the Jira key and slug are still required
 
 Examples of invalid names:
 
@@ -131,10 +131,9 @@ Allowed PR sources:
 - `refactor/*`
 - `test/*`
 - `ci/*`
-- `build/*`
-- `perf/*`
 - `chore/*`
 - `rc/*`
+- `codex/*`
 - `developer`
 - `staging`
 - `master`
@@ -149,8 +148,11 @@ Rules:
 
 Preferred PR title format:
 
-- `[KAN-123] implement google auth`
-- `[KAN-456] fix payment validation`
+- `[KAN-123] feat(auth): implement google auth`
+- `[KAN-456] fix(payment): reject invalid payment state`
+
+The Jira key must be the first visible token in the title. Detailed delivery
+rules live in `docs/ai/task-finalization-workflow.md`.
 
 ---
 
