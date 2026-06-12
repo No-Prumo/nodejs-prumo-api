@@ -84,6 +84,23 @@ Current Jira project key:
 Always re-check Jira before making a batch change. Issue statuses, parent links,
 and available workflow transitions may change.
 
+## Jira Access Fast Path
+
+When a known Sandicts Jira key is provided, use direct Jira issue access before
+any broad search.
+
+Recommended lookup order:
+
+1. get accessible Atlassian resources and select `sandicts.atlassian.net`
+2. call the direct Jira issue tool for the known key, for example `KAN-61`
+3. call direct transition or comment tools only after the user approves the
+   Jira mutation
+4. use JQL for known backlog slices, such as `parent = KAN-46`
+
+Use broad Rovo Search only when the target Jira issue, Confluence page, or JQL
+filter is unknown. This avoids the slow or denied generic Rovo Search path when
+the work already has a concrete Jira key.
+
 ## Jira Hierarchy
 
 Use this hierarchy:

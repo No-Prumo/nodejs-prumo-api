@@ -68,6 +68,15 @@ Do not start every screen before the backend exists. Build ahead only when the
 contract is clear or the screen can be safely mocked without creating product
 decisions outside the source-of-truth docs.
 
+Repository and runtime decision:
+
+- the frontend app lives in `sandicts/reactjs-sandicts-web`
+- local path is `apps/reactjs-sandicts-web`, sibling to
+  `apps/nodejs-sandicts-api`
+- use Node.js 24 LTS and npm 11 for the initial frontend foundation
+- run the backend locally on port `3000` and the frontend locally on port
+  `3001`
+
 ## Start Criteria
 
 ### Frontend Planning Can Start Now
@@ -152,8 +161,6 @@ Rules:
 
 Open stack details:
 
-- package manager alignment with the backend repository
-- frontend repository location
 - exact OpenAPI generator
 - auth storage/session behavior with backend
 - deployment target
@@ -645,11 +652,11 @@ Decided:
 - [x] Decide API client strategy: generated OpenAPI client from Nest Swagger.
 - [x] Decide local UI state strategy: Zustand only for local UI state.
 - [x] Decide frontend test strategy: Playwright, Vitest, and Testing Library.
+- [x] Decide frontend repository location: `sandicts/reactjs-sandicts-web`.
+- [x] Decide package manager and Node.js version: npm 11 and Node.js 24 LTS.
 
 Still open:
 
-- [ ] Decide frontend repository location.
-- [ ] Decide package manager and Node.js version.
 - [ ] Decide exact OpenAPI generator.
 - [ ] Decide whether the first app is player-first, partner-first, or balanced.
 - [ ] Decide auth storage/session strategy with backend.
