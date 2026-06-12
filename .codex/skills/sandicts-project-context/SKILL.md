@@ -60,5 +60,7 @@ Use `docs/ai/index.md` as the canonical catalog and reading router.
 Main roots:
 
 - `docs/ai/`: durable backend, product, business-rule, API, CI/CD, and AI-routing context.
-- `docs/frontend/`: portable frontend planning, stack, page, screen, and delivery docs.
-- `docs/frontend/discovery/`: historical discovery drafts; read only for legacy comparison or audit tasks.
+- `docs/frontend/`: pointer to frontend docs now owned by the sibling
+  `sandicts/reactjs-sandicts-web` repository.
+- Frontend planning, stack, page, screen, delivery, and discovery docs are
+  canonical in `sandicts/reactjs-sandicts-web:docs/frontend`.

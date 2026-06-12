@@ -13,7 +13,7 @@ Use repository evidence first: the user request, changed files, `git diff`, `git
 
 When finishing a task, preparing commits, opening a PR, updating a PR title, or producing a delivery summary, read `docs/ai/task-finalization-workflow.md` first.
 
-For Jira roadmap, backlog, Epic, Story, Task, Subtask, Bug, or issue-planning requests, read `docs/ai/product/sandicts-jira-planning-workflow.md` first. When frontend or fullstack Jira work is involved, also read `docs/frontend/sandicts-frontend-planning.md`; read `docs/frontend/sandicts-page-functional-spec.md` only when the issue depends on page, route, permission, or user-flow details. When the user asks for backlog planning instead of a single delivery artifact, follow that workflow and do not force PR description or commit message sections unless the user asks for them.
+For Jira roadmap, backlog, Epic, Story, Task, Subtask, Bug, or issue-planning requests, read `docs/ai/product/sandicts-jira-planning-workflow.md` first. When frontend or fullstack Jira work is involved, read the canonical frontend planning docs from the sibling `sandicts/reactjs-sandicts-web` repository, especially `sandicts/reactjs-sandicts-web:docs/frontend/sandicts-frontend-planning.md`; read `sandicts/reactjs-sandicts-web:docs/frontend/sandicts-page-functional-spec.md` only when the issue depends on page, route, permission, or user-flow details. When the user asks for backlog planning instead of a single delivery artifact, follow that workflow and do not force PR description or commit message sections unless the user asks for them.
 
 ## Output Contract
 
