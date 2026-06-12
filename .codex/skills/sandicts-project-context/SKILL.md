@@ -15,11 +15,12 @@ The canonical project context lives in `docs/ai/index.md` and the documents link
 
 1. Start with `docs/ai/index.md` when the task touches architecture, API behavior, validation, errors, logging, configuration, CI/CD, product rules, or business rules.
 2. Read only the documents whose frontmatter `read-when` entries match the current task.
-3. Treat `docs/ai/` documents marked as `source-of-truth` as the operational project baseline.
-4. If code and `docs/ai/` disagree, surface the conflict and update the relevant document in the same change when the task changes the project rule.
-5. When a change alters behavior, setup, commands, environment variables, API contracts, architecture, database models, auth/session behavior, logging, CI/CD, or docs links that `README.md` explicitly describes, update `README.md` in the same change or state why no README change is needed.
-6. Keep `.codex/skills/` for Codex operating instructions and `docs/ai/` for durable project context and decisions.
-7. When changing repository skills, validate the edited skill folder with the skill validation script when available.
+3. Prefer smaller context docs before large functional, screen, roadmap, or Jira specs.
+4. Treat `docs/ai/` documents marked as `source-of-truth` as the operational project baseline.
+5. If code and `docs/ai/` disagree, surface the conflict and update the relevant document in the same change when the task changes the project rule.
+6. When a change alters behavior, setup, commands, environment variables, API contracts, architecture, database models, auth/session behavior, logging, CI/CD, or docs links that `README.md` explicitly describes, update `README.md` in the same change or state why no README change is needed.
+7. Keep `.codex/skills/` for Codex operating instructions and `docs/ai/` for durable project context and decisions.
+8. When changing repository skills, validate the edited skill folder with the skill validation script when available.
 
 ## Boundaries
 
@@ -27,6 +28,7 @@ The canonical project context lives in `docs/ai/index.md` and the documents link
 - Keep personal and generic skills outside this repository.
 - Avoid copying full project rules into this skill when a `docs/ai/` document already owns them.
 - Prefer small, task-focused project skills over broad generic instructions when this repository needs new Codex behavior.
+- Do not read long specs just because they are related; read them only when the task needs their detailed sections.
 
 ## Current Project Skills
 
@@ -36,24 +38,10 @@ The canonical project context lives in `docs/ai/index.md` and the documents link
 
 ## Current Project Docs
 
-- `docs/ai/api/error-handling-foundation.md`
-- `docs/ai/api/zod-swagger-foundation.md`
-- `docs/ai/architecture/authentication-session-pattern.md`
-- `docs/ai/architecture/backend-architecture-overview.md`
-- `docs/ai/architecture/controller-pattern.md`
-- `docs/ai/architecture/external-integrations-pattern.md`
-- `docs/ai/architecture/module-pattern.md`
-- `docs/ai/architecture/repository-pattern.md`
-- `docs/ai/architecture/use-case-pattern.md`
-- `docs/ai/business/sandicts-business-rules.md`
-- `docs/ai/ci-cd/ci-governance.md`
-- `docs/ai/ci-cd/ci-operational-rules.md`
-- `docs/ai/logging/logging-foundation.md`
-- `docs/ai/codex-skills-strategy.md`
-- `docs/ai/config/configuration-foundation.md`
-- `docs/ai/config/typescript-module-resolution.md`
-- `docs/ai/product/sandicts-mvp-scope.md`
-- `docs/ai/product/sandicts-product-context.md`
-- `docs/ai/product/sandicts-scope-checklist.md`
-- `docs/ai/product/sandicts-v2-backlog.md`
-- `docs/ai/product/shared-documentation-strategy.md`
+Use `docs/ai/index.md` as the canonical catalog and reading router.
+
+Main roots:
+
+- `docs/ai/`: durable backend, product, business-rule, API, CI/CD, and AI-routing context.
+- `docs/frontend/`: portable frontend planning, stack, page, screen, and delivery docs.
+- `docs/frontend/discovery/`: historical discovery drafts; read only for legacy comparison or audit tasks.

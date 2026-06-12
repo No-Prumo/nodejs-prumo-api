@@ -1,6 +1,29 @@
+---
+title: AI Context Index
+doc-type: ai-routing-index
+role: routing-index
+priority: high
+canonical: docs/ai/index.md
+scope: ai-routing, docs, skills, context-selection
+read-when:
+  - starting any Sandicts AI-assisted task
+  - deciding which project docs to read
+  - auditing docs or skills for AI context usage
+do-not-read-when:
+  - a more specific repository skill has already selected the exact docs needed
+---
+
 # AI Context Index
 
-Short catalog. Routing hints (`read-when`, `do-not-read-when`, `related`, `canonical`) live in each document’s YAML frontmatter.
+Short catalog. Routing hints (`read-when`, `do-not-read-when`, `related`, `canonical`) live in each document's YAML frontmatter.
+
+## Reading Rules
+
+- Start with this index or a repository skill, then open only docs whose `read-when` entries match the task.
+- Prefer smaller context docs before large functional specs.
+- Treat discovery docs as historical input unless the task explicitly asks for legacy comparison.
+- Read long page, screen, roadmap, or Jira specs only when the task depends on their detailed sections.
+- Do not load every related document just because it is listed in frontmatter.
 
 | Document                                                                                                   | Role                                           |
 | ---------------------------------------------------------------------------------------------------------- | ---------------------------------------------- |
@@ -22,9 +45,19 @@ Short catalog. Routing hints (`read-when`, `do-not-read-when`, `related`, `canon
 | [`docs/ai/logging/logging-foundation.md`](logging/logging-foundation.md)                                   | Logging baseline with nestjs-pino              |
 | [`docs/ai/product/sandicts-product-context.md`](product/sandicts-product-context.md)                       | Sandicts product context and MVP direction     |
 | [`docs/ai/product/sandicts-mvp-scope.md`](product/sandicts-mvp-scope.md)                                   | Approved MVP scope and explicit exclusions     |
+| [`docs/ai/product/sandicts-mvp-functional-spec.md`](product/sandicts-mvp-functional-spec.md)               | Detailed MVP functional spec; read on demand   |
+| [`docs/ai/product/sandicts-jira-planning-workflow.md`](product/sandicts-jira-planning-workflow.md)         | Jira roadmap, backlog, and issue-writing rules |
 | [`docs/ai/product/sandicts-scope-checklist.md`](product/sandicts-scope-checklist.md)                       | Working checklist for MVP, V2, and backlog     |
 | [`docs/ai/product/sandicts-v2-backlog.md`](product/sandicts-v2-backlog.md)                                 | V2 and later product backlog                   |
 | [`docs/ai/product/shared-documentation-strategy.md`](product/shared-documentation-strategy.md)              | Shared product docs ownership decision         |
+| [`docs/frontend/sandicts-frontend-context.md`](../frontend/sandicts-frontend-context.md)                   | Frontend product feel, UX direction, and stack |
+| [`docs/frontend/sandicts-frontend-tech-decisions.md`](../frontend/sandicts-frontend-tech-decisions.md)     | Frontend technical stack and architecture decisions |
+| [`docs/frontend/sandicts-mvp-delivery-roadmap.md`](../frontend/sandicts-mvp-delivery-roadmap.md)           | MVP frontend/fullstack delivery roadmap        |
+| [`docs/frontend/sandicts-frontend-planning.md`](../frontend/sandicts-frontend-planning.md)                 | Frontend start criteria and fullstack roadmap  |
+| [`docs/frontend/sandicts-page-functional-spec.md`](../frontend/sandicts-page-functional-spec.md)           | Frontend page inventory, behavior, and rules   |
+| [`docs/frontend/sandicts-mvp-screens-spec.md`](../frontend/sandicts-mvp-screens-spec.md)                   | Detailed MVP screen spec; read on demand       |
+| [`docs/frontend/discovery/legacy-sports-rats-web-audit.md`](../frontend/discovery/legacy-sports-rats-web-audit.md) | Legacy frontend audit; discovery only  |
+| [`docs/frontend/discovery/sandicts-mvp-frontend-roadmap-draft.md`](../frontend/discovery/sandicts-mvp-frontend-roadmap-draft.md) | Original frontend roadmap draft; discovery only |
 
 ## Common AI Reading Paths
 
@@ -43,6 +76,27 @@ For product scope decisions, read:
 3. `docs/ai/product/sandicts-v2-backlog.md`
 4. `docs/ai/product/sandicts-scope-checklist.md`
 5. `docs/ai/business/sandicts-business-rules.md`
+
+For Jira roadmap, backlog, or issue planning, read:
+
+1. `docs/ai/product/sandicts-product-context.md`
+2. `docs/ai/product/sandicts-mvp-scope.md`
+3. `docs/ai/product/sandicts-jira-planning-workflow.md`
+4. `docs/frontend/sandicts-mvp-delivery-roadmap.md` when frontend or fullstack sequencing is involved
+5. `docs/frontend/sandicts-page-functional-spec.md` only when the issue depends on page, route, permission, or user-flow details
+6. `docs/ai/business/sandicts-business-rules.md` only when the issue changes product/business behavior
+
+For frontend planning, read:
+
+1. `docs/frontend/sandicts-frontend-context.md`
+2. `docs/frontend/sandicts-frontend-tech-decisions.md`
+3. `docs/frontend/sandicts-frontend-planning.md`
+4. `docs/frontend/sandicts-mvp-delivery-roadmap.md`
+5. `docs/ai/product/sandicts-product-context.md`
+6. `docs/ai/product/sandicts-mvp-scope.md`
+7. `docs/frontend/sandicts-page-functional-spec.md` only for page inventory, routes, permissions, or flow behavior
+8. `docs/frontend/sandicts-mvp-screens-spec.md` only for Figma or detailed screen-state work
+9. `docs/ai/product/sandicts-jira-planning-workflow.md` only when creating or editing Jira issues
 
 For a new endpoint, read:
 
