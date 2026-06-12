@@ -51,14 +51,7 @@ Short catalog. Routing hints (`read-when`, `do-not-read-when`, `related`, `canon
 | [`docs/ai/product/sandicts-scope-checklist.md`](product/sandicts-scope-checklist.md)                       | Working checklist for MVP, V2, and backlog     |
 | [`docs/ai/product/sandicts-v2-backlog.md`](product/sandicts-v2-backlog.md)                                 | V2 and later product backlog                   |
 | [`docs/ai/product/shared-documentation-strategy.md`](product/shared-documentation-strategy.md)              | Shared product docs ownership decision         |
-| [`docs/frontend/sandicts-frontend-context.md`](../frontend/sandicts-frontend-context.md)                   | Frontend product feel, UX direction, and stack |
-| [`docs/frontend/sandicts-frontend-tech-decisions.md`](../frontend/sandicts-frontend-tech-decisions.md)     | Frontend technical stack and architecture decisions |
-| [`docs/frontend/sandicts-mvp-delivery-roadmap.md`](../frontend/sandicts-mvp-delivery-roadmap.md)           | MVP frontend/fullstack delivery roadmap        |
-| [`docs/frontend/sandicts-frontend-planning.md`](../frontend/sandicts-frontend-planning.md)                 | Frontend start criteria and fullstack roadmap  |
-| [`docs/frontend/sandicts-page-functional-spec.md`](../frontend/sandicts-page-functional-spec.md)           | Frontend page inventory, behavior, and rules   |
-| [`docs/frontend/sandicts-mvp-screens-spec.md`](../frontend/sandicts-mvp-screens-spec.md)                   | Detailed MVP screen spec; read on demand       |
-| [`docs/frontend/discovery/legacy-sports-rats-web-audit.md`](../frontend/discovery/legacy-sports-rats-web-audit.md) | Legacy frontend audit; discovery only  |
-| [`docs/frontend/discovery/sandicts-mvp-frontend-roadmap-draft.md`](../frontend/discovery/sandicts-mvp-frontend-roadmap-draft.md) | Original frontend roadmap draft; discovery only |
+| [`docs/frontend/README.md`](../frontend/README.md)                                                        | Pointer to frontend docs in `sandicts/reactjs-sandicts-web` |
 
 ## Common AI Reading Paths
 
@@ -83,20 +76,20 @@ For Jira roadmap, backlog, or issue planning, read:
 1. `docs/ai/product/sandicts-product-context.md`
 2. `docs/ai/product/sandicts-mvp-scope.md`
 3. `docs/ai/product/sandicts-jira-planning-workflow.md`
-4. `docs/frontend/sandicts-mvp-delivery-roadmap.md` when frontend or fullstack sequencing is involved
-5. `docs/frontend/sandicts-page-functional-spec.md` only when the issue depends on page, route, permission, or user-flow details
+4. `sandicts/reactjs-sandicts-web:docs/frontend/sandicts-mvp-delivery-roadmap.md` when frontend or fullstack sequencing is involved
+5. `sandicts/reactjs-sandicts-web:docs/frontend/sandicts-page-functional-spec.md` only when the issue depends on page, route, permission, or user-flow details
 6. `docs/ai/business/sandicts-business-rules.md` only when the issue changes product/business behavior
 
 For frontend planning, read:
 
-1. `docs/frontend/sandicts-frontend-context.md`
-2. `docs/frontend/sandicts-frontend-tech-decisions.md`
-3. `docs/frontend/sandicts-frontend-planning.md`
-4. `docs/frontend/sandicts-mvp-delivery-roadmap.md`
+1. `sandicts/reactjs-sandicts-web:docs/frontend/sandicts-frontend-context.md`
+2. `sandicts/reactjs-sandicts-web:docs/frontend/sandicts-frontend-tech-decisions.md`
+3. `sandicts/reactjs-sandicts-web:docs/frontend/sandicts-frontend-planning.md`
+4. `sandicts/reactjs-sandicts-web:docs/frontend/sandicts-mvp-delivery-roadmap.md`
 5. `docs/ai/product/sandicts-product-context.md`
 6. `docs/ai/product/sandicts-mvp-scope.md`
-7. `docs/frontend/sandicts-page-functional-spec.md` only for page inventory, routes, permissions, or flow behavior
-8. `docs/frontend/sandicts-mvp-screens-spec.md` only for Figma or detailed screen-state work
+7. `sandicts/reactjs-sandicts-web:docs/frontend/sandicts-page-functional-spec.md` only for page inventory, routes, permissions, or flow behavior
+8. `sandicts/reactjs-sandicts-web:docs/frontend/sandicts-mvp-screens-spec.md` only for Figma or detailed screen-state work
 9. `docs/ai/product/sandicts-jira-planning-workflow.md` only when creating or editing Jira issues
 
 For a new endpoint, read:

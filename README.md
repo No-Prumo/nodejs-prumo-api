@@ -406,7 +406,7 @@ Main responsibilities:
 | `.codex/skills` | Repository-owned Codex instructions for this project. |
 | `.github/workflows` | CI/CD workflows. |
 | `docs/ai` | Durable project context and source-of-truth technical/product docs. |
-| `docs/frontend` | Frontend-facing context docs. |
+| `docs/frontend` | Pointer to frontend docs now owned by `sandicts/reactjs-sandicts-web`. |
 | `prisma/schema.prisma` | Main Prisma generator and datasource configuration. |
 | `prisma/models` | Domain-grouped Prisma models. |
 | `prisma/migrations` | Database migrations. |

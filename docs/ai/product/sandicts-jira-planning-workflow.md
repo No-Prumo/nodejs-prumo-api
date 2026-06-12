@@ -10,10 +10,10 @@ related:
   - docs/ai/product/sandicts-v2-backlog.md
   - docs/ai/product/sandicts-scope-checklist.md
   - docs/ai/business/sandicts-business-rules.md
-  - docs/frontend/sandicts-frontend-planning.md
-  - docs/frontend/sandicts-frontend-tech-decisions.md
-  - docs/frontend/sandicts-mvp-delivery-roadmap.md
-  - docs/frontend/sandicts-page-functional-spec.md
+  - sandicts/reactjs-sandicts-web:docs/frontend/sandicts-frontend-planning.md
+  - sandicts/reactjs-sandicts-web:docs/frontend/sandicts-frontend-tech-decisions.md
+  - sandicts/reactjs-sandicts-web:docs/frontend/sandicts-mvp-delivery-roadmap.md
+  - sandicts/reactjs-sandicts-web:docs/frontend/sandicts-page-functional-spec.md
 scope: jira, roadmap, backlog, delivery-planning, issue-writing, mvp
 read-when:
   - planning Jira epics, stories, tasks, subtasks, or bugs
@@ -64,12 +64,12 @@ Use these documents as the hierarchy of truth:
 3. `docs/ai/business/sandicts-business-rules.md`
 4. `docs/ai/product/sandicts-v2-backlog.md`
 5. `docs/ai/product/sandicts-scope-checklist.md`
-6. `docs/frontend/sandicts-frontend-tech-decisions.md` for frontend stack
-   decisions
-7. `docs/frontend/sandicts-mvp-delivery-roadmap.md` for frontend/fullstack
-   decision, prototype, docs, and delivery sequencing
-8. `docs/frontend/sandicts-page-functional-spec.md` for page inventory and
-   page-level behavior
+6. `sandicts/reactjs-sandicts-web:docs/frontend/sandicts-frontend-tech-decisions.md`
+   for frontend stack decisions
+7. `sandicts/reactjs-sandicts-web:docs/frontend/sandicts-mvp-delivery-roadmap.md`
+   for frontend/fullstack decision, prototype, docs, and delivery sequencing
+8. `sandicts/reactjs-sandicts-web:docs/frontend/sandicts-page-functional-spec.md`
+   for page inventory and page-level behavior
 
 Jira should reflect these docs. If Jira and the docs disagree, do not guess.
 Surface the conflict and ask whether to update Jira, update docs, or preserve
@@ -1200,10 +1200,11 @@ explicitly accepts backend-only completion for that stage.
 | MVP Hardening | Responsive review and smoke suite | Critical path works end to end |
 
 For detailed frontend planning, use
-`docs/frontend/sandicts-frontend-planning.md`.
+`sandicts/reactjs-sandicts-web:docs/frontend/sandicts-frontend-planning.md`.
 
 For page inventory, page behavior, permissions, route drafts, and page-level
-open decisions, use `docs/frontend/sandicts-page-functional-spec.md`.
+open decisions, use
+`sandicts/reactjs-sandicts-web:docs/frontend/sandicts-page-functional-spec.md`.
 
 ## Dependency Map
 
