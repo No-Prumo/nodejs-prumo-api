@@ -35,6 +35,11 @@ tasks.
 
 Decided:
 
+- frontend application lives in the separate `sandicts/reactjs-sandicts-web`
+  repository
+- local frontend path is `apps/reactjs-sandicts-web`, sibling to the backend
+  repository
+- use Node.js 24 LTS and npm 11 for the initial frontend foundation
 - use Next.js App Router with TypeScript
 - use shadcn/ui with Tailwind CSS and lucide-react
 - use TanStack Query for server state
@@ -46,9 +51,6 @@ Decided:
 
 Still open:
 
-- frontend repository location
-- Node.js version for the frontend
-- package manager for the frontend
 - exact OpenAPI generator
 - deployment target
 - CI shape for frontend checks
@@ -56,6 +58,35 @@ Still open:
 - final navigation model for player and partner areas
 
 ## Core Stack
+
+### Repository Location
+
+Decision:
+
+- create and maintain the frontend in `sandicts/reactjs-sandicts-web`
+- keep it as a separate sibling repository from `sandicts/nodejs-sandicts-api`
+- use local path `apps/reactjs-sandicts-web`
+
+Reason:
+
+- the backend repository is already an independent Nest API with its own npm
+  lockfile, Prisma workflow, CI checks, and deployment concerns
+- converting the backend repository into a monorepo would add setup work before
+  the MVP frontend has proven a need for shared packages
+- separate repositories keep frontend CI, deployment, preview environments, and
+  package management independent
+- the frontend can still stay type-aligned with the backend by generating an
+  OpenAPI client from the Nest Swagger contract
+
+Consequences:
+
+- local development runs the API and web app as separate processes
+- the API should keep using port `3000`; the frontend should use port `3001`
+  locally
+- CORS, cookie/session behavior, and deployment URLs remain explicit follow-up
+  decisions
+- shared code packages should not be introduced until repeated cross-repo
+  duplication creates a real maintenance cost
 
 ### Framework
 
@@ -296,11 +327,9 @@ Suggested task titles:
 
 ## Open Technical Decisions
 
-Resolve before creating the frontend app:
+Resolve before completing the frontend foundation and first real API
+integration:
 
-- repository location: this backend repo, monorepo workspace, or separate repo
-- package manager: keep npm alignment or choose another tool
-- Node.js version: align with deployment and CI
 - OpenAPI generator: Orval versus openapi-typescript/openapi-fetch
 - environment variable naming
 - frontend lint/typecheck/test commands
@@ -332,7 +361,5 @@ This document does not decide:
 - exact Figma layouts
 - exact route map
 - deployment provider
-- package manager
-- frontend repository location
 - final API endpoint names
 - business rules already owned by backend/product docs

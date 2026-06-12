@@ -22,6 +22,23 @@ The canonical project context lives in `docs/ai/index.md` and the documents link
 7. Keep `.codex/skills/` for Codex operating instructions and `docs/ai/` for durable project context and decisions.
 8. When changing repository skills, validate the edited skill folder with the skill validation script when available.
 
+## Jira Fast Path
+
+When the user provides a concrete Jira key such as `KAN-61`, avoid broad Rovo
+Search as the first step.
+
+Use the direct Jira path instead:
+
+1. get accessible Atlassian resources and use the `sandicts.atlassian.net`
+   cloud id
+2. call the direct Jira issue tool for the known key
+3. use JQL only when a Jira list, parent issue set, or filtered backlog is
+   needed
+4. use direct transition/comment tools for approved status or comment updates
+
+Use Rovo Search only for open-ended Jira/Confluence discovery where the target
+issue, page, or JQL filter is not already known.
+
 ## Boundaries
 
 - Do not store tokens, credentials, secrets, private config, local absolute paths, or personal preferences in this repository.

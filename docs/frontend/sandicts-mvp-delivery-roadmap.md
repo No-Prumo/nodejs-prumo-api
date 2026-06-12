@@ -579,11 +579,15 @@ Exit criteria:
 
 ## Current Open Decision Backlog
 
+Resolved foundation decisions:
+
+- frontend repository location: `sandicts/reactjs-sandicts-web`
+- local frontend path: `apps/reactjs-sandicts-web`
+- frontend runtime: Node.js 24 LTS with npm 11
+- local ports: API on `3000`, frontend on `3001`
+
 Frontend foundation:
 
-- frontend repository location
-- package manager
-- Node.js version
 - OpenAPI generator
 - deployment target
 - CI checks and commands
