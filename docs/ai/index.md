@@ -42,6 +42,7 @@ Short catalog. Routing hints (`read-when`, `do-not-read-when`, `related`, `canon
 | [`docs/ai/ci-cd/ci-governance.md`](ci-cd/ci-governance.md)                                                 | Policy, source of truth                        |
 | [`docs/ai/ci-cd/ci-operational-rules.md`](ci-cd/ci-operational-rules.md)                                   | Mechanical: regex, jobs, thresholds as in YAML |
 | [`docs/ai/codex-skills-strategy.md`](codex-skills-strategy.md)                                             | Codex skills ownership and repository strategy |
+| [`docs/ai/task-finalization-workflow.md`](task-finalization-workflow.md)                                   | Task finish, commit, and PR title workflow     |
 | [`docs/ai/logging/logging-foundation.md`](logging/logging-foundation.md)                                   | Logging baseline with nestjs-pino              |
 | [`docs/ai/product/sandicts-product-context.md`](product/sandicts-product-context.md)                       | Sandicts product context and MVP direction     |
 | [`docs/ai/product/sandicts-mvp-scope.md`](product/sandicts-mvp-scope.md)                                   | Approved MVP scope and explicit exclusions     |
@@ -122,3 +123,9 @@ For Codex skills or AI operating instructions, read:
 
 1. `docs/ai/codex-skills-strategy.md`
 2. `.codex/skills/sandicts-project-context/SKILL.md`
+
+For finishing a Jira task, committing, or opening a PR, read:
+
+1. `docs/ai/task-finalization-workflow.md`
+2. `.codex/skills/jira-pr-commit-writer/SKILL.md`
+3. `.github/pull_request_template.md`

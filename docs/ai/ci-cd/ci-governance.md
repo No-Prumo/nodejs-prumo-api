@@ -148,8 +148,11 @@ Rules:
 
 Preferred PR title format:
 
-- `[KAN-123] implement google auth`
-- `[KAN-456] fix payment validation`
+- `[KAN-123] feat(auth): implement google auth`
+- `[KAN-456] fix(payment): reject invalid payment state`
+
+The Jira key must be the first visible token in the title. Detailed delivery
+rules live in `docs/ai/task-finalization-workflow.md`.
 
 ---
 
