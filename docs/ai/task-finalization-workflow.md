@@ -46,6 +46,7 @@ Before committing:
 11. Push the branch.
 12. Open or update the pull request.
 13. Watch CI until the relevant checks finish.
+14. Move delivered Jira issue(s) to `In Review`.
 
 If unrelated local changes are present, do not include them in the commit. Ask
 for direction only when the unrelated changes block the task.
@@ -164,8 +165,23 @@ Validation should match risk:
 
 Do not mark a validation as complete in the PR unless it actually ran.
 
+## Jira Status Rule
+
+After the pull request is opened or updated for the delivered work, move the
+primary Jira task to `In Review`.
+
+Rules:
+
+- Move every Jira issue actually delivered by the PR to `In Review`.
+- If a PR references multiple Jira issues, only move the issues whose scope is
+  implemented, documented, or otherwise completed by that PR.
+- Leave follow-up, next-batch, or planning-only issues in their current workflow
+  status unless the user explicitly asks to move them.
+- Do not move the issue to `Concluído`; that happens only after review and
+  merge are complete.
+- Mention the Jira status move in the final delivery summary.
+
 ## Historical PR Titles
 
 Closed PR titles can be normalized when explicitly requested. Do not rewrite
 historical PR titles silently as part of unrelated work.
-
