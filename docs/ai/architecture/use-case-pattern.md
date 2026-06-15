@@ -56,7 +56,10 @@ Avoid one large `ReservationsService` with many unrelated commands. It hides bus
 
 ## Default Shape
 
+Keep use case request and response types in a sibling `.types.ts` file.
+
 ```ts
+// create-reservation.use-case.types.ts
 type CreateReservationUseCaseRequest = {
   actorId: string;
   courtId: string;
@@ -73,6 +76,19 @@ type CreateReservationUseCaseResponse = {
   };
 };
 
+export type {
+  CreateReservationUseCaseRequest,
+  CreateReservationUseCaseResponse,
+};
+```
+
+```ts
+// create-reservation.use-case.ts
+import type {
+  CreateReservationUseCaseRequest,
+  CreateReservationUseCaseResponse,
+} from './create-reservation.use-case.types';
+
 @Injectable()
 class CreateReservationUseCase {
   constructor(
@@ -88,10 +104,6 @@ class CreateReservationUseCase {
 }
 
 export { CreateReservationUseCase };
-export type {
-  CreateReservationUseCaseRequest,
-  CreateReservationUseCaseResponse,
-};
 ```
 
 Rules:
@@ -99,6 +111,8 @@ Rules:
 - expose one public `execute()` method
 - receive one semantic request object
 - return one semantic response object
+- keep request and response types in a dedicated `.types.ts` file beside the use
+  case implementation
 - return only data intended for the API or next application boundary
 - do not return raw Prisma records by accident
 
@@ -136,6 +150,28 @@ Examples:
 
 Do not throw Nest `HttpException` from a use case.
 
+Prefer module-level reusable error factories over inline local functions when
+the same error can occur in more than one use case.
+
+Good:
+
+```ts
+import { invalidAccessToken } from '../../errors/auth-errors';
+
+throw invalidAccessToken({
+  action: 'sign_out',
+  reason: 'missing_or_invalid_bearer_token',
+});
+```
+
+Avoid:
+
+```ts
+function invalidAccessToken(): AppError {
+  return new AppError('unauthorized', 'Invalid authentication credentials');
+}
+```
+
 Do not catch an error only to log and rethrow it. The global exception filter and request logger already handle expected HTTP visibility. Add explicit logs only for high-value business events or unusual integration decisions.
 
 ## Observability
@@ -143,7 +179,9 @@ Do not catch an error only to log and rethrow it. The global exception filter an
 Good use case observability:
 
 - semantic error messages
-- safe `details` in `AppError` when useful for internal logs
+- exact public `AppError.code` values when the frontend needs to branch on a
+  specific failure
+- safe `details` in `AppError` for internal logs and observability
 - explicit integration event records for webhooks and payments
 - no secrets in errors or logs
 - no duplicate logging for normal `4xx` business failures
@@ -203,4 +241,3 @@ Focus tests on:
 - permission failures
 - state transitions
 - integration port calls when they define the workflow
-

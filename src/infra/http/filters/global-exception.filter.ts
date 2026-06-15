@@ -17,35 +17,10 @@ import {
   type ErrorCode,
   isErrorCode,
 } from '../../../shared/errors/error-codes';
-
-type ErrorResponseBody = {
-  code: ErrorCode;
-  details?: never;
-  issues?: unknown[];
-  message: string;
-  path: string;
-  requestId: string;
-  statusCode: number;
-  timestamp: string;
-};
-
-type NormalizedException = {
-  details?: unknown;
-  logMessage?: string;
-  originalMessage?: string;
-  responseBody: ErrorResponseBody;
-  shouldLog: boolean;
-};
-
-type HttpExceptionResponseBody =
-  | string
-  | {
-      code?: unknown;
-      error?: unknown;
-      errors?: unknown;
-      issues?: unknown;
-      message?: unknown;
-    };
+import type {
+  HttpExceptionResponseBody,
+  NormalizedException,
+} from './global-exception.filter.types';
 
 const REQUEST_ID_HEADERS = ['X-Request-Id', 'X-Correlation-Id'] as const;
 
@@ -67,18 +42,21 @@ class GlobalExceptionFilter implements ExceptionFilter {
     );
 
     if (normalizedException.shouldLog) {
-      this.logger.error(
-        {
-          code: normalizedException.responseBody.code,
-          details: normalizedException.details,
-          exceptionName: getExceptionName(exception),
-          originalMessage: normalizedException.originalMessage,
-          path: normalizedException.responseBody.path,
-          requestId: normalizedException.responseBody.requestId,
-          statusCode: normalizedException.responseBody.statusCode,
-        },
-        normalizedException.logMessage,
-      );
+      const logPayload = {
+        code: normalizedException.responseBody.code,
+        details: normalizedException.details,
+        exceptionName: getExceptionName(exception),
+        originalMessage: normalizedException.originalMessage,
+        path: normalizedException.responseBody.path,
+        requestId: normalizedException.responseBody.requestId,
+        statusCode: normalizedException.responseBody.statusCode,
+      };
+
+      if (normalizedException.logLevel === 'warn') {
+        this.logger.warn(logPayload, normalizedException.logMessage);
+      } else {
+        this.logger.error(logPayload, normalizedException.logMessage);
+      }
     }
 
     response
@@ -113,6 +91,9 @@ class GlobalExceptionFilter implements ExceptionFilter {
     if (exception instanceof AppError) {
       return {
         details: exception.details,
+        logLevel: 'warn',
+        logMessage: 'Application error handled',
+        originalMessage: exception.message,
         responseBody: {
           code: exception.code,
           message: exception.message,
@@ -121,7 +102,7 @@ class GlobalExceptionFilter implements ExceptionFilter {
           statusCode: mapAppErrorCodeToStatus(exception.code),
           timestamp,
         },
-        shouldLog: false,
+        shouldLog: exception.details !== undefined,
       };
     }
 
@@ -144,6 +125,7 @@ class GlobalExceptionFilter implements ExceptionFilter {
           : getHttpExceptionMessage(exceptionResponse, exception.message);
 
       return {
+        logLevel: shouldLog ? 'error' : undefined,
         logMessage: shouldLog ? 'Internal HTTP exception handled' : undefined,
         originalMessage: exception.message,
         responseBody: {
@@ -164,6 +146,7 @@ class GlobalExceptionFilter implements ExceptionFilter {
 
     return {
       details: exception,
+      logLevel: 'error',
       logMessage: 'Unexpected exception handled',
       originalMessage:
         exception instanceof Error ? exception.message : 'Unexpected error',
@@ -305,8 +288,15 @@ function isInternalHttpException(exception: HttpException) {
 function mapAppErrorCodeToStatus(code: AppError['code']) {
   switch (code) {
     case 'unauthorized':
+    case 'invalid_access_token':
+    case 'invalid_refresh_token':
+    case 'refresh_token_expired':
+    case 'refresh_token_reused':
+    case 'refresh_token_revoked':
+    case 'auth_session_inactive':
       return 401;
     case 'forbidden':
+    case 'account_auth_forbidden':
       return 403;
     case 'resource_not_found':
       return 404;

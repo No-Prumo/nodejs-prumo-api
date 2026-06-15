@@ -11,7 +11,10 @@ import { TokenService } from './application/services/tokens/token.service';
 import { ConsumeMagicLinkUseCase } from './application/use-cases/consume-magic-link/consume-magic-link.use-case';
 import { CreateAuthSessionUseCase } from './application/use-cases/create-auth-session/create-auth-session.use-case';
 import { GoogleSignInUseCase } from './application/use-cases/google-sign-in/google-sign-in.use-case';
+import { RefreshAuthSessionUseCase } from './application/use-cases/refresh-auth-session/refresh-auth-session.use-case';
 import { RequestMagicLinkUseCase } from './application/use-cases/request-magic-link/request-magic-link.use-case';
+import { SignOutAllUseCase } from './application/use-cases/sign-out-all/sign-out-all.use-case';
+import { SignOutUseCase } from './application/use-cases/sign-out/sign-out.use-case';
 import { DevelopmentEmailGateway } from './infrastructure/gateways/email/development-email.gateway';
 import { GoogleIdTokenVerifierGateway } from './infrastructure/gateways/google/google-id-token-verifier.gateway';
 import { PrismaAccountsRepository } from './infrastructure/persistence/prisma/prisma-accounts.repository';
@@ -20,21 +23,30 @@ import { PrismaExternalIdentitiesRepository } from './infrastructure/persistence
 import { PrismaMagicLinkChallengesRepository } from './infrastructure/persistence/prisma/prisma-magic-link-challenges.repository';
 import { ConsumeMagicLinkController } from './presentation/http/consume-magic-link/consume-magic-link.controller';
 import { GoogleSignInController } from './presentation/http/google-sign-in/google-sign-in.controller';
+import { RefreshAuthSessionController } from './presentation/http/refresh-auth-session/refresh-auth-session.controller';
 import { RequestMagicLinkController } from './presentation/http/request-magic-link/request-magic-link.controller';
+import { SignOutAllController } from './presentation/http/sign-out-all/sign-out-all.controller';
+import { SignOutController } from './presentation/http/sign-out/sign-out.controller';
 
 @Module({
   controllers: [
     RequestMagicLinkController,
     ConsumeMagicLinkController,
     GoogleSignInController,
+    RefreshAuthSessionController,
+    SignOutController,
+    SignOutAllController,
   ],
   providers: [
     ConsumeMagicLinkUseCase,
     CreateAuthSessionUseCase,
     GoogleSignInUseCase,
     MagicLinkTokenService,
+    RefreshAuthSessionUseCase,
     RequestMagicLinkUseCase,
     RefreshTokenHasher,
+    SignOutAllUseCase,
+    SignOutUseCase,
     TokenService,
     {
       provide: ACCOUNTS_REPOSITORY,

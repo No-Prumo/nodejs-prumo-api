@@ -75,6 +75,7 @@ function createResponse(requestId = 'req-123'): MockHttpResponse {
 
 function createLogger() {
   const error = vi.fn();
+  const warn = vi.fn();
   const setContext = vi.fn();
 
   return {
@@ -82,8 +83,10 @@ function createLogger() {
     logger: {
       error,
       setContext,
+      warn,
     } as unknown as PinoLogger,
     setContext,
+    warn,
   };
 }
 
@@ -110,7 +113,7 @@ function getResponseBody(mockResponse: MockHttpResponse): ResponseBody {
 }
 
 describe('GlobalExceptionFilter', () => {
-  it('normalizes AppError without additional logging', () => {
+  it('normalizes AppError and logs internal details without exposing them', () => {
     const logger = createLogger();
     const filter = new GlobalExceptionFilter(logger.logger);
     const request = createRequest('/orders/123/cancel');
@@ -137,7 +140,67 @@ describe('GlobalExceptionFilter', () => {
       statusCode: 422,
     });
     expect(typeof body.timestamp).toBe('string');
+    expect(body).not.toHaveProperty('details');
     expect(logger.error).not.toHaveBeenCalled();
+    expect(logger.warn).toHaveBeenCalledWith(
+      expect.objectContaining({
+        code: 'business_rule_violation',
+        details: {
+          orderId: '123',
+        },
+        exceptionName: 'AppError',
+        originalMessage: 'Cannot cancel a paid order',
+        path: '/orders/123/cancel',
+        requestId: 'req-123',
+        statusCode: 422,
+      }),
+      'Application error handled',
+    );
+  });
+
+  it('maps exact auth AppError codes for frontend handling', () => {
+    const logger = createLogger();
+    const filter = new GlobalExceptionFilter(logger.logger);
+    const request = createRequest('/auth/sign-out');
+    const mockResponse = createResponse();
+    const host = createArgumentsHost(request, mockResponse.response);
+
+    filter.catch(
+      new AppError(
+        'invalid_access_token',
+        'Invalid authentication credentials',
+        {
+          details: {
+            area: 'auth',
+            reason: 'missing_or_invalid_bearer_token',
+          },
+        },
+      ),
+      host,
+    );
+
+    expect(mockResponse.statusCode).toBe(401);
+    const body = getResponseBody(mockResponse);
+
+    expect(body).toMatchObject({
+      code: 'invalid_access_token',
+      message: 'Invalid authentication credentials',
+      path: '/auth/sign-out',
+      requestId: 'req-123',
+      statusCode: 401,
+    });
+    expect(body).not.toHaveProperty('details');
+    expect(logger.warn).toHaveBeenCalledWith(
+      expect.objectContaining({
+        code: 'invalid_access_token',
+        details: {
+          area: 'auth',
+          reason: 'missing_or_invalid_bearer_token',
+        },
+        statusCode: 401,
+      }),
+      'Application error handled',
+    );
   });
 
   it('normalizes HttpException 4xx without additional logging', () => {

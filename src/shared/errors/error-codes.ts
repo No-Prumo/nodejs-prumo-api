@@ -1,6 +1,13 @@
 const appErrorCodes = [
   'unauthorized',
+  'invalid_access_token',
+  'invalid_refresh_token',
+  'refresh_token_expired',
+  'refresh_token_reused',
+  'refresh_token_revoked',
+  'auth_session_inactive',
   'forbidden',
+  'account_auth_forbidden',
   'resource_not_found',
   'conflict',
   'business_rule_violation',

@@ -1,13 +1,5 @@
 import type { AuthConfig } from '../../../../../config';
-
-type RefreshTokenCookieOptions = {
-  httpOnly: boolean;
-  secure: boolean;
-  sameSite: 'lax' | 'strict' | 'none';
-  path: string;
-  expires?: Date;
-  maxAge?: number;
-};
+import type { RefreshTokenCookieOptions } from './auth-cookie.types';
 
 function buildRefreshTokenCookieOptions(
   authSettings: AuthConfig,
@@ -34,5 +26,42 @@ function buildClearRefreshTokenCookieOptions(
   };
 }
 
-export { buildClearRefreshTokenCookieOptions, buildRefreshTokenCookieOptions };
-export type { RefreshTokenCookieOptions };
+function readCookieValue(
+  cookieHeader: string | undefined,
+  cookieName: string,
+): string | null {
+  if (!cookieHeader) {
+    return null;
+  }
+
+  const cookies = cookieHeader.split(';');
+
+  for (const cookie of cookies) {
+    const [rawName, ...rawValueParts] = cookie.split('=');
+    const name = rawName?.trim();
+
+    if (name !== cookieName) {
+      continue;
+    }
+
+    const value = rawValueParts.join('=').trim();
+
+    if (value.length === 0) {
+      return null;
+    }
+
+    try {
+      return decodeURIComponent(value);
+    } catch {
+      return value;
+    }
+  }
+
+  return null;
+}
+
+export {
+  buildClearRefreshTokenCookieOptions,
+  buildRefreshTokenCookieOptions,
+  readCookieValue,
+};
