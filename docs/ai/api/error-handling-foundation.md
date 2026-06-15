@@ -57,6 +57,11 @@ Use one concrete `AppError` with:
 
 Do not create a large exception hierarchy now.
 
+For expected application failures, prefer reusable module-level error factory
+functions instead of creating one-off `new AppError(...)` calls inside use
+cases. Place those factories in the module application layer, for example
+`src/modules/auth/application/errors/auth-errors.ts`.
+
 ### Error codes
 
 Current normalized codes are:
@@ -65,7 +70,14 @@ Current normalized codes are:
 - `validation_error`
 - `rate_limited`
 - `unauthorized`
+- `invalid_access_token`
+- `invalid_refresh_token`
+- `refresh_token_expired`
+- `refresh_token_reused`
+- `refresh_token_revoked`
+- `auth_session_inactive`
 - `forbidden`
+- `account_auth_forbidden`
 - `resource_not_found`
 - `conflict`
 - `business_rule_violation`
@@ -73,7 +85,12 @@ Current normalized codes are:
 
 Rules:
 
+- use the most specific safe public `code` available so the frontend can branch
+  on exact failure cases
 - `validation_error` is for HTTP validation failures, especially Zod input parsing
+- `invalid_access_token`, `invalid_refresh_token`, and related auth/session
+  codes are safe public auth failures that still avoid exposing raw token or
+  storage internals
 - domain and application should prefer `business_rule_violation` for expected business failures
 - `internal_error` is reserved for unexpected or internal-only failures
 - `rate_limited` is for HTTP throttling failures such as auth endpoint abuse
@@ -84,15 +101,17 @@ The request completion log produced by `nestjs-pino` remains the primary error l
 
 The global exception filter should:
 
-- not emit extra logs for `AppError` mapped to `4xx`
+- emit a structured warning for `AppError` mapped to `4xx` when the error has
+  internal `details`
 - not emit extra logs for normal `HttpException` `4xx`
 - emit an extra structured log only for unexpected or internal `5xx`
 
 Reason:
 
-- avoids logging the same client error twice
-- keeps the main HTTP log as the canonical operational event
-- still adds focused context when the failure is unexpected
+- keeps normal framework `4xx` responses quiet
+- lets application errors carry internal reason, actor, session, and security
+  context into pino and future observability tools
+- keeps public responses free of sensitive details
 
 ### Public vs internal error data
 
@@ -116,6 +135,8 @@ Rule:
 
 - `issues` is for public validation feedback
 - `details` is for internal debugging and logs only
+- never put raw access tokens, refresh tokens, cookies, provider credentials, or
+  magic link tokens in `details`
 
 ## HTTP contract
 
@@ -158,7 +179,14 @@ Validation example:
 Map known codes in the filter:
 
 - `unauthorized` -> `401`
+- `invalid_access_token` -> `401`
+- `invalid_refresh_token` -> `401`
+- `refresh_token_expired` -> `401`
+- `refresh_token_reused` -> `401`
+- `refresh_token_revoked` -> `401`
+- `auth_session_inactive` -> `401`
 - `forbidden` -> `403`
+- `account_auth_forbidden` -> `403`
 - `resource_not_found` -> `404`
 - `conflict` -> `409`
 - `business_rule_violation` -> `422`

@@ -55,6 +55,23 @@ it should:
 For Sandicts, planning quality matters because the product has many attractive
 future ideas. The Jira backlog must protect the MVP from scope drift.
 
+## Collaboration Gates
+
+For Sandicts backend and frontend Jira work, use separate approval gates:
+
+1. Plan gate: when the user asks to work on a Jira issue, inspect Jira and the
+   relevant project docs, evaluate readiness, produce the execution plan, and
+   stop.
+2. Implementation gate: start code changes only after the user explicitly says
+   to implement the approved plan.
+3. Local review gate: after implementation and validation, stop before commit,
+   push, PR creation, or Jira transition so the user can review the local code.
+4. Delivery gate: commit, push, open or update a PR, and move Jira to `In Review`
+   only after the user explicitly approves delivery.
+
+Implementation approval does not imply delivery approval. Delivery approval does
+not mean moving any issue to `Concluido`.
+
 ## Source Documents
 
 Use these documents as the hierarchy of truth:
@@ -696,6 +713,8 @@ Output:
 - short execution plan
 - Jira status update only after the user approves it
 - code changes only after the plan is accepted or the user asks to proceed
+- no commit, push, PR, or `In Review` transition until the user has reviewed the
+  local implementation and explicitly approves delivery
 
 ## Codex Jira Operating Rules
 
@@ -1186,18 +1205,18 @@ explicitly accepts backend-only completion for that stage.
 
 ### Fullstack Roadmap Overlay
 
-| Backend phase | Frontend phase | Integration gate |
-| --- | --- | --- |
-| Auth | App shell, auth screen, session state | Sign in, preserve or refresh session, sign out |
-| Player Profile | Profile onboarding UI | Create/update profile, main sport, simple level |
-| Partner Onboarding | Partner dashboard shell and profile form | Create/update partner profile |
-| Court Management | Court list, detail, creation, pricing, rules | Create court and see it in partner court list |
-| Availability | Calendar and slot editor | Publish slot and expose it to discovery data |
-| Discovery | Player discovery and filters | Filter courts by sport, availability, and price |
-| Reservations | Request flow and partner reservation management | Request, confirm, cancel, and block duplicates |
-| Manual Payments | Pending payments and payment status controls | Update payment state and reflect it in reservations |
-| Open Matches | Match list, detail, create, join, leave | Create, join, leave, and block invalid joins |
-| MVP Hardening | Responsive review and smoke suite | Critical path works end to end |
+| Backend phase      | Frontend phase                                  | Integration gate                                    |
+| ------------------ | ----------------------------------------------- | --------------------------------------------------- |
+| Auth               | App shell, auth screen, session state           | Sign in, preserve or refresh session, sign out      |
+| Player Profile     | Profile onboarding UI                           | Create/update profile, main sport, simple level     |
+| Partner Onboarding | Partner dashboard shell and profile form        | Create/update partner profile                       |
+| Court Management   | Court list, detail, creation, pricing, rules    | Create court and see it in partner court list       |
+| Availability       | Calendar and slot editor                        | Publish slot and expose it to discovery data        |
+| Discovery          | Player discovery and filters                    | Filter courts by sport, availability, and price     |
+| Reservations       | Request flow and partner reservation management | Request, confirm, cancel, and block duplicates      |
+| Manual Payments    | Pending payments and payment status controls    | Update payment state and reflect it in reservations |
+| Open Matches       | Match list, detail, create, join, leave         | Create, join, leave, and block invalid joins        |
+| MVP Hardening      | Responsive review and smoke suite               | Critical path works end to end                      |
 
 For detailed frontend planning, use
 `sandicts/reactjs-sandicts-web:docs/frontend/sandicts-frontend-planning.md`.
@@ -1264,11 +1283,11 @@ Goal
 
 Changes
 
-| Action | Type | Parent | Title | Priority | Labels |
-| ------ | ---- | ------ | ----- | -------- | ------ |
-| Create | Epic | - | [MVP] Player Profile Foundation | Medium | mvp,players |
-| Create | Story | Player Profile Foundation | [Players] Player manages a basic profile | Medium | mvp,players |
-| Edit | Task | KAN-37 | [Backend] Build auth module foundation | Medium | mvp,auth,backend |
+| Action | Type  | Parent                    | Title                                    | Priority | Labels           |
+| ------ | ----- | ------------------------- | ---------------------------------------- | -------- | ---------------- |
+| Create | Epic  | -                         | [MVP] Player Profile Foundation          | Medium   | mvp,players      |
+| Create | Story | Player Profile Foundation | [Players] Player manages a basic profile | Medium   | mvp,players      |
+| Edit   | Task  | KAN-37                    | [Backend] Build auth module foundation   | Medium   | mvp,auth,backend |
 
 Notes
 
@@ -1282,6 +1301,10 @@ Only execute the batch after user approval.
 
 Useful prompts:
 
+- `Plan KAN-123.`
+- `Check KAN-123 and create the execution plan only.`
+- `Approved: implement the KAN-123 plan.`
+- `Implementation approved. Commit, push, open the PR, and move KAN-123 to In Review.`
 - `Plan the next Jira batch after auth, but do not create anything yet.`
 - `Create the approved Player Profile Jira batch.`
 - `Normalize KAN-36 title and description using the planning workflow.`

@@ -201,24 +201,38 @@ Use named exports at the end of source files.
 
 Rules:
 
-- declare constants, classes, functions, and types without inline `export`
+- declare constants, classes, and functions without inline `export`
 - export all public symbols from a final export block
 - use a separate final `export type { ... }` block for type-only exports
 - avoid `export default`
+- keep type aliases and interfaces in dedicated `.types.ts` files next to the
+  implementation that owns them; do not declare module-specific request,
+  response, helper, adapter, or service types in the same file as executable
+  functions/classes
+- files whose primary purpose is a type contract, such as repository ports or
+  domain type catalogs, may contain types directly
 
 Example:
 
 ```ts
 const THINGS_REPOSITORY = Symbol('THINGS_REPOSITORY');
 
+class ThingService {}
+
+export { THINGS_REPOSITORY, ThingService };
+```
+
+```ts
+// things.types.ts
+type ThingRecord = {
+  id: string;
+};
+
 type ThingsRepository = {
   findById(id: string): Promise<ThingRecord | null>;
 };
 
-class ThingService {}
-
-export { THINGS_REPOSITORY, ThingService };
-export type { ThingsRepository };
+export type { ThingRecord, ThingsRepository };
 ```
 
 ## Microservice Readiness

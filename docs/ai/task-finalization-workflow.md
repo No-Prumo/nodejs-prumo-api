@@ -34,22 +34,39 @@ This document is the source of truth for end-of-task delivery conventions.
 Before committing:
 
 1. Identify the active Jira key and intended delivery scope.
-2. Check the current branch name.
-3. Inspect `git status --short`.
-4. Inspect `git diff --stat`.
-5. Inspect relevant file diffs when the change is not trivial.
-6. Confirm changed files belong to the active task.
-7. Leave unrelated user or local changes unstaged.
-8. Run validation that matches the risk of the change.
-9. Stage only the files that belong to the task.
-10. Commit with the standard commit message format.
-11. Push the branch.
-12. Open or update the pull request.
-13. Watch CI until the relevant checks finish.
-14. Move delivered Jira issue(s) to `In Review`.
+2. Confirm the user has reviewed the local implementation and explicitly
+   approved commit, push, PR, and Jira delivery.
+3. Check the current branch name.
+4. Inspect `git status --short`.
+5. Inspect `git diff --stat`.
+6. Inspect relevant file diffs when the change is not trivial.
+7. Confirm changed files belong to the active task.
+8. Leave unrelated user or local changes unstaged.
+9. Run validation that matches the risk of the change.
+10. Stage only the files that belong to the task.
+11. Commit with the standard commit message format.
+12. Push the branch.
+13. Open or update the pull request and enable delete branch after merge.
+14. Watch CI until the relevant checks finish.
+15. Move delivered Jira issue(s) to `In Review`.
 
 If unrelated local changes are present, do not include them in the commit. Ask
 for direction only when the unrelated changes block the task.
+
+## Human Review Gate
+
+After implementation and local validation, Codex must stop and report what
+changed, what validation ran, and what still needs review. Do not stage,
+commit, push, open a pull request, or move Jira to `In Review` until the user
+explicitly approves that delivery step.
+
+Preferred approval phrase:
+
+```text
+Implementation approved. Commit, push, open the PR, and move KAN-123 to In Review.
+```
+
+If the user approves only part of the delivery, do only that part.
 
 ## Branch Rule
 
@@ -149,6 +166,7 @@ Rules:
 - Describe only the current PR changes, not the full parent epic.
 - Mark validation checkboxes only for commands or checks that actually ran.
 - Include the primary Jira key and related Jira keys under `Notes`.
+- Confirm GitHub is set to delete the source branch after the PR is merged.
 - Mention known gaps, skipped validations, or docs-only rationale explicitly.
 - Update the PR body if the scope changes after opening the PR.
 
@@ -172,6 +190,7 @@ primary Jira task to `In Review`.
 
 Rules:
 
+- Only move Jira to `In Review` after the user explicitly approves delivery.
 - Move every Jira issue actually delivered by the PR to `In Review`.
 - If a PR references multiple Jira issues, only move the issues whose scope is
   implemented, documented, or otherwise completed by that PR.

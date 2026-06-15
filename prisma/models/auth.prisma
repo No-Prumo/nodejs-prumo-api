@@ -13,6 +13,12 @@ enum AuthSessionStatus {
   REVOKED
 }
 
+enum AuthRefreshTokenStatus {
+  ACTIVE
+  ROTATED
+  REVOKED
+}
+
 enum AuthSessionCreationSource {
   MAGIC_LINK
   GOOGLE
@@ -32,7 +38,6 @@ model Account {
   authSessions       AuthSession[]
 
   @@index([status])
-
   @@map("accounts")
 }
 
@@ -66,13 +71,36 @@ model AuthSession {
   absoluteExpiresAt    DateTime                  @map("absolute_expires_at")
   revokedAt            DateTime?                 @map("revoked_at")
 
-  account Account @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  account       Account            @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  refreshTokens AuthRefreshToken[]
 
   @@index([accountId, status])
   @@index([refreshTokenFamilyId])
   @@index([idleExpiresAt])
   @@index([absoluteExpiresAt])
   @@map("auth_sessions")
+}
+
+model AuthRefreshToken {
+  id                   String                 @id @default(uuid()) @db.Uuid
+  sessionId            String                 @map("session_id") @db.Uuid
+  refreshTokenFamilyId String                 @map("refresh_token_family_id")
+  tokenHash            String                 @unique @map("token_hash")
+  status               AuthRefreshTokenStatus @default(ACTIVE)
+  createdAt            DateTime               @default(now()) @map("created_at")
+  lastUsedAt           DateTime?              @map("last_used_at")
+  rotatedAt            DateTime?              @map("rotated_at")
+  revokedAt            DateTime?              @map("revoked_at")
+  idleExpiresAt        DateTime               @map("idle_expires_at")
+  absoluteExpiresAt    DateTime               @map("absolute_expires_at")
+
+  session AuthSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId, status])
+  @@index([refreshTokenFamilyId, status])
+  @@index([idleExpiresAt])
+  @@index([absoluteExpiresAt])
+  @@map("auth_refresh_tokens")
 }
 
 model MagicLinkChallenge {

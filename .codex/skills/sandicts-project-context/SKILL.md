@@ -22,6 +22,50 @@ The canonical project context lives in `docs/ai/index.md` and the documents link
 7. Keep `.codex/skills/` for Codex operating instructions and `docs/ai/` for durable project context and decisions.
 8. When changing repository skills, validate the edited skill folder with the skill validation script when available.
 
+## Jira Task Collaboration Contract
+
+When the user asks Codex to work on a Jira issue in this repository or in the
+Sandicts frontend repository, follow this collaboration sequence:
+
+1. Inspect the Jira issue and relevant project docs.
+2. Evaluate whether the issue is ready and aligned with architecture and scope.
+3. Produce an execution plan and stop.
+4. Start code changes only after the user explicitly authorizes implementation.
+5. After implementation and validation, stop before commit, push, PR creation,
+   or Jira transition so the user can review the local code.
+6. Commit, push, open or update a PR, and move Jira only after the user gives
+   explicit approval for that delivery step.
+
+Do not infer approval for later delivery steps from implementation approval.
+Treat planning approval, implementation approval, and PR/Jira approval as
+separate gates.
+
+## Type Placement Contract
+
+For Sandicts backend and frontend work, keep executable implementation and
+module-specific type contracts separated:
+
+- put use case request/response types, helper option types, adapter record
+  shapes, service contracts, and component/view model types in sibling
+  `.types.ts` files
+- do not declare those types in the same file as the function, class, hook, or
+  component that uses them
+- files whose primary purpose is a type contract, such as repository ports or
+  domain type catalogs, may contain types directly
+
+## Error Handling Contract
+
+For Sandicts backend work:
+
+- prefer reusable module-level error factories over inline local error factory
+  functions when an error can be reused
+- return the most specific safe public error `code` so frontend code can handle
+  exact failure cases
+- keep raw tokens, cookies, provider credentials, and storage internals out of
+  public responses and log details
+- include safe internal `details` in `AppError` for pino logs and future
+  observability tooling
+
 ## Jira Fast Path
 
 When the user provides a concrete Jira key such as `KAN-61`, avoid broad Rovo

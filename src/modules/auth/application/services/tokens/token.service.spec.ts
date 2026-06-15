@@ -45,6 +45,68 @@ describe('TokenService', () => {
     });
   });
 
+  it('verifies access tokens signed by the service', () => {
+    const service = new TokenService(authSettings);
+
+    const issuedToken = service.issueAccessToken({
+      sub: 'account-id',
+      sessionId: 'session-id',
+    });
+
+    expect(service.verifyAccessToken(issuedToken.token)).toMatchObject({
+      sub: 'account-id',
+      sessionId: 'session-id',
+    });
+  });
+
+  it('rejects tampered access tokens', () => {
+    const service = new TokenService(authSettings);
+    const issuedToken = service.issueAccessToken({
+      sub: 'account-id',
+      sessionId: 'session-id',
+    });
+    const [encodedHeader, encodedPayload, encodedSignature] =
+      issuedToken.token.split('.');
+    const tamperedPayload = Buffer.from(
+      JSON.stringify({
+        sub: 'another-account-id',
+        sessionId: 'session-id',
+        iat: 1,
+        exp: 9999999999,
+      }),
+    ).toString('base64url');
+
+    expect(
+      service.verifyAccessToken(
+        `${encodedHeader}.${tamperedPayload}.${encodedSignature}`,
+      ),
+    ).toBeNull();
+    expect(service.verifyAccessToken('not-a-jwt')).toBeNull();
+    expect(
+      service.verifyAccessToken(`${encodedHeader}.${encodedPayload}`),
+    ).toBeNull();
+  });
+
+  it('rejects expired access tokens', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-01-01T00:00:00.000Z'));
+
+    const service = new TokenService({
+      ...authSettings,
+      accessTokenTtlSeconds: 1,
+    });
+    const issuedToken = service.issueAccessToken({
+      sub: 'account-id',
+      sessionId: 'session-id',
+    });
+
+    vi.setSystemTime(new Date('2026-01-01T00:00:02.000Z'));
+
+    expect(service.verifyAccessToken(issuedToken.token)).toBeNull();
+
+    vi.useRealTimers();
+  });
+
   it('generates high-entropy opaque refresh tokens', () => {
     const service = new TokenService(authSettings);
 

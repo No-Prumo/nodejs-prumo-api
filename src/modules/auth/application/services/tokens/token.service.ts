@@ -1,21 +1,17 @@
-import { createHmac, randomBytes, randomUUID } from 'node:crypto';
+import {
+  createHmac,
+  randomBytes,
+  randomUUID,
+  timingSafeEqual,
+} from 'node:crypto';
 import { Inject, Injectable } from '@nestjs/common';
 import { authConfig, type AuthConfig } from '../../../../../config';
-
-type JsonPrimitive = string | number | boolean | null;
-type JsonValue = JsonPrimitive | JsonValue[] | { [key: string]: JsonValue };
-
-type AccessTokenClaims = {
-  sub: string;
-  sessionId: string;
-  role?: string;
-  partnerId?: string;
-};
-
-type IssuedAccessToken = {
-  token: string;
-  expiresAt: Date;
-};
+import type {
+  AccessTokenClaims,
+  IssuedAccessToken,
+  JsonValue,
+  VerifiedAccessTokenClaims,
+} from './token.service.types';
 
 @Injectable()
 class TokenService {
@@ -41,6 +37,41 @@ class TokenService {
     };
   }
 
+  verifyAccessToken(token: string): VerifiedAccessTokenClaims | null {
+    const [encodedHeader, encodedPayload, signature, extraPart] =
+      token.split('.');
+
+    if (!encodedHeader || !encodedPayload || !signature || extraPart) {
+      return null;
+    }
+
+    const expectedSignature = this.signJwtParts(encodedHeader, encodedPayload);
+
+    if (!this.safeEqual(signature, expectedSignature)) {
+      return null;
+    }
+
+    const header = this.decodeJson(encodedHeader);
+    const payload = this.decodeJson(encodedPayload);
+
+    if (
+      !header ||
+      header.alg !== 'HS256' ||
+      header.typ !== 'JWT' ||
+      !isVerifiedAccessTokenClaims(payload)
+    ) {
+      return null;
+    }
+
+    const nowSeconds = Math.floor(Date.now() / 1000);
+
+    if (payload.exp <= nowSeconds) {
+      return null;
+    }
+
+    return payload;
+  }
+
   generateOpaqueRefreshToken(): string {
     return randomBytes(48).toString('base64url');
   }
@@ -57,11 +88,38 @@ class TokenService {
 
     const encodedHeader = this.base64UrlEncodeJson(header);
     const encodedPayload = this.base64UrlEncodeJson(payload);
-    const signature = createHmac('sha256', this.authSettings.accessTokenSecret)
-      .update(`${encodedHeader}.${encodedPayload}`)
-      .digest('base64url');
+    const signature = this.signJwtParts(encodedHeader, encodedPayload);
 
     return `${encodedHeader}.${encodedPayload}.${signature}`;
+  }
+
+  private signJwtParts(encodedHeader: string, encodedPayload: string): string {
+    return createHmac('sha256', this.authSettings.accessTokenSecret)
+      .update(`${encodedHeader}.${encodedPayload}`)
+      .digest('base64url');
+  }
+
+  private safeEqual(value: string, expectedValue: string): boolean {
+    const actual = Buffer.from(value);
+    const expected = Buffer.from(expectedValue);
+
+    if (actual.length !== expected.length) {
+      return false;
+    }
+
+    return timingSafeEqual(actual, expected);
+  }
+
+  private decodeJson(value: string): Record<string, JsonValue> | null {
+    try {
+      const decoded: unknown = JSON.parse(
+        Buffer.from(value, 'base64url').toString(),
+      );
+
+      return isJsonRecord(decoded) ? decoded : null;
+    } catch {
+      return null;
+    }
   }
 
   private base64UrlEncodeJson(value: Record<string, JsonValue>): string {
@@ -69,5 +127,25 @@ class TokenService {
   }
 }
 
+function isJsonRecord(value: unknown): value is Record<string, JsonValue> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function isVerifiedAccessTokenClaims(
+  value: unknown,
+): value is VerifiedAccessTokenClaims {
+  if (!isJsonRecord(value)) {
+    return false;
+  }
+
+  return (
+    typeof value.sub === 'string' &&
+    typeof value.sessionId === 'string' &&
+    typeof value.iat === 'number' &&
+    typeof value.exp === 'number' &&
+    (value.role === undefined || typeof value.role === 'string') &&
+    (value.partnerId === undefined || typeof value.partnerId === 'string')
+  );
+}
+
 export { TokenService };
-export type { AccessTokenClaims, IssuedAccessToken };
