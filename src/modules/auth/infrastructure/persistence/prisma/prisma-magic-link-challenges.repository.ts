@@ -1,20 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../../../../../infra/prisma/prisma.service';
+import { PrismaService } from '@infra/prisma/prisma.service';
 import type {
   CreateMagicLinkChallengeData,
   MagicLinkChallengeRecord,
   MagicLinkChallengesRepository,
 } from '../../../application/ports/magic-link-challenges.repository';
-
-type PrismaMagicLinkChallengeRecord = {
-  id: string;
-  email: string;
-  tokenHash: string;
-  expiresAt: Date;
-  usedAt: Date | null;
-  revokedAt: Date | null;
-  createdAt: Date;
-};
+import type { PrismaMagicLinkChallengeRecord } from './prisma-magic-link-challenges.repository.types';
 
 @Injectable()
 class PrismaMagicLinkChallengesRepository implements MagicLinkChallengesRepository {

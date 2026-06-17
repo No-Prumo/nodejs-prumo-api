@@ -9,7 +9,7 @@ import type { Request, Response } from 'express';
 import { PinoLogger } from 'nestjs-pino';
 import { ZodSerializationException, ZodValidationException } from 'nestjs-zod';
 import { z } from 'zod';
-import { AppError } from '../../../shared/errors/app-error';
+import { AppError } from '@shared/errors/app-error';
 import { GlobalExceptionFilter } from './global-exception.filter';
 
 type MockHttpResponse = {
@@ -129,7 +129,7 @@ describe('GlobalExceptionFilter', () => {
       host,
     );
 
-    expect(mockResponse.statusCode).toBe(422);
+    expect(mockResponse.statusCode).toBe(HttpStatus.UNPROCESSABLE_ENTITY);
     const body = getResponseBody(mockResponse);
 
     expect(body).toMatchObject({
@@ -137,7 +137,7 @@ describe('GlobalExceptionFilter', () => {
       message: 'Cannot cancel a paid order',
       path: '/orders/123/cancel',
       requestId: 'req-123',
-      statusCode: 422,
+      statusCode: HttpStatus.UNPROCESSABLE_ENTITY,
     });
     expect(typeof body.timestamp).toBe('string');
     expect(body).not.toHaveProperty('details');
@@ -152,7 +152,7 @@ describe('GlobalExceptionFilter', () => {
         originalMessage: 'Cannot cancel a paid order',
         path: '/orders/123/cancel',
         requestId: 'req-123',
-        statusCode: 422,
+        statusCode: HttpStatus.UNPROCESSABLE_ENTITY,
       }),
       'Application error handled',
     );
@@ -179,7 +179,7 @@ describe('GlobalExceptionFilter', () => {
       host,
     );
 
-    expect(mockResponse.statusCode).toBe(401);
+    expect(mockResponse.statusCode).toBe(HttpStatus.UNAUTHORIZED);
     const body = getResponseBody(mockResponse);
 
     expect(body).toMatchObject({
@@ -187,7 +187,7 @@ describe('GlobalExceptionFilter', () => {
       message: 'Invalid authentication credentials',
       path: '/auth/sign-out',
       requestId: 'req-123',
-      statusCode: 401,
+      statusCode: HttpStatus.UNAUTHORIZED,
     });
     expect(body).not.toHaveProperty('details');
     expect(logger.warn).toHaveBeenCalledWith(
@@ -197,7 +197,7 @@ describe('GlobalExceptionFilter', () => {
           area: 'auth',
           reason: 'missing_or_invalid_bearer_token',
         },
-        statusCode: 401,
+        statusCode: HttpStatus.UNAUTHORIZED,
       }),
       'Application error handled',
     );
@@ -212,7 +212,7 @@ describe('GlobalExceptionFilter', () => {
 
     filter.catch(new UnauthorizedException(), host);
 
-    expect(mockResponse.statusCode).toBe(401);
+    expect(mockResponse.statusCode).toBe(HttpStatus.UNAUTHORIZED);
     const body = getResponseBody(mockResponse);
 
     expect(body).toMatchObject({
@@ -220,7 +220,7 @@ describe('GlobalExceptionFilter', () => {
       message: 'Unauthorized',
       path: '/admin',
       requestId: 'req-123',
-      statusCode: 401,
+      statusCode: HttpStatus.UNAUTHORIZED,
     });
     expect(typeof body.timestamp).toBe('string');
     expect(logger.error).not.toHaveBeenCalled();
@@ -235,7 +235,7 @@ describe('GlobalExceptionFilter', () => {
 
     filter.catch(new ZodValidationException(getZodError()), host);
 
-    expect(mockResponse.statusCode).toBe(400);
+    expect(mockResponse.statusCode).toBe(HttpStatus.BAD_REQUEST);
     const body = getResponseBody(mockResponse);
 
     expect(body).toMatchObject({
@@ -243,7 +243,7 @@ describe('GlobalExceptionFilter', () => {
       message: 'Validation failed',
       path: '/orders',
       requestId: 'req-123',
-      statusCode: 400,
+      statusCode: HttpStatus.BAD_REQUEST,
     });
     expect(typeof body.timestamp).toBe('string');
     expect(Array.isArray(body.issues)).toBe(true);
@@ -276,7 +276,7 @@ describe('GlobalExceptionFilter', () => {
       host,
     );
 
-    expect(mockResponse.statusCode).toBe(400);
+    expect(mockResponse.statusCode).toBe(HttpStatus.BAD_REQUEST);
     const body = getResponseBody(mockResponse);
 
     expect(body).toMatchObject({
@@ -284,7 +284,7 @@ describe('GlobalExceptionFilter', () => {
       message: 'missing order id, invalid tenant',
       path: '/orders',
       requestId: 'req-123',
-      statusCode: 400,
+      statusCode: HttpStatus.BAD_REQUEST,
     });
     expect(typeof body.timestamp).toBe('string');
     expect(logger.error).not.toHaveBeenCalled();
@@ -302,7 +302,7 @@ describe('GlobalExceptionFilter', () => {
       host,
     );
 
-    expect(mockResponse.statusCode).toBe(429);
+    expect(mockResponse.statusCode).toBe(HttpStatus.TOO_MANY_REQUESTS);
     const body = getResponseBody(mockResponse);
 
     expect(body).toMatchObject({
@@ -310,7 +310,7 @@ describe('GlobalExceptionFilter', () => {
       message: 'Too many requests',
       path: '/auth/magic-link/request',
       requestId: 'req-123',
-      statusCode: 429,
+      statusCode: HttpStatus.TOO_MANY_REQUESTS,
     });
     expect(typeof body.timestamp).toBe('string');
     expect(logger.error).not.toHaveBeenCalled();
@@ -325,7 +325,7 @@ describe('GlobalExceptionFilter', () => {
 
     filter.catch(new Error('database is down'), host);
 
-    expect(mockResponse.statusCode).toBe(500);
+    expect(mockResponse.statusCode).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
     const body = getResponseBody(mockResponse);
 
     expect(body).toMatchObject({
@@ -333,7 +333,7 @@ describe('GlobalExceptionFilter', () => {
       message: 'Internal server error',
       path: '/orders',
       requestId: 'req-123',
-      statusCode: 500,
+      statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
     });
     expect(typeof body.timestamp).toBe('string');
     expect(logger.error).toHaveBeenCalledWith(
@@ -343,7 +343,7 @@ describe('GlobalExceptionFilter', () => {
         originalMessage: 'database is down',
         path: '/orders',
         requestId: 'req-123',
-        statusCode: 500,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
       }),
       'Unexpected exception handled',
     );
@@ -358,7 +358,7 @@ describe('GlobalExceptionFilter', () => {
 
     filter.catch(new ZodSerializationException(getZodError()), host);
 
-    expect(mockResponse.statusCode).toBe(500);
+    expect(mockResponse.statusCode).toBe(HttpStatus.INTERNAL_SERVER_ERROR);
     const body = getResponseBody(mockResponse);
 
     expect(body).toMatchObject({
@@ -366,7 +366,7 @@ describe('GlobalExceptionFilter', () => {
       message: 'Internal server error',
       path: '/orders',
       requestId: 'req-123',
-      statusCode: 500,
+      statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
     });
     expect(typeof body.timestamp).toBe('string');
     expect(logger.error).toHaveBeenCalledWith(
@@ -376,7 +376,7 @@ describe('GlobalExceptionFilter', () => {
         originalMessage: 'Internal Server Error',
         path: '/orders',
         requestId: 'req-123',
-        statusCode: 500,
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
       }),
       'Internal HTTP exception handled',
     );

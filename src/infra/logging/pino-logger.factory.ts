@@ -1,20 +1,23 @@
 import { randomUUID } from 'node:crypto';
-import type {
-  IncomingHttpHeaders,
-  IncomingMessage,
-  ServerResponse,
-} from 'node:http';
+import type { IncomingHttpHeaders, ServerResponse } from 'node:http';
 import type { Params } from 'nestjs-pino';
 import { stdSerializers, stdTimeFunctions } from 'pino';
-import type {
-  AppConfig,
-  LoggerConfig,
-  ObservabilityConfig,
-} from '../../config';
+import type { AppConfig, LoggerConfig, ObservabilityConfig } from '@config';
+import type { RequestLike, TraceContext } from './pino-logger.factory.types';
 
 const REQUEST_ID_HEADER = 'x-request-id';
 const CORRELATION_ID_HEADER = 'x-correlation-id';
 const TRACEPARENT_HEADER = 'traceparent';
+const traceparentVersionLength = 2;
+const traceparentFlagsLength = 2;
+const traceIdHexLength = 32;
+const spanIdHexLength = 16;
+const clientErrorStatusCode = 400;
+const serverErrorStatusCode = 500;
+const traceIdPattern = new RegExp(`^[\\da-f]{${traceIdHexLength}}$`, 'i');
+const zeroTraceIdPattern = new RegExp(`^0{${traceIdHexLength}}$`, 'i');
+const spanIdPattern = new RegExp(`^[\\da-f]{${spanIdHexLength}}$`, 'i');
+const zeroSpanIdPattern = new RegExp(`^0{${spanIdHexLength}}$`, 'i');
 const HTTP_LOG_ATTRIBUTE_KEYS = {
   err: 'error',
   req: 'request',
@@ -54,15 +57,6 @@ const REDACT_PATHS = [
   'body.refreshToken',
   'body.secret',
 ] as const;
-
-type RequestLike = IncomingMessage & {
-  originalUrl?: string;
-};
-
-type TraceContext = {
-  spanId: string;
-  traceId: string;
-};
 
 function getHeaderValue(
   headers: IncomingHttpHeaders,
@@ -146,12 +140,12 @@ function extractTraceContext(
   const [version, traceId, spanId, traceFlags] = traceparent.split('-');
 
   const isTraceparentValid =
-    version?.length === 2 &&
-    traceFlags?.length === 2 &&
-    /^[\da-f]{32}$/i.test(traceId ?? '') &&
-    !/^0{32}$/i.test(traceId ?? '') &&
-    /^[\da-f]{16}$/i.test(spanId ?? '') &&
-    !/^0{16}$/i.test(spanId ?? '');
+    version?.length === traceparentVersionLength &&
+    traceFlags?.length === traceparentFlagsLength &&
+    traceIdPattern.test(traceId ?? '') &&
+    !zeroTraceIdPattern.test(traceId ?? '') &&
+    spanIdPattern.test(spanId ?? '') &&
+    !zeroSpanIdPattern.test(spanId ?? '');
 
   if (!isTraceparentValid) {
     return {};
@@ -202,11 +196,11 @@ function createPinoLoggerOptions(
       customErrorMessage: (request, response) =>
         `${request.method} ${getRequestUrl(request)} failed with status ${response.statusCode}`,
       customLogLevel: (_request, response, error) => {
-        if (error || response.statusCode >= 500) {
+        if (error || response.statusCode >= serverErrorStatusCode) {
           return 'error';
         }
 
-        if (response.statusCode >= 400) {
+        if (response.statusCode >= clientErrorStatusCode) {
           return 'warn';
         }
 

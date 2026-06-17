@@ -1,7 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../../../../../infra/prisma/prisma.service';
-import { AppError } from '../../../../../shared/errors/app-error';
-import { Prisma } from '../../../../../generated/prisma/client';
+import { authErrorReasons } from '@auth/application/errors/auth-error-reasons';
+import { externalIdentityConflict } from '@auth/application/errors/auth-errors';
+import { Prisma } from '@generated/prisma/client';
+import { PrismaService } from '@infra/prisma/prisma.service';
 import type { AuthProvider } from '../../../domain/auth-provider';
 import type {
   AccountProviderLookup,
@@ -10,14 +11,7 @@ import type {
   ExternalIdentityRecord,
   ProviderSubjectLookup,
 } from '../../../application/ports/external-identities.repository';
-
-type PrismaExternalIdentityRecord = {
-  id: string;
-  accountId: string;
-  provider: 'GOOGLE';
-  providerSubject: string;
-  createdAt: Date;
-};
+import type { PrismaExternalIdentityRecord } from './prisma-external-identities.repository.types';
 
 @Injectable()
 class PrismaExternalIdentitiesRepository implements ExternalIdentitiesRepository {
@@ -38,12 +32,12 @@ class PrismaExternalIdentitiesRepository implements ExternalIdentitiesRepository
       return this.mapIdentity(identity);
     } catch (error) {
       if (isUniqueConstraintError(error)) {
-        throw new AppError('conflict', 'External identity is already linked', {
+        throw externalIdentityConflict({
+          accountId: data.accountId,
           cause: error,
-          details: {
-            accountId: data.accountId,
-            provider: data.provider,
-          },
+          action: 'create_external_identity',
+          provider: data.provider,
+          reason: authErrorReasons.uniqueConstraintViolation,
         });
       }
 

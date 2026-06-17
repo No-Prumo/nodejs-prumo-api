@@ -1,5 +1,6 @@
-import { buildAuthConfig, validateEnv } from '../../../../../config';
-import { InMemoryMagicLinkChallengesRepository } from '../../../infrastructure/persistence/in-memory/in-memory-magic-link-challenges.repository';
+import { buildTestAuthConfig } from '@test-support/auth/build-test-auth-config';
+import { InMemoryMagicLinkChallengesRepository } from '@auth/infrastructure/persistence/in-memory/in-memory-magic-link-challenges.repository';
+import { secondsToMilliseconds } from '@shared/time/time.helpers';
 import type {
   EmailGateway,
   SendMagicLinkEmailRequest,
@@ -10,17 +11,11 @@ import {
   RequestMagicLinkUseCase,
 } from './request-magic-link.use-case';
 
-const authSettings = buildAuthConfig(
-  validateEnv({
-    AUTH_MAGIC_LINK_TTL_SECONDS: '600',
-    DATABASE_URL: 'postgresql://postgres:sandicts@localhost:5432/sandicts',
-    POSTGRES_DB: 'sandicts',
-    POSTGRES_HOST: 'localhost',
-    POSTGRES_PASSWORD: 'sandicts',
-    POSTGRES_PORT: '5432',
-    POSTGRES_USER: 'postgres',
-  }),
-);
+const magicLinkTtlSeconds = 600;
+const magicLinkTtlMilliseconds = secondsToMilliseconds(magicLinkTtlSeconds);
+const authSettings = buildTestAuthConfig({
+  AUTH_MAGIC_LINK_TTL_SECONDS: `${magicLinkTtlSeconds}`,
+});
 
 class FakeEmailGateway implements EmailGateway {
   readonly sentMagicLinks: SendMagicLinkEmailRequest[] = [];
@@ -85,10 +80,10 @@ describe('RequestMagicLinkUseCase', () => {
     );
     expect(challenge?.tokenHash).not.toBe(sentEmail?.token);
     expect(challenge?.expiresAt.getTime()).toBeGreaterThanOrEqual(
-      beforeRequest + 600 * 1000,
+      beforeRequest + magicLinkTtlMilliseconds,
     );
     expect(challenge?.expiresAt.getTime()).toBeLessThanOrEqual(
-      Date.now() + 600 * 1000,
+      Date.now() + magicLinkTtlMilliseconds,
     );
   });
 });

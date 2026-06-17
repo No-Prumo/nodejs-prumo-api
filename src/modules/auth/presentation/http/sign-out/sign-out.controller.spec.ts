@@ -1,16 +1,7 @@
-import { buildAuthConfig, validateEnv } from '../../../../../config';
+import { buildTestAuthConfig } from '@test-support/auth/build-test-auth-config';
 import { SignOutController } from './sign-out.controller';
 
-const authSettings = buildAuthConfig(
-  validateEnv({
-    DATABASE_URL: 'postgresql://postgres:sandicts@localhost:5432/sandicts',
-    POSTGRES_DB: 'sandicts',
-    POSTGRES_HOST: 'localhost',
-    POSTGRES_PASSWORD: 'sandicts',
-    POSTGRES_PORT: '5432',
-    POSTGRES_USER: 'postgres',
-  }),
-);
+const authSettings = buildTestAuthConfig();
 
 describe('SignOutController', () => {
   it('revokes the current session and clears the refresh token cookie', async () => {

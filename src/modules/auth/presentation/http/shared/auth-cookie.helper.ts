@@ -1,4 +1,4 @@
-import type { AuthConfig } from '../../../../../config';
+import type { AuthConfig } from '@config';
 import type { RefreshTokenCookieOptions } from './auth-cookie.types';
 
 function buildRefreshTokenCookieOptions(

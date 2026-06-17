@@ -1,5 +1,7 @@
 const appErrorCodes = [
   'unauthorized',
+  'invalid_google_credential',
+  'invalid_magic_link_token',
   'invalid_access_token',
   'invalid_refresh_token',
   'refresh_token_expired',
@@ -8,6 +10,7 @@ const appErrorCodes = [
   'auth_session_inactive',
   'forbidden',
   'account_auth_forbidden',
+  'external_identity_conflict',
   'resource_not_found',
   'conflict',
   'business_rule_violation',

@@ -2,6 +2,7 @@ import {
   Controller,
   Headers,
   HttpCode,
+  HttpStatus,
   Inject,
   Ip,
   Post,
@@ -11,8 +12,12 @@ import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
 import type { Response } from 'express';
 import { ZodResponse } from 'nestjs-zod';
-import { authConfig, type AuthConfig } from '../../../../../config';
+import { authConfig, type AuthConfig } from '@config';
 import { RefreshAuthSessionUseCase } from '../../../application/use-cases/refresh-auth-session/refresh-auth-session.use-case';
+import {
+  authRateLimitWindowMilliseconds,
+  refreshAuthSessionRateLimit,
+} from '../shared/auth-http-rate-limit.constants';
 import {
   buildRefreshTokenCookieOptions,
   readCookieValue,
@@ -29,15 +34,20 @@ class RefreshAuthSessionController {
   ) {}
 
   @Post('refresh')
-  @HttpCode(200)
-  @Throttle({ default: { limit: 30, ttl: 15 * 60 * 1000 } })
+  @HttpCode(HttpStatus.OK)
+  @Throttle({
+    default: {
+      limit: refreshAuthSessionRateLimit,
+      ttl: authRateLimitWindowMilliseconds,
+    },
+  })
   @ApiOperation({
     summary: 'Refresh auth session',
     description:
       'Rotates the refresh token cookie and returns a new access token.',
   })
   @ZodResponse({
-    status: 200,
+    status: HttpStatus.OK,
     description: 'Refreshed authenticated session response',
     type: RefreshAuthSessionResponseDto,
   })

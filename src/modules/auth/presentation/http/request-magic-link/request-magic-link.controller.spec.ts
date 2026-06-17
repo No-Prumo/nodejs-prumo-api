@@ -1,4 +1,4 @@
-import type { RequestMagicLinkUseCaseResponse } from '../../../application/use-cases/request-magic-link/request-magic-link.use-case';
+import type { RequestMagicLinkUseCaseResponse } from '../../../application/use-cases/request-magic-link/request-magic-link.use-case.types';
 import { RequestMagicLinkController } from './request-magic-link.controller';
 
 describe('RequestMagicLinkController', () => {

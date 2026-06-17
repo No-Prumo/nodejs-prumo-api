@@ -2,19 +2,16 @@ import {
   Controller,
   Headers,
   HttpCode,
+  HttpStatus,
   Inject,
   Post,
   Res,
 } from '@nestjs/common';
-import {
-  ApiHeader,
-  ApiNoContentResponse,
-  ApiOperation,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiNoContentResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import type { Response } from 'express';
-import { authConfig, type AuthConfig } from '../../../../../config';
+import { authConfig, type AuthConfig } from '@config';
 import { SignOutAllUseCase } from '../../../application/use-cases/sign-out-all/sign-out-all.use-case';
+import { ApiBearerAccessTokenHeader } from '../shared/api-bearer-access-token-header.decorator';
 import { buildClearRefreshTokenCookieOptions } from '../shared/auth-cookie.helper';
 import { readBearerToken } from '../shared/bearer-token.helper';
 
@@ -28,17 +25,13 @@ class SignOutAllController {
   ) {}
 
   @Post('sign-out-all')
-  @HttpCode(204)
+  @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({
     summary: 'Sign out all sessions',
     description:
       'Revokes all active auth sessions for the authenticated account and clears the refresh cookie for the current browser.',
   })
-  @ApiHeader({
-    name: 'Authorization',
-    description: 'Bearer access token for the current account.',
-    required: true,
-  })
+  @ApiBearerAccessTokenHeader('Bearer access token for the current account.')
   @ApiNoContentResponse({ description: 'All account sessions signed out' })
   async signOutAllSessions(
     @Headers('authorization') authorizationHeader: string | undefined,

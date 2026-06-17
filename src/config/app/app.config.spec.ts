@@ -1,12 +1,14 @@
 import { buildAppConfig } from './app.config';
 import { validateEnv } from '../env/env.schema';
 
+const testPostgresPort = '5432';
+
 const baseEnv = {
   DATABASE_URL: 'postgresql://postgres:sandicts@localhost:5432/sandicts',
   POSTGRES_DB: 'sandicts',
   POSTGRES_HOST: 'localhost',
   POSTGRES_PASSWORD: 'sandicts',
-  POSTGRES_PORT: '5432',
+  POSTGRES_PORT: testPostgresPort,
   POSTGRES_USER: 'postgres',
 };
 

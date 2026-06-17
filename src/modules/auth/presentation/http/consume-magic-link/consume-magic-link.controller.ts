@@ -3,6 +3,7 @@ import {
   Controller,
   Headers,
   HttpCode,
+  HttpStatus,
   Inject,
   Ip,
   Post,
@@ -12,8 +13,12 @@ import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
 import type { Response } from 'express';
 import { ZodResponse } from 'nestjs-zod';
-import { authConfig, type AuthConfig } from '../../../../../config';
+import { authConfig, type AuthConfig } from '@config';
 import { ConsumeMagicLinkUseCase } from '../../../application/use-cases/consume-magic-link/consume-magic-link.use-case';
+import {
+  authRateLimitWindowMilliseconds,
+  consumeMagicLinkRateLimit,
+} from '../shared/auth-http-rate-limit.constants';
 import { buildRefreshTokenCookieOptions } from '../shared/auth-cookie.helper';
 import {
   ConsumeMagicLinkBodyDto,
@@ -30,14 +35,19 @@ class ConsumeMagicLinkController {
   ) {}
 
   @Post('consume')
-  @HttpCode(200)
-  @Throttle({ default: { limit: 10, ttl: 15 * 60 * 1000 } })
+  @HttpCode(HttpStatus.OK)
+  @Throttle({
+    default: {
+      limit: consumeMagicLinkRateLimit,
+      ttl: authRateLimitWindowMilliseconds,
+    },
+  })
   @ApiOperation({
     summary: 'Consume magic link',
     description: 'Consumes a one-time token and creates an auth session.',
   })
   @ZodResponse({
-    status: 200,
+    status: HttpStatus.OK,
     description: 'Authenticated session response',
     type: ConsumeMagicLinkResponseDto,
   })

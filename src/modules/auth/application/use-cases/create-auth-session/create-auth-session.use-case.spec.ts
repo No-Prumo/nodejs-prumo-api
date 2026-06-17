@@ -1,31 +1,17 @@
-import { buildAuthConfig, validateEnv } from '../../../../../config';
-import { InMemoryAccountsRepository } from '../../../infrastructure/persistence/in-memory/in-memory-accounts.repository';
-import { InMemoryAuthSessionsRepository } from '../../../infrastructure/persistence/in-memory/in-memory-auth-sessions.repository';
-import type { AccountRecord } from '../../ports/accounts.repository';
+import { buildAccountRecord } from '@test-support/auth/build-account-record';
+import { buildTestAuthConfig } from '@test-support/auth/build-test-auth-config';
+import { InMemoryAccountsRepository } from '@auth/infrastructure/persistence/in-memory/in-memory-accounts.repository';
+import { InMemoryAuthSessionsRepository } from '@auth/infrastructure/persistence/in-memory/in-memory-auth-sessions.repository';
 import { RefreshTokenHasher } from '../../services/tokens/refresh-token-hasher';
 import { TokenService } from '../../services/tokens/token.service';
 import { CreateAuthSessionUseCase } from './create-auth-session.use-case';
 
-const account: AccountRecord = {
-  id: 'account-id',
+const account = buildAccountRecord({
   email: 'User@Example.com',
   normalizedEmail: 'user@example.com',
-  displayName: 'User',
-  status: 'active',
-  createdAt: new Date('2026-01-01T00:00:00.000Z'),
-  updatedAt: new Date('2026-01-01T00:00:00.000Z'),
-};
+});
 
-const authSettings = buildAuthConfig(
-  validateEnv({
-    DATABASE_URL: 'postgresql://postgres:sandicts@localhost:5432/sandicts',
-    POSTGRES_DB: 'sandicts',
-    POSTGRES_HOST: 'localhost',
-    POSTGRES_PASSWORD: 'sandicts',
-    POSTGRES_PORT: '5432',
-    POSTGRES_USER: 'postgres',
-  }),
-);
+const authSettings = buildTestAuthConfig();
 
 describe('CreateAuthSessionUseCase', () => {
   function makeSut() {
@@ -75,10 +61,11 @@ describe('CreateAuthSessionUseCase', () => {
 
   it('rejects blocked accounts', async () => {
     const { accountsRepository, authSessionsRepository, useCase } = makeSut();
-    accountsRepository.accounts.push({
-      ...account,
-      status: 'blocked',
-    } satisfies AccountRecord);
+    accountsRepository.accounts.push(
+      buildAccountRecord({
+        status: 'blocked',
+      }),
+    );
 
     await expect(
       useCase.execute({
@@ -86,7 +73,7 @@ describe('CreateAuthSessionUseCase', () => {
         creationSource: 'google',
       }),
     ).rejects.toMatchObject({
-      code: 'forbidden',
+      code: 'account_auth_forbidden',
     });
     expect(authSessionsRepository.authSessions).toHaveLength(0);
   });

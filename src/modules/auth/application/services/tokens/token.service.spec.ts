@@ -1,11 +1,23 @@
-import type { AuthConfig } from '../../../../../config';
+import type { AuthConfig } from '@config';
+import { secondsPerDay } from '@shared/time/time.constants';
 import { TokenService } from './token.service';
+
+const accessTokenTtlSeconds = 900;
+const refreshTokenIdleTtlDays = 14;
+const refreshTokenAbsoluteTtlDays = 30;
+const refreshTokenIdleTtlSeconds = secondsPerDay * refreshTokenIdleTtlDays;
+const refreshTokenAbsoluteTtlSeconds =
+  secondsPerDay * refreshTokenAbsoluteTtlDays;
+const tamperedTokenIssuedAtSeconds = 1;
+const futureTamperedTokenExpirationSeconds = 9999999999;
+const expiredAccessTokenTtlSeconds = 1;
+const expectedOpaqueRefreshTokenLength = 64;
 
 const authSettings = {
   accessTokenSecret: 'test-access-token-secret-with-enough-length',
-  accessTokenTtlSeconds: 900,
-  refreshTokenIdleTtlSeconds: 60 * 60 * 24 * 14,
-  refreshTokenAbsoluteTtlSeconds: 60 * 60 * 24 * 30,
+  accessTokenTtlSeconds,
+  refreshTokenIdleTtlSeconds,
+  refreshTokenAbsoluteTtlSeconds,
   refreshTokenCookie: {
     name: 'sandicts_refresh_token',
     path: '/auth/refresh',
@@ -71,8 +83,8 @@ describe('TokenService', () => {
       JSON.stringify({
         sub: 'another-account-id',
         sessionId: 'session-id',
-        iat: 1,
-        exp: 9999999999,
+        iat: tamperedTokenIssuedAtSeconds,
+        exp: futureTamperedTokenExpirationSeconds,
       }),
     ).toString('base64url');
 
@@ -93,7 +105,7 @@ describe('TokenService', () => {
 
     const service = new TokenService({
       ...authSettings,
-      accessTokenTtlSeconds: 1,
+      accessTokenTtlSeconds: expiredAccessTokenTtlSeconds,
     });
     const issuedToken = service.issueAccessToken({
       sub: 'account-id',
@@ -114,7 +126,7 @@ describe('TokenService', () => {
     const secondToken = service.generateOpaqueRefreshToken();
 
     expect(firstToken).not.toBe(secondToken);
-    expect(firstToken).toHaveLength(64);
-    expect(secondToken).toHaveLength(64);
+    expect(firstToken).toHaveLength(expectedOpaqueRefreshTokenLength);
+    expect(secondToken).toHaveLength(expectedOpaqueRefreshTokenLength);
   });
 });

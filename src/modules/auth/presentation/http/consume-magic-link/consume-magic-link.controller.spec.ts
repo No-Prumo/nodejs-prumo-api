@@ -1,17 +1,8 @@
-import { buildAuthConfig, validateEnv } from '../../../../../config';
-import type { ConsumeMagicLinkUseCaseResponse } from '../../../application/use-cases/consume-magic-link/consume-magic-link.use-case';
+import { buildTestAuthConfig } from '@test-support/auth/build-test-auth-config';
+import type { ConsumeMagicLinkUseCaseResponse } from '../../../application/use-cases/consume-magic-link/consume-magic-link.use-case.types';
 import { ConsumeMagicLinkController } from './consume-magic-link.controller';
 
-const authSettings = buildAuthConfig(
-  validateEnv({
-    DATABASE_URL: 'postgresql://postgres:sandicts@localhost:5432/sandicts',
-    POSTGRES_DB: 'sandicts',
-    POSTGRES_HOST: 'localhost',
-    POSTGRES_PASSWORD: 'sandicts',
-    POSTGRES_PORT: '5432',
-    POSTGRES_USER: 'postgres',
-  }),
-);
+const authSettings = buildTestAuthConfig();
 
 describe('ConsumeMagicLinkController', () => {
   it('sets the refresh token cookie and omits it from the consume response body', async () => {

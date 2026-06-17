@@ -6,7 +6,7 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "build": "npm run prisma:generate && nest build",
+    "build": "npm run prisma:generate && node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\" && tsc -p tsconfig.build.json --incremental false && tsc-alias -p tsconfig.build.json",
     "format": "prettier --write --no-error-on-unmatched-pattern \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "npm run prisma:generate && nest start",
     "start:dev": "npm run prisma:generate && nest start --watch",
@@ -68,6 +68,7 @@
     "supertest": "^7.0.0",
     "ts-loader": "^9.5.2",
     "ts-node": "^10.9.2",
+    "tsc-alias": "^1.8.17",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.7.3",
     "typescript-eslint": "^8.20.0",
@@ -77,10 +78,13 @@
     "brace-expansion": "^1.1.13",
     "flatted": "^3.4.2",
     "@hono/node-server": "^1.19.13",
+    "form-data": "^4.0.6",
+    "hono": "^4.12.25",
+    "js-yaml": "^4.2.0",
     "lodash": "^4.18.1",
     "path-to-regexp": "^8.4.2",
     "postcss": "^8.5.10",
     "picomatch": "^4.0.4",
-    "vite": "^8.0.5"
+    "vite": "^8.0.16"
   }
 }

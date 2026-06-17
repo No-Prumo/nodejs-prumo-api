@@ -1,9 +1,5 @@
 import type { AppErrorCode } from './error-codes';
-
-type AppErrorOptions = {
-  cause?: unknown;
-  details?: unknown;
-};
+import type { AppErrorOptions } from './app-error.types';
 
 class AppError extends Error {
   readonly code: AppErrorCode;
@@ -29,4 +25,3 @@ class AppError extends Error {
 }
 
 export { AppError };
-export type { AppErrorOptions };

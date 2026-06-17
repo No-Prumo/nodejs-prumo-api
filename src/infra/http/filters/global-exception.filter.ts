@@ -12,17 +12,22 @@ import {
   ZodSerializationException,
   ZodValidationException,
 } from 'nestjs-zod';
-import { AppError } from '../../../shared/errors/app-error';
-import {
-  type ErrorCode,
-  isErrorCode,
-} from '../../../shared/errors/error-codes';
+import { AppError } from '@shared/errors/app-error';
+import { type ErrorCode, isErrorCode } from '@shared/errors/error-codes';
 import type {
   HttpExceptionResponseBody,
   NormalizedException,
 } from './global-exception.filter.types';
 
 const REQUEST_ID_HEADERS = ['X-Request-Id', 'X-Correlation-Id'] as const;
+const badRequestStatusCode: number = HttpStatus.BAD_REQUEST;
+const unauthorizedStatusCode: number = HttpStatus.UNAUTHORIZED;
+const forbiddenStatusCode: number = HttpStatus.FORBIDDEN;
+const notFoundStatusCode: number = HttpStatus.NOT_FOUND;
+const conflictStatusCode: number = HttpStatus.CONFLICT;
+const tooManyRequestsStatusCode: number = HttpStatus.TOO_MANY_REQUESTS;
+const unprocessableEntityStatusCode: number = HttpStatus.UNPROCESSABLE_ENTITY;
+const internalServerErrorStatusCode: number = HttpStatus.INTERNAL_SERVER_ERROR;
 
 @Catch()
 class GlobalExceptionFilter implements ExceptionFilter {
@@ -281,50 +286,55 @@ function isInternalHttpException(exception: HttpException) {
   return (
     exception instanceof ZodSerializationException ||
     exception instanceof ZodSchemaDeclarationException ||
-    exception.getStatus() >= 500
+    exception.getStatus() >= internalServerErrorStatusCode
   );
 }
 
 function mapAppErrorCodeToStatus(code: AppError['code']) {
   switch (code) {
     case 'unauthorized':
+    case 'invalid_google_credential':
+    case 'invalid_magic_link_token':
     case 'invalid_access_token':
     case 'invalid_refresh_token':
     case 'refresh_token_expired':
     case 'refresh_token_reused':
     case 'refresh_token_revoked':
     case 'auth_session_inactive':
-      return 401;
+      return unauthorizedStatusCode;
     case 'forbidden':
     case 'account_auth_forbidden':
-      return 403;
+      return forbiddenStatusCode;
     case 'resource_not_found':
-      return 404;
+      return notFoundStatusCode;
     case 'conflict':
-      return 409;
+    case 'external_identity_conflict':
+      return conflictStatusCode;
     case 'business_rule_violation':
-      return 422;
+      return unprocessableEntityStatusCode;
   }
 }
 
 function mapHttpStatusToErrorCode(statusCode: number): ErrorCode {
   switch (statusCode) {
-    case 400:
+    case badRequestStatusCode:
       return 'bad_request';
-    case 401:
+    case unauthorizedStatusCode:
       return 'unauthorized';
-    case 403:
+    case forbiddenStatusCode:
       return 'forbidden';
-    case 404:
+    case notFoundStatusCode:
       return 'resource_not_found';
-    case 409:
+    case conflictStatusCode:
       return 'conflict';
-    case 429:
+    case tooManyRequestsStatusCode:
       return 'rate_limited';
-    case 422:
+    case unprocessableEntityStatusCode:
       return 'business_rule_violation';
     default:
-      return statusCode >= 500 ? 'internal_error' : 'bad_request';
+      return statusCode >= internalServerErrorStatusCode
+        ? 'internal_error'
+        : 'bad_request';
   }
 }
 

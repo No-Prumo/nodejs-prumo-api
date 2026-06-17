@@ -1,4 +1,4 @@
-import type { ErrorCode } from '../../../shared/errors/error-codes';
+import type { ErrorCode } from '@shared/errors/error-codes';
 
 type ErrorResponseBody = {
   code: ErrorCode;

@@ -1,23 +1,23 @@
-import { buildAuthConfig, validateEnv } from '../../../../../config';
-import { InMemoryAccountsRepository } from '../../../infrastructure/persistence/in-memory/in-memory-accounts.repository';
-import { InMemoryAuthSessionsRepository } from '../../../infrastructure/persistence/in-memory/in-memory-auth-sessions.repository';
-import { InMemoryMagicLinkChallengesRepository } from '../../../infrastructure/persistence/in-memory/in-memory-magic-link-challenges.repository';
+import { buildTestAuthConfig } from '@test-support/auth/build-test-auth-config';
+import { InMemoryAccountsRepository } from '@auth/infrastructure/persistence/in-memory/in-memory-accounts.repository';
+import { InMemoryAuthSessionsRepository } from '@auth/infrastructure/persistence/in-memory/in-memory-auth-sessions.repository';
+import { InMemoryMagicLinkChallengesRepository } from '@auth/infrastructure/persistence/in-memory/in-memory-magic-link-challenges.repository';
+import {
+  minutesToMilliseconds,
+  secondsToMilliseconds,
+} from '@shared/time/time.helpers';
 import { MagicLinkTokenService } from '../../services/tokens/magic-link-token.service';
 import { RefreshTokenHasher } from '../../services/tokens/refresh-token-hasher';
 import { TokenService } from '../../services/tokens/token.service';
 import { ConsumeMagicLinkUseCase } from './consume-magic-link.use-case';
 import { CreateAuthSessionUseCase } from '../create-auth-session/create-auth-session.use-case';
 
-const authSettings = buildAuthConfig(
-  validateEnv({
-    DATABASE_URL: 'postgresql://postgres:sandicts@localhost:5432/sandicts',
-    POSTGRES_DB: 'sandicts',
-    POSTGRES_HOST: 'localhost',
-    POSTGRES_PASSWORD: 'sandicts',
-    POSTGRES_PORT: '5432',
-    POSTGRES_USER: 'postgres',
-  }),
+const authSettings = buildTestAuthConfig();
+const validMagicLinkWindowMinutes = 15;
+const validMagicLinkWindowMilliseconds = minutesToMilliseconds(
+  validMagicLinkWindowMinutes,
 );
+const expiredMagicLinkOffsetMilliseconds = secondsToMilliseconds(1);
 
 describe('ConsumeMagicLinkUseCase', () => {
   function makeSut() {
@@ -53,7 +53,7 @@ describe('ConsumeMagicLinkUseCase', () => {
     magicLinkTokenService: MagicLinkTokenService,
     token: string,
     email = 'user@example.com',
-    expiresAt = new Date(Date.now() + 15 * 60 * 1000),
+    expiresAt = new Date(Date.now() + validMagicLinkWindowMilliseconds),
   ) {
     return challengesRepository.create({
       email,
@@ -116,7 +116,7 @@ describe('ConsumeMagicLinkUseCase', () => {
       magicLinkTokenService,
       expiredToken,
       'expired@example.com',
-      new Date(Date.now() - 1000),
+      new Date(Date.now() - expiredMagicLinkOffsetMilliseconds),
     );
     await createChallenge(
       challengesRepository,
@@ -127,18 +127,18 @@ describe('ConsumeMagicLinkUseCase', () => {
     await expect(
       useCase.execute({ token: 'invalid-token' }),
     ).rejects.toMatchObject({
-      code: 'unauthorized',
+      code: 'invalid_magic_link_token',
     });
     await expect(
       useCase.execute({ token: expiredToken }),
     ).rejects.toMatchObject({
-      code: 'unauthorized',
+      code: 'invalid_magic_link_token',
     });
 
     await useCase.execute({ token: usedToken });
 
     await expect(useCase.execute({ token: usedToken })).rejects.toMatchObject({
-      code: 'unauthorized',
+      code: 'invalid_magic_link_token',
     });
   });
 });

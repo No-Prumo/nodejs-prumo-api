@@ -1,0 +1,26 @@
+const authErrorReasons = {
+  accountNotFound: 'account_not_found',
+  accountProviderAlreadyLinked: 'account_provider_already_linked',
+  accountStatusNotActive: 'account_status_not_active',
+  challengeNotFoundExpiredOrConsumed: 'challenge_not_found_expired_or_consumed',
+  expiredToken: 'expired_token',
+  invalidAudience: 'invalid_audience',
+  invalidIssuer: 'invalid_issuer',
+  linkedAccountNotFound: 'linked_account_not_found',
+  missingClientId: 'missing_client_id',
+  missingEmail: 'missing_email',
+  missingOrInvalidBearerToken: 'missing_or_invalid_bearer_token',
+  missingPayload: 'missing_payload',
+  missingSubject: 'missing_subject',
+  refreshRotationConflict: 'refresh_rotation_conflict',
+  refreshTokenExpired: 'refresh_token_expired',
+  revokedRefreshTokenSubmitted: 'revoked_refresh_token_submitted',
+  rotatedRefreshTokenSubmitted: 'rotated_refresh_token_submitted',
+  sessionInactiveOrExpired: 'session_inactive_or_expired',
+  tokenHashNotFound: 'token_hash_not_found',
+  uniqueConstraintViolation: 'unique_constraint_violation',
+  unverifiedEmail: 'unverified_email',
+  verificationFailed: 'verification_failed',
+} as const;
+
+export { authErrorReasons };

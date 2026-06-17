@@ -6,6 +6,7 @@ priority: high
 canonical: docs/ai/ci-cd/ci-governance.md
 related:
   - docs/ai/ci-cd/ci-operational-rules.md
+  - docs/ai/ci-cd/security-audit-remediation.md
 use-together-with:
   - docs/ai/ci-cd/ci-operational-rules.md
 scope: github-actions, pull-requests, branch-policy
@@ -167,6 +168,8 @@ Every pull request targeting a protected branch must run, at minimum:
 - dependency audit
 
 The dependency audit blocking threshold must be explicit in workflow code.
+Dependency vulnerability remediation rules live in
+`docs/ai/ci-cd/security-audit-remediation.md`.
 
 ---
 
@@ -228,3 +231,4 @@ These rules must not be relaxed unless explicitly requested:
 - CI changes must not silently weaken governance
 - `npm` remains the package manager
 - Node.js version remains aligned with project baseline
+- dependency vulnerability fixes must preserve or strengthen the audit job

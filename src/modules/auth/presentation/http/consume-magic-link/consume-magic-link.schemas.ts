@@ -5,9 +5,16 @@ import {
   AuthSessionResponseSchema,
 } from '../shared/auth-session-response.schemas';
 
+const minimumMagicLinkTokenLength = 32;
+const maximumMagicLinkTokenLength = 256;
+
 const ConsumeMagicLinkBodySchema = z
   .object({
-    token: z.string().trim().min(32).max(256),
+    token: z
+      .string()
+      .trim()
+      .min(minimumMagicLinkTokenLength)
+      .max(maximumMagicLinkTokenLength),
   })
   .meta({ id: 'ConsumeMagicLinkBody' });
 

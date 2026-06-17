@@ -1,35 +1,20 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { OAuth2Client } from 'google-auth-library';
-import { authConfig, type AuthConfig } from '../../../../../config';
-import { AppError } from '../../../../../shared/errors/app-error';
+import { authErrorReasons } from '@auth/application/errors/auth-error-reasons';
+import { invalidGoogleCredential } from '@auth/application/errors/auth-errors';
+import { authConfig, type AuthConfig } from '@config';
+import { unixSecondsToMilliseconds } from '@shared/time/time.helpers';
 import type {
   GoogleIdTokenVerifier,
   VerifiedGoogleIdentity,
   VerifyGoogleIdTokenRequest,
 } from '../../../application/ports/google-id-token-verifier';
+import type {
+  GoogleOAuthClient,
+  GoogleTokenPayload,
+} from './google-id-token-verifier.gateway.types';
 
 const googleIssuers = ['accounts.google.com', 'https://accounts.google.com'];
-
-type GoogleTokenPayload = {
-  aud?: string;
-  email?: string;
-  email_verified?: boolean | string;
-  exp?: number;
-  iss?: string;
-  name?: string;
-  sub?: string;
-};
-
-type GoogleLoginTicket = {
-  getPayload(): GoogleTokenPayload | undefined;
-};
-
-type GoogleOAuthClient = {
-  verifyIdToken(options: {
-    audience: string;
-    idToken: string;
-  }): Promise<GoogleLoginTicket>;
-};
 
 @Injectable()
 class GoogleIdTokenVerifierGateway implements GoogleIdTokenVerifier {
@@ -45,7 +30,10 @@ class GoogleIdTokenVerifierGateway implements GoogleIdTokenVerifier {
     const clientId = this.authSettings.google.clientId;
 
     if (!clientId) {
-      throw invalidGoogleCredential(undefined, 'missing_client_id');
+      throw invalidGoogleCredential({
+        action: 'verify_google_id_token',
+        reason: authErrorReasons.missingClientId,
+      });
     }
 
     let payload: GoogleTokenPayload | undefined;
@@ -57,39 +45,64 @@ class GoogleIdTokenVerifierGateway implements GoogleIdTokenVerifier {
       });
       payload = ticket.getPayload();
     } catch (error) {
-      throw invalidGoogleCredential(error, 'verification_failed');
+      throw invalidGoogleCredential({
+        action: 'verify_google_id_token',
+        cause: error,
+        reason: authErrorReasons.verificationFailed,
+      });
     }
 
     if (!payload) {
-      throw invalidGoogleCredential(undefined, 'missing_payload');
+      throw invalidGoogleCredential({
+        action: 'verify_google_id_token',
+        reason: authErrorReasons.missingPayload,
+      });
     }
 
     if (!payload.iss || !googleIssuers.includes(payload.iss)) {
-      throw invalidGoogleCredential(undefined, 'invalid_issuer');
+      throw invalidGoogleCredential({
+        action: 'verify_google_id_token',
+        reason: authErrorReasons.invalidIssuer,
+      });
     }
 
     if (payload.aud !== clientId) {
-      throw invalidGoogleCredential(undefined, 'invalid_audience');
+      throw invalidGoogleCredential({
+        action: 'verify_google_id_token',
+        reason: authErrorReasons.invalidAudience,
+      });
     }
 
-    if (!payload.exp || payload.exp * 1000 <= Date.now()) {
-      throw invalidGoogleCredential(undefined, 'expired_token');
+    if (!payload.exp || unixSecondsToMilliseconds(payload.exp) <= Date.now()) {
+      throw invalidGoogleCredential({
+        action: 'verify_google_id_token',
+        reason: authErrorReasons.expiredToken,
+      });
     }
 
     const subject = payload.sub?.trim();
 
     if (!subject) {
-      throw invalidGoogleCredential(undefined, 'missing_subject');
+      throw invalidGoogleCredential({
+        action: 'verify_google_id_token',
+        reason: authErrorReasons.missingSubject,
+      });
     }
 
     const email = payload.email?.trim();
 
     if (!email || !email.includes('@')) {
-      throw invalidGoogleCredential(undefined, 'missing_email');
+      throw invalidGoogleCredential({
+        action: 'verify_google_id_token',
+        reason: authErrorReasons.missingEmail,
+      });
     }
 
     if (!isVerifiedEmail(payload.email_verified)) {
-      throw invalidGoogleCredential(undefined, 'unverified_email');
+      throw invalidGoogleCredential({
+        action: 'verify_google_id_token',
+        reason: authErrorReasons.unverifiedEmail,
+      });
     }
 
     return {
@@ -115,12 +128,4 @@ function normalizeNullableText(value: unknown): string | null {
   return trimmedValue.length > 0 ? trimmedValue : null;
 }
 
-function invalidGoogleCredential(cause?: unknown, reason?: string): AppError {
-  return new AppError('unauthorized', 'Invalid authentication credentials', {
-    cause,
-    details: reason ? { reason } : undefined,
-  });
-}
-
 export { GoogleIdTokenVerifierGateway };
-export type { GoogleOAuthClient };

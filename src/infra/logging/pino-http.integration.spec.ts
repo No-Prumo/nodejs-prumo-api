@@ -7,6 +7,11 @@ import pinoHttp, { type Options } from 'pino-http';
 import { describe, expect, it } from 'vitest';
 import { createPinoLoggerOptions } from './pino-logger.factory';
 
+const appPort = 3000;
+const successfulResponseStatusCode = 200;
+const dynamicTestServerPort = 0;
+const loopbackHost = '127.0.0.1';
+
 const appSettings = {
   environment: 'staging',
   globalPrefix: 'api',
@@ -19,7 +24,7 @@ const appSettings = {
   isTestEnvironment: false,
   isTestRuntime: false,
   nodeEnv: 'production',
-  port: 3000,
+  port: appPort,
   version: '1.2.3',
 } as const;
 
@@ -56,7 +61,7 @@ async function makeRequest(
     const request = httpRequest(
       {
         headers,
-        host: '127.0.0.1',
+        host: loopbackHost,
         method: 'GET',
         path: '/',
         port,
@@ -85,11 +90,11 @@ describe('pino-http integration', () => {
     const logger = pinoHttp(getPinoHttpOptions(), destination);
     const server = createServer((request, response) => {
       logger(request, response);
-      response.statusCode = 200;
+      response.statusCode = successfulResponseStatusCode;
       response.end('ok');
     });
 
-    server.listen(0, '127.0.0.1');
+    server.listen(dynamicTestServerPort, loopbackHost);
     await once(server, 'listening');
 
     const { port } = server.address() as AddressInfo;
@@ -152,7 +157,7 @@ describe('pino-http integration', () => {
       },
       requestId: 'review-123',
       response: {
-        statusCode: 200,
+        statusCode: successfulResponseStatusCode,
       },
       service: 'sandicts-api',
       spanId: '00f067aa0ba902b7',
@@ -161,7 +166,7 @@ describe('pino-http integration', () => {
     });
     expect(parsedLog.durationMs).toBeTypeOf('number');
     expect(parsedLog.request.headers).toMatchObject({
-      host: `127.0.0.1:${port}`,
+      host: `${loopbackHost}:${port}`,
       'user-agent': 'vitest-client',
     });
     expect(parsedLog.request.headers).not.toHaveProperty('authorization');

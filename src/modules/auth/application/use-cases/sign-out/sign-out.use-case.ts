@@ -1,5 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { invalidAccessToken } from '../../errors/auth-errors';
+import { authErrorReasons } from '@auth/application/errors/auth-error-reasons';
+import { invalidAccessToken } from '@auth/application/errors/auth-errors';
 import {
   AUTH_SESSIONS_REPOSITORY,
   type AuthSessionsRepository,
@@ -21,7 +22,7 @@ class SignOutUseCase {
     if (!claims) {
       throw invalidAccessToken({
         action: 'sign_out',
-        reason: 'missing_or_invalid_bearer_token',
+        reason: authErrorReasons.missingOrInvalidBearerToken,
       });
     }
 
