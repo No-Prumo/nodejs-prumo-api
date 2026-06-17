@@ -43,6 +43,7 @@ Short catalog. Routing hints (`read-when`, `do-not-read-when`, `related`, `canon
 | [`docs/ai/testing/test-organization.md`](testing/test-organization.md)                                     | Test fixtures, builders, and helper placement               |
 | [`docs/ai/ci-cd/ci-governance.md`](ci-cd/ci-governance.md)                                                 | Policy, source of truth                                     |
 | [`docs/ai/ci-cd/ci-operational-rules.md`](ci-cd/ci-operational-rules.md)                                   | Mechanical: regex, jobs, thresholds as in YAML              |
+| [`docs/ai/ci-cd/security-audit-remediation.md`](ci-cd/security-audit-remediation.md)                       | Dependency vulnerability remediation workflow               |
 | [`docs/ai/codex-skills-strategy.md`](codex-skills-strategy.md)                                             | Codex skills ownership and repository strategy              |
 | [`docs/ai/task-finalization-workflow.md`](task-finalization-workflow.md)                                   | Task finish, commit, and PR title workflow                  |
 | [`docs/ai/logging/logging-foundation.md`](logging/logging-foundation.md)                                   | Logging baseline with nestjs-pino                           |
@@ -125,3 +126,10 @@ For finishing a Jira task, committing, or opening a PR, read:
 1. `docs/ai/task-finalization-workflow.md`
 2. `.codex/skills/jira-pr-commit-writer/SKILL.md`
 3. `.github/pull_request_template.md`
+
+For dependency audit failures or vulnerability remediation, read:
+
+1. `docs/ai/ci-cd/security-audit-remediation.md`
+2. `docs/ai/ci-cd/ci-governance.md`
+3. `docs/ai/ci-cd/ci-operational-rules.md`
+4. `docs/ai/task-finalization-workflow.md`

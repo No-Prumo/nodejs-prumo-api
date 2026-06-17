@@ -21,6 +21,7 @@ The canonical project context lives in `docs/ai/index.md` and the documents link
 6. When a change alters behavior, setup, commands, environment variables, API contracts, architecture, database models, auth/session behavior, logging, CI/CD, or docs links that `README.md` explicitly describes, update `README.md` in the same change or state why no README change is needed.
 7. Keep `.codex/skills/` for Codex operating instructions and `docs/ai/` for durable project context and decisions.
 8. When changing repository skills, validate the edited skill folder with the skill validation script when available.
+9. For dependency audit failures or vulnerability remediation, read `docs/ai/ci-cd/security-audit-remediation.md`.
 
 ## Jira Task Collaboration Contract
 
@@ -120,6 +121,18 @@ For Sandicts backend controllers:
 - keep one-off Swagger metadata in the controller
 - place module-specific decorators in the module HTTP `shared/` folder until
   multiple modules use the same contract
+
+## Security Audit Remediation Contract
+
+For Sandicts backend dependency vulnerability fixes:
+
+- reproduce the CI audit locally with `npm audit --audit-level=moderate`
+- identify dependency paths with `npm explain <package>`
+- prefer targeted non-breaking updates or `overrides` over broad forced fixes
+- document the vulnerable packages, chosen fix, and validation in both the PR and
+  Jira
+- keep dependency remediation commits separate from unrelated code or docs
+  commits whenever possible
 
 ## Jira Fast Path
 

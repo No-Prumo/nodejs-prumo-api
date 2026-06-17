@@ -8,6 +8,7 @@ related:
   - .codex/skills/jira-pr-commit-writer/SKILL.md
   - .github/pull_request_template.md
   - docs/ai/ci-cd/ci-governance.md
+  - docs/ai/ci-cd/security-audit-remediation.md
 scope: git, github, jira, commits, pull-requests, task-finalization
 read-when:
   - finishing a Jira task
@@ -182,6 +183,21 @@ Validation should match risk:
 - Security/dependency changes: run dependency audit.
 
 Do not mark a validation as complete in the PR unless it actually ran.
+
+## Security Remediation Rule
+
+When a task fixes dependency vulnerabilities, follow
+`docs/ai/ci-cd/security-audit-remediation.md`.
+
+Rules:
+
+- keep dependency vulnerability remediation in a separate commit whenever
+  possible
+- document the vulnerable package, dependency path, chosen fix, and validation in
+  both the PR and the related Jira issue
+- prefer targeted non-breaking updates or overrides before broad forced audit
+  fixes
+- do not weaken the audit threshold or remove the dependency audit job
 
 ## Jira Status Rule
 
