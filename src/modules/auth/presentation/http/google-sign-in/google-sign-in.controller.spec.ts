@@ -1,18 +1,10 @@
-import { buildAuthConfig, validateEnv } from '../../../../../config';
-import type { GoogleSignInUseCaseResponse } from '../../../application/use-cases/google-sign-in/google-sign-in.use-case';
+import { buildTestAuthConfig } from '@test-support/auth/build-test-auth-config';
+import type { GoogleSignInUseCaseResponse } from '../../../application/use-cases/google-sign-in/google-sign-in.use-case.types';
 import { GoogleSignInController } from './google-sign-in.controller';
 
-const authSettings = buildAuthConfig(
-  validateEnv({
-    AUTH_GOOGLE_CLIENT_ID: 'google-web-client-id.apps.googleusercontent.com',
-    DATABASE_URL: 'postgresql://postgres:sandicts@localhost:5432/sandicts',
-    POSTGRES_DB: 'sandicts',
-    POSTGRES_HOST: 'localhost',
-    POSTGRES_PASSWORD: 'sandicts',
-    POSTGRES_PORT: '5432',
-    POSTGRES_USER: 'postgres',
-  }),
-);
+const authSettings = buildTestAuthConfig({
+  AUTH_GOOGLE_CLIENT_ID: 'google-web-client-id.apps.googleusercontent.com',
+});
 
 describe('GoogleSignInController', () => {
   it('sets the refresh token cookie and omits it from the sign-in response body', async () => {

@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { authConfig, type AuthConfig } from '../../../../../config';
+import { authErrorReasons } from '@auth/application/errors/auth-error-reasons';
 import {
   accountAuthForbidden,
   authSessionInactive,
@@ -7,7 +7,9 @@ import {
   refreshTokenExpired,
   refreshTokenReused,
   refreshTokenRevoked,
-} from '../../errors/auth-errors';
+} from '@auth/application/errors/auth-errors';
+import { authConfig, type AuthConfig } from '@config';
+import { addSeconds } from '@shared/time/time.helpers';
 import {
   ACCOUNTS_REPOSITORY,
   type AccountsRepository,
@@ -52,7 +54,7 @@ class RefreshAuthSessionUseCase {
     if (!refreshTokenRecord) {
       throw invalidRefreshToken({
         action: 'refresh_auth_session',
-        reason: 'token_hash_not_found',
+        reason: authErrorReasons.tokenHashNotFound,
       });
     }
 
@@ -64,7 +66,7 @@ class RefreshAuthSessionUseCase {
       throw refreshTokenReused({
         action: 'refresh_auth_session',
         refreshTokenFamilyId: refreshTokenRecord.refreshTokenFamilyId,
-        reason: 'rotated_refresh_token_submitted',
+        reason: authErrorReasons.rotatedRefreshTokenSubmitted,
         sessionId: refreshTokenRecord.sessionId,
       });
     }
@@ -73,7 +75,7 @@ class RefreshAuthSessionUseCase {
       throw refreshTokenRevoked({
         action: 'refresh_auth_session',
         refreshTokenFamilyId: refreshTokenRecord.refreshTokenFamilyId,
-        reason: 'revoked_refresh_token_submitted',
+        reason: authErrorReasons.revokedRefreshTokenSubmitted,
         sessionId: refreshTokenRecord.sessionId,
       });
     }
@@ -93,7 +95,7 @@ class RefreshAuthSessionUseCase {
     if (!account) {
       throw invalidRefreshToken({
         action: 'refresh_auth_session',
-        reason: 'account_not_found',
+        reason: authErrorReasons.accountNotFound,
         sessionId: refreshTokenRecord.sessionId,
       });
     }
@@ -102,7 +104,7 @@ class RefreshAuthSessionUseCase {
       throw accountAuthForbidden({
         accountId: account.id,
         action: 'refresh_auth_session',
-        reason: 'account_status_not_active',
+        reason: authErrorReasons.accountStatusNotActive,
         status: account.status,
       });
     }
@@ -110,7 +112,7 @@ class RefreshAuthSessionUseCase {
     const nextRefreshToken = this.tokenService.generateOpaqueRefreshToken();
     const nextRefreshTokenHash = this.refreshTokenHasher.hash(nextRefreshToken);
     const nextRefreshTokenIdleExpiresAt = minDate(
-      this.addSeconds(now, this.authSettings.refreshTokenIdleTtlSeconds),
+      addSeconds(now, this.authSettings.refreshTokenIdleTtlSeconds),
       refreshTokenRecord.session.absoluteExpiresAt,
     );
 
@@ -134,7 +136,7 @@ class RefreshAuthSessionUseCase {
       throw refreshTokenReused({
         action: 'refresh_auth_session',
         refreshTokenFamilyId: refreshTokenRecord.refreshTokenFamilyId,
-        reason: 'refresh_rotation_conflict',
+        reason: authErrorReasons.refreshRotationConflict,
         sessionId: refreshTokenRecord.sessionId,
       });
     }
@@ -160,10 +162,6 @@ class RefreshAuthSessionUseCase {
       refreshTokenAbsoluteExpiresAt:
         refreshTokenRecord.session.absoluteExpiresAt,
     };
-  }
-
-  private addSeconds(date: Date, seconds: number): Date {
-    return new Date(date.getTime() + seconds * 1000);
   }
 }
 
@@ -198,7 +196,7 @@ function getUnrefreshableTokenError(
     return refreshTokenExpired({
       action: 'refresh_auth_session',
       refreshTokenFamilyId: token.refreshTokenFamilyId,
-      reason: 'refresh_token_expired',
+      reason: authErrorReasons.refreshTokenExpired,
       sessionId: token.sessionId,
     });
   }
@@ -206,7 +204,7 @@ function getUnrefreshableTokenError(
   return authSessionInactive({
     action: 'refresh_auth_session',
     refreshTokenFamilyId: token.refreshTokenFamilyId,
-    reason: 'session_inactive_or_expired',
+    reason: authErrorReasons.sessionInactiveOrExpired,
     sessionId: token.sessionId,
     status: token.session.status,
   });

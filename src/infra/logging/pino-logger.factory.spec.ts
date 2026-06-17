@@ -3,6 +3,8 @@ import type { Options } from 'pino-http';
 import { describe, expect, it, vi } from 'vitest';
 import { createPinoLoggerOptions } from './pino-logger.factory';
 
+const appPort = 3000;
+
 const appSettings = {
   environment: 'staging',
   globalPrefix: 'api',
@@ -15,7 +17,7 @@ const appSettings = {
   isTestEnvironment: false,
   isTestRuntime: false,
   nodeEnv: 'production',
-  port: 3000,
+  port: appPort,
   version: '1.2.3',
 } as const;
 

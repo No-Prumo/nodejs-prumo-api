@@ -1,10 +1,13 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { authConfig, type AuthConfig } from '../../../../../config';
-import { AppError } from '../../../../../shared/errors/app-error';
-import type { AuthSessionCreationSource } from '../../../domain/auth-session-creation-source';
+import { authErrorReasons } from '@auth/application/errors/auth-error-reasons';
+import {
+  accountAuthForbidden,
+  accountNotFound,
+} from '@auth/application/errors/auth-errors';
+import { authConfig, type AuthConfig } from '@config';
+import { addSeconds } from '@shared/time/time.helpers';
 import {
   ACCOUNTS_REPOSITORY,
-  type AccountRecord,
   type AccountsRepository,
 } from '../../ports/accounts.repository';
 import {
@@ -13,29 +16,10 @@ import {
 } from '../../ports/auth-sessions.repository';
 import { RefreshTokenHasher } from '../../services/tokens/refresh-token-hasher';
 import { TokenService } from '../../services/tokens/token.service';
-
-type CreateAuthSessionUseCaseRequest = {
-  accountId: string;
-  creationSource: AuthSessionCreationSource;
-  userAgent?: string | null;
-  ipAddress?: string | null;
-};
-
-type CreateAuthSessionUseCaseResponse = {
-  account: AuthenticatedAccount;
-  session: CreatedAuthSession;
-  accessToken: string;
-  accessTokenExpiresAt: Date;
-  refreshToken: string;
-  refreshTokenIdleExpiresAt: Date;
-  refreshTokenAbsoluteExpiresAt: Date;
-};
-
-type AuthenticatedAccount = Pick<AccountRecord, 'displayName' | 'email' | 'id'>;
-
-type CreatedAuthSession = {
-  id: string;
-};
+import type {
+  CreateAuthSessionUseCaseRequest,
+  CreateAuthSessionUseCaseResponse,
+} from './create-auth-session.use-case.types';
 
 @Injectable()
 class CreateAuthSessionUseCase {
@@ -56,25 +40,30 @@ class CreateAuthSessionUseCase {
     const account = await this.accountsRepository.findById(request.accountId);
 
     if (!account) {
-      throw new AppError('resource_not_found', 'Account was not found', {
-        details: { accountId: request.accountId },
+      throw accountNotFound({
+        accountId: request.accountId,
+        action: 'create_auth_session',
+        reason: authErrorReasons.accountNotFound,
       });
     }
 
     if (account.status !== 'active') {
-      throw new AppError('forbidden', 'Account cannot create auth sessions', {
-        details: { accountId: account.id, status: account.status },
+      throw accountAuthForbidden({
+        accountId: account.id,
+        action: 'create_auth_session',
+        reason: authErrorReasons.accountStatusNotActive,
+        status: account.status,
       });
     }
 
     const now = new Date();
     const refreshToken = this.tokenService.generateOpaqueRefreshToken();
     const refreshTokenHash = this.refreshTokenHasher.hash(refreshToken);
-    const refreshTokenIdleExpiresAt = this.addSeconds(
+    const refreshTokenIdleExpiresAt = addSeconds(
       now,
       this.authSettings.refreshTokenIdleTtlSeconds,
     );
-    const refreshTokenAbsoluteExpiresAt = this.addSeconds(
+    const refreshTokenAbsoluteExpiresAt = addSeconds(
       now,
       this.authSettings.refreshTokenAbsoluteTtlSeconds,
     );
@@ -111,14 +100,6 @@ class CreateAuthSessionUseCase {
       refreshTokenAbsoluteExpiresAt,
     };
   }
-
-  private addSeconds(date: Date, seconds: number): Date {
-    return new Date(date.getTime() + seconds * 1000);
-  }
 }
 
 export { CreateAuthSessionUseCase };
-export type {
-  CreateAuthSessionUseCaseRequest,
-  CreateAuthSessionUseCaseResponse,
-};

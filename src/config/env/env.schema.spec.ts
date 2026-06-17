@@ -1,5 +1,12 @@
 import { validateEnv } from './env.schema';
 
+const inputApiPort = '4000';
+const expectedApiPort = 4000;
+const inputPostgresPort = '5432';
+const expectedPostgresPort = 5432;
+const defaultAccessTokenTtlSeconds = 900;
+const defaultMagicLinkTtlSeconds = 900;
+
 describe('validateEnv', () => {
   it('coerces env values and applies defaults', () => {
     const env = validateEnv({
@@ -7,11 +14,11 @@ describe('validateEnv', () => {
       APP_VERSION: '1.2.3',
       DATABASE_URL: 'postgresql://postgres:sandicts@localhost:5432/sandicts',
       POSTGRES_HOST: 'localhost',
-      POSTGRES_PORT: '5432',
+      POSTGRES_PORT: inputPostgresPort,
       POSTGRES_USER: 'postgres',
       POSTGRES_PASSWORD: 'sandicts',
       POSTGRES_DB: 'sandicts',
-      PORT: '4000',
+      PORT: inputApiPort,
       LOG_PRETTY: 'false',
       DOCS_ENABLED: 'true',
     });
@@ -19,15 +26,17 @@ describe('validateEnv', () => {
     expect(env.NODE_ENV).toBe('development');
     expect(env.APP_ENV).toBe('staging');
     expect(env.APP_VERSION).toBe('1.2.3');
-    expect(env.PORT).toBe(4000);
-    expect(env.POSTGRES_PORT).toBe(5432);
+    expect(env.PORT).toBe(expectedApiPort);
+    expect(env.POSTGRES_PORT).toBe(expectedPostgresPort);
     expect(env.LOG_PRETTY).toBe(false);
     expect(env.DOCS_ENABLED).toBe(true);
     expect(env.APP_HOST).toBe('0.0.0.0');
     expect(env.DOCS_PATH).toBe('docs');
-    expect(env.AUTH_ACCESS_TOKEN_TTL_SECONDS).toBe(900);
+    expect(env.AUTH_ACCESS_TOKEN_TTL_SECONDS).toBe(
+      defaultAccessTokenTtlSeconds,
+    );
     expect(env.AUTH_GOOGLE_CLIENT_ID).toBeUndefined();
-    expect(env.AUTH_MAGIC_LINK_TTL_SECONDS).toBe(900);
+    expect(env.AUTH_MAGIC_LINK_TTL_SECONDS).toBe(defaultMagicLinkTtlSeconds);
     expect(env.AUTH_REFRESH_TOKEN_COOKIE_PATH).toBe('/auth/refresh');
   });
 
@@ -39,7 +48,7 @@ describe('validateEnv', () => {
         POSTGRES_DB: 'sandicts',
         POSTGRES_HOST: 'localhost',
         POSTGRES_PASSWORD: 'sandicts',
-        POSTGRES_PORT: '5432',
+        POSTGRES_PORT: inputPostgresPort,
         POSTGRES_USER: 'postgres',
       }),
     ).toThrow('Invalid environment variables');
@@ -54,7 +63,7 @@ describe('validateEnv', () => {
         POSTGRES_DB: 'sandicts',
         POSTGRES_HOST: 'localhost',
         POSTGRES_PASSWORD: 'sandicts',
-        POSTGRES_PORT: '5432',
+        POSTGRES_PORT: inputPostgresPort,
         POSTGRES_USER: 'postgres',
       }),
     ).not.toThrow();

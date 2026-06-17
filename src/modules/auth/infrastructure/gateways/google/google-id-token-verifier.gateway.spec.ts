@@ -1,27 +1,20 @@
-import { buildAuthConfig, validateEnv } from '../../../../../config';
-import {
-  GoogleIdTokenVerifierGateway,
-  type GoogleOAuthClient,
-} from './google-id-token-verifier.gateway';
+import { buildTestAuthConfig } from '@test-support/auth/build-test-auth-config';
+import { nowAsUnixSeconds } from '@shared/time/time.helpers';
+import { GoogleIdTokenVerifierGateway } from './google-id-token-verifier.gateway';
+import type { GoogleOAuthClient } from './google-id-token-verifier.gateway.types';
 
 const googleClientId = 'google-web-client-id.apps.googleusercontent.com';
+const validGoogleTokenTtlSeconds = 900;
+const expiredGoogleTokenOffsetSeconds = 1;
 
-const authSettings = buildAuthConfig(
-  validateEnv({
-    AUTH_GOOGLE_CLIENT_ID: googleClientId,
-    DATABASE_URL: 'postgresql://postgres:sandicts@localhost:5432/sandicts',
-    POSTGRES_DB: 'sandicts',
-    POSTGRES_HOST: 'localhost',
-    POSTGRES_PASSWORD: 'sandicts',
-    POSTGRES_PORT: '5432',
-    POSTGRES_USER: 'postgres',
-  }),
-);
+const authSettings = buildTestAuthConfig({
+  AUTH_GOOGLE_CLIENT_ID: googleClientId,
+});
 
 const validPayload = {
   iss: 'https://accounts.google.com',
   aud: googleClientId,
-  exp: Math.floor(Date.now() / 1000) + 900,
+  exp: nowAsUnixSeconds() + validGoogleTokenTtlSeconds,
   sub: 'google-sub-123',
   email: 'player@example.com',
   email_verified: true,
@@ -71,7 +64,7 @@ describe('GoogleIdTokenVerifierGateway', () => {
     await expect(
       gateway.verify({ idToken: 'invalid-google-id-token' }),
     ).rejects.toMatchObject({
-      code: 'unauthorized',
+      code: 'invalid_google_credential',
       message: 'Invalid authentication credentials',
     });
   });
@@ -79,7 +72,10 @@ describe('GoogleIdTokenVerifierGateway', () => {
   it.each([
     ['issuer', { iss: 'https://issuer.example.com' }],
     ['audience', { aud: 'another-client-id' }],
-    ['expiration', { exp: Math.floor(Date.now() / 1000) - 1 }],
+    [
+      'expiration',
+      { exp: nowAsUnixSeconds() - expiredGoogleTokenOffsetSeconds },
+    ],
     ['subject', { sub: '' }],
     ['verified email', { email_verified: false }],
   ])('rejects tokens with invalid %s', async (_label, override) => {
@@ -91,7 +87,7 @@ describe('GoogleIdTokenVerifierGateway', () => {
     await expect(
       gateway.verify({ idToken: 'invalid-google-id-token' }),
     ).rejects.toMatchObject({
-      code: 'unauthorized',
+      code: 'invalid_google_credential',
       message: 'Invalid authentication credentials',
     });
   });

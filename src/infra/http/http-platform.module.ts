@@ -2,11 +2,17 @@ import { Module } from '@nestjs/common';
 import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { createZodValidationPipe, ZodSerializerInterceptor } from 'nestjs-zod';
+import { minutesToMilliseconds } from '@shared/time/time.helpers';
 import { GlobalExceptionFilter } from './filters/global-exception.filter';
 
 const AppZodValidationPipe = createZodValidationPipe({
   strictSchemaDeclaration: true,
 });
+const defaultThrottleWindowMinutes = 1;
+const defaultThrottleWindowMilliseconds = minutesToMilliseconds(
+  defaultThrottleWindowMinutes,
+);
+const defaultThrottleRequestLimit = 120;
 
 @Module({
   imports: [
@@ -14,8 +20,8 @@ const AppZodValidationPipe = createZodValidationPipe({
       throttlers: [
         {
           name: 'default',
-          ttl: 60 * 1000,
-          limit: 120,
+          ttl: defaultThrottleWindowMilliseconds,
+          limit: defaultThrottleRequestLimit,
         },
       ],
     }),

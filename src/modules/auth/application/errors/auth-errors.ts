@@ -1,6 +1,10 @@
-import { AppError } from '../../../../shared/errors/app-error';
-import type { AppErrorCode } from '../../../../shared/errors/error-codes';
-import type { AuthErrorContext, AuthErrorDetails } from './auth-errors.types';
+import { AppError } from '@shared/errors/app-error';
+import type { AppErrorCode } from '@shared/errors/error-codes';
+import type {
+  AuthErrorContext,
+  AuthErrorDetails,
+  AuthErrorOptions,
+} from './auth-errors.types';
 
 const INVALID_AUTHENTICATION_MESSAGE = 'Invalid authentication credentials';
 
@@ -9,6 +13,28 @@ function invalidAccessToken(context: AuthErrorContext = {}): AppError {
     severity: 'auth',
     ...context,
   });
+}
+
+function invalidGoogleCredential(options: AuthErrorOptions = {}): AppError {
+  return authError(
+    'invalid_google_credential',
+    INVALID_AUTHENTICATION_MESSAGE,
+    {
+      severity: 'auth',
+      ...options,
+    },
+  );
+}
+
+function invalidMagicLinkToken(context: AuthErrorContext = {}): AppError {
+  return authError(
+    'invalid_magic_link_token',
+    'Magic link is invalid or expired',
+    {
+      severity: 'auth',
+      ...context,
+    },
+  );
 }
 
 function invalidRefreshToken(context: AuthErrorContext = {}): AppError {
@@ -57,13 +83,32 @@ function accountAuthForbidden(context: AuthErrorContext = {}): AppError {
   );
 }
 
+function accountNotFound(context: AuthErrorContext = {}): AppError {
+  return authError('resource_not_found', 'Account was not found', {
+    severity: 'auth',
+    ...context,
+  });
+}
+
+function externalIdentityConflict(options: AuthErrorOptions = {}): AppError {
+  return authError(
+    'external_identity_conflict',
+    'Account is already linked to an external identity',
+    {
+      severity: 'auth',
+      ...options,
+    },
+  );
+}
+
 function authError(
   code: AppErrorCode,
   message: string,
-  context: AuthErrorContext,
+  options: AuthErrorOptions,
 ): AppError {
   return new AppError(code, message, {
-    details: buildAuthErrorDetails(code, context),
+    cause: options.cause,
+    details: buildAuthErrorDetails(code, options),
   });
 }
 
@@ -77,6 +122,7 @@ function buildAuthErrorDetails(
     code,
     accountId: context.accountId,
     action: context.action,
+    provider: context.provider,
     refreshTokenFamilyId: context.refreshTokenFamilyId,
     reason: context.reason,
     sessionId: context.sessionId,
@@ -86,8 +132,12 @@ function buildAuthErrorDetails(
 
 export {
   accountAuthForbidden,
+  accountNotFound,
   authSessionInactive,
+  externalIdentityConflict,
   invalidAccessToken,
+  invalidGoogleCredential,
+  invalidMagicLinkToken,
   invalidRefreshToken,
   refreshTokenExpired,
   refreshTokenReused,

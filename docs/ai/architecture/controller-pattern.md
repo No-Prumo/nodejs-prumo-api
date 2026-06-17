@@ -172,6 +172,27 @@ Reason:
 - reusable response fragments belong in `presentation/http/shared/`, not in the
   application layer
 
+## Reusable HTTP Decorators
+
+Create a reusable decorator when route metadata is repeated and carries the same
+semantic meaning across endpoints.
+
+Good examples:
+
+- required Bearer access token header metadata
+- common auth error response metadata
+- repeated pagination query metadata once pagination exists
+
+Avoid decorators for:
+
+- one-off Swagger metadata
+- route-specific operation summaries
+- metadata that would hide important controller behavior
+
+Place module-specific decorators in the module HTTP `shared/` folder. Move a
+decorator to `src/infra/http/decorators/` only after multiple modules use the
+same contract.
+
 ## Response Shape
 
 The controller should not leak internal records.

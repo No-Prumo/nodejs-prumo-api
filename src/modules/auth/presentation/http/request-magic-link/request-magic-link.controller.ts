@@ -1,8 +1,12 @@
-import { Body, Controller, HttpCode, Post } from '@nestjs/common';
+import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
 import { ZodResponse } from 'nestjs-zod';
 import { RequestMagicLinkUseCase } from '../../../application/use-cases/request-magic-link/request-magic-link.use-case';
+import {
+  authRateLimitWindowMilliseconds,
+  requestMagicLinkRateLimit,
+} from '../shared/auth-http-rate-limit.constants';
 import {
   RequestMagicLinkBodyDto,
   RequestMagicLinkResponseDto,
@@ -14,14 +18,19 @@ class RequestMagicLinkController {
   constructor(private readonly requestMagicLink: RequestMagicLinkUseCase) {}
 
   @Post('request')
-  @HttpCode(200)
-  @Throttle({ default: { limit: 5, ttl: 15 * 60 * 1000 } })
+  @HttpCode(HttpStatus.OK)
+  @Throttle({
+    default: {
+      limit: requestMagicLinkRateLimit,
+      ttl: authRateLimitWindowMilliseconds,
+    },
+  })
   @ApiOperation({
     summary: 'Request magic link',
     description: 'Returns a generic success response for valid email input.',
   })
   @ZodResponse({
-    status: 200,
+    status: HttpStatus.OK,
     description: 'Generic magic link request response',
     type: RequestMagicLinkResponseDto,
   })

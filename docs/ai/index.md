@@ -25,33 +25,35 @@ Short catalog. Routing hints (`read-when`, `do-not-read-when`, `related`, `canon
 - Read long page, screen, roadmap, or Jira specs only when the task depends on their detailed sections.
 - Do not load every related document just because it is listed in frontmatter.
 
-| Document                                                                                                   | Role                                           |
-| ---------------------------------------------------------------------------------------------------------- | ---------------------------------------------- |
-| [`docs/ai/api/error-handling-foundation.md`](api/error-handling-foundation.md)                             | Global HTTP error handling baseline            |
-| [`docs/ai/api/zod-swagger-foundation.md`](api/zod-swagger-foundation.md)                                   | API validation and Swagger baseline            |
-| [`docs/ai/architecture/authentication-session-pattern.md`](architecture/authentication-session-pattern.md) | Auth methods, sessions, and refresh tokens     |
-| [`docs/ai/architecture/backend-architecture-overview.md`](architecture/backend-architecture-overview.md)   | Backend architecture source of truth           |
-| [`docs/ai/architecture/controller-pattern.md`](architecture/controller-pattern.md)                         | Controller and HTTP boundary pattern           |
-| [`docs/ai/architecture/external-integrations-pattern.md`](architecture/external-integrations-pattern.md)   | External gateway and webhook pattern           |
-| [`docs/ai/architecture/module-pattern.md`](architecture/module-pattern.md)                                 | Nest feature module pattern                    |
-| [`docs/ai/architecture/repository-pattern.md`](architecture/repository-pattern.md)                         | Repository port and Prisma adapter pattern     |
-| [`docs/ai/architecture/use-case-pattern.md`](architecture/use-case-pattern.md)                             | Application use case pattern                   |
-| [`docs/ai/business/sandicts-business-rules.md`](business/sandicts-business-rules.md)                       | Sandicts business rules and backend invariants |
-| [`docs/ai/config/configuration-foundation.md`](config/configuration-foundation.md)                         | Backend config baseline, source of truth       |
-| [`docs/ai/config/typescript-module-resolution.md`](config/typescript-module-resolution.md)                 | TypeScript/Nest module resolution decision     |
-| [`docs/ai/ci-cd/ci-governance.md`](ci-cd/ci-governance.md)                                                 | Policy, source of truth                        |
-| [`docs/ai/ci-cd/ci-operational-rules.md`](ci-cd/ci-operational-rules.md)                                   | Mechanical: regex, jobs, thresholds as in YAML |
-| [`docs/ai/codex-skills-strategy.md`](codex-skills-strategy.md)                                             | Codex skills ownership and repository strategy |
-| [`docs/ai/task-finalization-workflow.md`](task-finalization-workflow.md)                                   | Task finish, commit, and PR title workflow     |
-| [`docs/ai/logging/logging-foundation.md`](logging/logging-foundation.md)                                   | Logging baseline with nestjs-pino              |
-| [`docs/ai/product/sandicts-product-context.md`](product/sandicts-product-context.md)                       | Sandicts product context and MVP direction     |
-| [`docs/ai/product/sandicts-mvp-scope.md`](product/sandicts-mvp-scope.md)                                   | Approved MVP scope and explicit exclusions     |
-| [`docs/ai/product/sandicts-mvp-functional-spec.md`](product/sandicts-mvp-functional-spec.md)               | Detailed MVP functional spec; read on demand   |
-| [`docs/ai/product/sandicts-jira-planning-workflow.md`](product/sandicts-jira-planning-workflow.md)         | Jira roadmap, backlog, and issue-writing rules |
-| [`docs/ai/product/sandicts-scope-checklist.md`](product/sandicts-scope-checklist.md)                       | Working checklist for MVP, V2, and backlog     |
-| [`docs/ai/product/sandicts-v2-backlog.md`](product/sandicts-v2-backlog.md)                                 | V2 and later product backlog                   |
-| [`docs/ai/product/shared-documentation-strategy.md`](product/shared-documentation-strategy.md)              | Shared product docs ownership decision         |
-| [`docs/frontend/README.md`](../frontend/README.md)                                                        | Pointer to frontend docs in `sandicts/reactjs-sandicts-web` |
+| Document                                                                                                   | Role                                                        |
+| ---------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------- |
+| [`docs/ai/api/error-handling-foundation.md`](api/error-handling-foundation.md)                             | Global HTTP error handling baseline                         |
+| [`docs/ai/api/zod-swagger-foundation.md`](api/zod-swagger-foundation.md)                                   | API validation and Swagger baseline                         |
+| [`docs/ai/architecture/authentication-session-pattern.md`](architecture/authentication-session-pattern.md) | Auth methods, sessions, and refresh tokens                  |
+| [`docs/ai/architecture/backend-architecture-overview.md`](architecture/backend-architecture-overview.md)   | Backend architecture source of truth                        |
+| [`docs/ai/architecture/code-style-pattern.md`](architecture/code-style-pattern.md)                         | Code style, semantic constants, and magic number rules      |
+| [`docs/ai/architecture/controller-pattern.md`](architecture/controller-pattern.md)                         | Controller and HTTP boundary pattern                        |
+| [`docs/ai/architecture/external-integrations-pattern.md`](architecture/external-integrations-pattern.md)   | External gateway and webhook pattern                        |
+| [`docs/ai/architecture/module-pattern.md`](architecture/module-pattern.md)                                 | Nest feature module pattern                                 |
+| [`docs/ai/architecture/repository-pattern.md`](architecture/repository-pattern.md)                         | Repository port and Prisma adapter pattern                  |
+| [`docs/ai/architecture/use-case-pattern.md`](architecture/use-case-pattern.md)                             | Application use case pattern                                |
+| [`docs/ai/business/sandicts-business-rules.md`](business/sandicts-business-rules.md)                       | Sandicts business rules and backend invariants              |
+| [`docs/ai/config/configuration-foundation.md`](config/configuration-foundation.md)                         | Backend config baseline, source of truth                    |
+| [`docs/ai/config/typescript-module-resolution.md`](config/typescript-module-resolution.md)                 | TypeScript/Nest module resolution decision                  |
+| [`docs/ai/testing/test-organization.md`](testing/test-organization.md)                                     | Test fixtures, builders, and helper placement               |
+| [`docs/ai/ci-cd/ci-governance.md`](ci-cd/ci-governance.md)                                                 | Policy, source of truth                                     |
+| [`docs/ai/ci-cd/ci-operational-rules.md`](ci-cd/ci-operational-rules.md)                                   | Mechanical: regex, jobs, thresholds as in YAML              |
+| [`docs/ai/codex-skills-strategy.md`](codex-skills-strategy.md)                                             | Codex skills ownership and repository strategy              |
+| [`docs/ai/task-finalization-workflow.md`](task-finalization-workflow.md)                                   | Task finish, commit, and PR title workflow                  |
+| [`docs/ai/logging/logging-foundation.md`](logging/logging-foundation.md)                                   | Logging baseline with nestjs-pino                           |
+| [`docs/ai/product/sandicts-product-context.md`](product/sandicts-product-context.md)                       | Sandicts product context and MVP direction                  |
+| [`docs/ai/product/sandicts-mvp-scope.md`](product/sandicts-mvp-scope.md)                                   | Approved MVP scope and explicit exclusions                  |
+| [`docs/ai/product/sandicts-mvp-functional-spec.md`](product/sandicts-mvp-functional-spec.md)               | Detailed MVP functional spec; read on demand                |
+| [`docs/ai/product/sandicts-jira-planning-workflow.md`](product/sandicts-jira-planning-workflow.md)         | Jira roadmap, backlog, and issue-writing rules              |
+| [`docs/ai/product/sandicts-scope-checklist.md`](product/sandicts-scope-checklist.md)                       | Working checklist for MVP, V2, and backlog                  |
+| [`docs/ai/product/sandicts-v2-backlog.md`](product/sandicts-v2-backlog.md)                                 | V2 and later product backlog                                |
+| [`docs/ai/product/shared-documentation-strategy.md`](product/shared-documentation-strategy.md)             | Shared product docs ownership decision                      |
+| [`docs/frontend/README.md`](../frontend/README.md)                                                         | Pointer to frontend docs in `sandicts/reactjs-sandicts-web` |
 
 ## Common AI Reading Paths
 
@@ -105,6 +107,7 @@ For authentication work, read:
 2. `docs/ai/architecture/controller-pattern.md`
 3. `docs/ai/architecture/use-case-pattern.md`
 4. `docs/ai/api/error-handling-foundation.md`
+5. `docs/ai/testing/test-organization.md` when adding or changing auth tests
 
 For persistence or providers, read:
 

@@ -62,6 +62,11 @@ functions instead of creating one-off `new AppError(...)` calls inside use
 cases. Place those factories in the module application layer, for example
 `src/modules/auth/application/errors/auth-errors.ts`.
 
+For repeated internal error details, centralize stable values instead of using
+string literals in multiple files. In the auth module, shared `details.reason`
+values live in `src/modules/auth/application/errors/auth-error-reasons.ts`, and
+provider values should reuse the auth domain catalog instead of new strings.
+
 ### Error codes
 
 Current normalized codes are:
@@ -70,6 +75,8 @@ Current normalized codes are:
 - `validation_error`
 - `rate_limited`
 - `unauthorized`
+- `invalid_google_credential`
+- `invalid_magic_link_token`
 - `invalid_access_token`
 - `invalid_refresh_token`
 - `refresh_token_expired`
@@ -78,6 +85,7 @@ Current normalized codes are:
 - `auth_session_inactive`
 - `forbidden`
 - `account_auth_forbidden`
+- `external_identity_conflict`
 - `resource_not_found`
 - `conflict`
 - `business_rule_violation`
@@ -91,6 +99,10 @@ Rules:
 - `invalid_access_token`, `invalid_refresh_token`, and related auth/session
   codes are safe public auth failures that still avoid exposing raw token or
   storage internals
+- `invalid_google_credential` is for invalid Google Sign-In or One Tap ID tokens
+- `invalid_magic_link_token` is for invalid, expired, or already consumed magic
+  link tokens
+- `external_identity_conflict` is for safe auth-provider linking conflicts
 - domain and application should prefer `business_rule_violation` for expected business failures
 - `internal_error` is reserved for unexpected or internal-only failures
 - `rate_limited` is for HTTP throttling failures such as auth endpoint abuse
@@ -179,6 +191,8 @@ Validation example:
 Map known codes in the filter:
 
 - `unauthorized` -> `401`
+- `invalid_google_credential` -> `401`
+- `invalid_magic_link_token` -> `401`
 - `invalid_access_token` -> `401`
 - `invalid_refresh_token` -> `401`
 - `refresh_token_expired` -> `401`
@@ -189,6 +203,7 @@ Map known codes in the filter:
 - `account_auth_forbidden` -> `403`
 - `resource_not_found` -> `404`
 - `conflict` -> `409`
+- `external_identity_conflict` -> `409`
 - `business_rule_violation` -> `422`
 
 ### `HttpException`

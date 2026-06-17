@@ -5,13 +5,16 @@ import {
   timingSafeEqual,
 } from 'node:crypto';
 import { Inject, Injectable } from '@nestjs/common';
-import { authConfig, type AuthConfig } from '../../../../../config';
+import { authConfig, type AuthConfig } from '@config';
+import { nowAsUnixSeconds, unixSecondsToDate } from '@shared/time/time.helpers';
 import type {
   AccessTokenClaims,
   IssuedAccessToken,
   JsonValue,
   VerifiedAccessTokenClaims,
 } from './token.service.types';
+
+const opaqueRefreshTokenByteLength = 48;
 
 @Injectable()
 class TokenService {
@@ -21,7 +24,7 @@ class TokenService {
   ) {}
 
   issueAccessToken(claims: AccessTokenClaims): IssuedAccessToken {
-    const issuedAtSeconds = Math.floor(Date.now() / 1000);
+    const issuedAtSeconds = nowAsUnixSeconds();
     const expiresAtSeconds =
       issuedAtSeconds + this.authSettings.accessTokenTtlSeconds;
 
@@ -33,7 +36,7 @@ class TokenService {
 
     return {
       token: this.signJwt(payload),
-      expiresAt: new Date(expiresAtSeconds * 1000),
+      expiresAt: unixSecondsToDate(expiresAtSeconds),
     };
   }
 
@@ -63,7 +66,7 @@ class TokenService {
       return null;
     }
 
-    const nowSeconds = Math.floor(Date.now() / 1000);
+    const nowSeconds = nowAsUnixSeconds();
 
     if (payload.exp <= nowSeconds) {
       return null;
@@ -73,7 +76,7 @@ class TokenService {
   }
 
   generateOpaqueRefreshToken(): string {
-    return randomBytes(48).toString('base64url');
+    return randomBytes(opaqueRefreshTokenByteLength).toString('base64url');
   }
 
   generateRefreshTokenFamilyId(): string {

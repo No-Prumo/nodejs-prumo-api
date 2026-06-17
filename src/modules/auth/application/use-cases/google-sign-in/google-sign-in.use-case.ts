@@ -1,5 +1,12 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { AppError } from '../../../../../shared/errors/app-error';
+import { authErrorReasons } from '@auth/application/errors/auth-error-reasons';
+import {
+  accountAuthForbidden,
+  accountNotFound,
+  externalIdentityConflict,
+  invalidGoogleCredential,
+} from '@auth/application/errors/auth-errors';
+import { authProviderCodes } from '@auth/domain/auth-provider';
 import type { AccountRecord } from '../../ports/accounts.repository';
 import {
   ACCOUNTS_REPOSITORY,
@@ -15,26 +22,11 @@ import {
   type GoogleIdTokenVerifier,
 } from '../../ports/google-id-token-verifier';
 import { normalizeEmail } from '../../services/email/normalize-email';
-import {
-  CreateAuthSessionUseCase,
-  type CreateAuthSessionUseCaseResponse,
-} from '../create-auth-session/create-auth-session.use-case';
-
-type GoogleSignInUseCaseRequest = {
-  credential: string;
-  userAgent?: string | null;
-  ipAddress?: string | null;
-};
-
-type GoogleSignInUseCaseResponse = {
-  account: CreateAuthSessionUseCaseResponse['account'];
-  session: CreateAuthSessionUseCaseResponse['session'];
-  accessToken: string;
-  accessTokenExpiresAt: Date;
-  refreshToken: string;
-  refreshTokenIdleExpiresAt: Date;
-  refreshTokenAbsoluteExpiresAt: Date;
-};
+import { CreateAuthSessionUseCase } from '../create-auth-session/create-auth-session.use-case';
+import type {
+  GoogleSignInUseCaseRequest,
+  GoogleSignInUseCaseResponse,
+} from './google-sign-in.use-case.types';
 
 @Injectable()
 class GoogleSignInUseCase {
@@ -56,7 +48,10 @@ class GoogleSignInUseCase {
     });
 
     if (!googleIdentity.emailVerified) {
-      throw invalidGoogleCredential('unverified_email');
+      throw invalidGoogleCredential({
+        action: 'google_sign_in',
+        reason: authErrorReasons.unverifiedEmail,
+      });
     }
 
     const account = await this.resolveAccount(googleIdentity);
@@ -83,7 +78,7 @@ class GoogleSignInUseCase {
   ): Promise<AccountRecord> {
     const existingIdentity =
       await this.externalIdentitiesRepository.findByProviderAndSubject({
-        provider: 'google',
+        provider: authProviderCodes.google,
         providerSubject: googleIdentity.subject,
       });
 
@@ -93,8 +88,11 @@ class GoogleSignInUseCase {
       );
 
       if (!account) {
-        throw new AppError('resource_not_found', 'Account was not found', {
-          details: { accountId: existingIdentity.accountId },
+        throw accountNotFound({
+          accountId: existingIdentity.accountId,
+          action: 'google_sign_in',
+          provider: authProviderCodes.google,
+          reason: authErrorReasons.linkedAccountNotFound,
         });
       }
 
@@ -119,7 +117,7 @@ class GoogleSignInUseCase {
 
     await this.externalIdentitiesRepository.create({
       accountId: account.id,
-      provider: 'google',
+      provider: authProviderCodes.google,
       providerSubject: googleIdentity.subject,
     });
 
@@ -131,15 +129,19 @@ class GoogleSignInUseCase {
     providerSubject: string,
   ) {
     if (account.status !== 'active') {
-      throw new AppError('forbidden', 'Account cannot create auth sessions', {
-        details: { accountId: account.id, status: account.status },
+      throw accountAuthForbidden({
+        accountId: account.id,
+        action: 'google_sign_in',
+        provider: authProviderCodes.google,
+        reason: authErrorReasons.accountStatusNotActive,
+        status: account.status,
       });
     }
 
     const existingAccountIdentity =
       await this.externalIdentitiesRepository.findByAccountAndProvider({
         accountId: account.id,
-        provider: 'google',
+        provider: authProviderCodes.google,
       });
 
     if (existingAccountIdentity) {
@@ -147,31 +149,20 @@ class GoogleSignInUseCase {
         return;
       }
 
-      throw new AppError(
-        'conflict',
-        'Account is already linked to an external identity',
-        {
-          details: {
-            accountId: account.id,
-            provider: 'google',
-          },
-        },
-      );
+      throw externalIdentityConflict({
+        accountId: account.id,
+        action: 'google_sign_in',
+        provider: authProviderCodes.google,
+        reason: authErrorReasons.accountProviderAlreadyLinked,
+      });
     }
 
     await this.externalIdentitiesRepository.create({
       accountId: account.id,
-      provider: 'google',
+      provider: authProviderCodes.google,
       providerSubject,
     });
   }
 }
 
-function invalidGoogleCredential(reason: string): AppError {
-  return new AppError('unauthorized', 'Invalid authentication credentials', {
-    details: { reason },
-  });
-}
-
 export { GoogleSignInUseCase };
-export type { GoogleSignInUseCaseRequest, GoogleSignInUseCaseResponse };

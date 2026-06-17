@@ -40,6 +40,13 @@ Do not infer approval for later delivery steps from implementation approval.
 Treat planning approval, implementation approval, and PR/Jira approval as
 separate gates.
 
+Use these exact Portuguese trigger phrases when the user asks how to start each
+gate:
+
+- Planning: `Planeje a task KAN-XXX.`
+- Implementation: `Aprovado: implemente o plano da KAN-XXX.`
+- Delivery: `Aprovado: pode commitar, subir PR e mover a KAN-XXX para In Review.`
+
 ## Type Placement Contract
 
 For Sandicts backend and frontend work, keep executable implementation and
@@ -61,10 +68,58 @@ For Sandicts backend work:
   functions when an error can be reused
 - return the most specific safe public error `code` so frontend code can handle
   exact failure cases
+- centralize repeated internal `details.reason` values as module-level
+  constants and reuse domain catalogs for repeated values such as auth providers
 - keep raw tokens, cookies, provider credentials, and storage internals out of
   public responses and log details
 - include safe internal `details` in `AppError` for pino logs and future
   observability tooling
+
+## Import Alias Contract
+
+For Sandicts backend work:
+
+- keep sibling files, including `.types.ts`, on relative imports
+- prefer approved `tsconfig.json` path aliases for frequently imported roots
+  such as `@config`, `@shared/*`, `@infra/*`, `@generated/*`, `@auth/*`, and
+  `@test-support/*`
+- keep `tsc-alias` in the backend build path when production source uses these
+  aliases
+- validate typecheck, tests, lint, and build after alias changes
+
+## Test Organization Contract
+
+For Sandicts backend tests:
+
+- keep `makeSut()` local when it clarifies a spec-specific dependency graph
+- extract repeated fixtures and config builders to `test/support/`
+- prefer builders over exported mutable fixture objects
+- do not import `@test-support/*` from production `src/**/*.ts` files
+
+## Semantic Constant Contract
+
+For Sandicts backend and frontend work:
+
+- avoid inline numeric literals when the value represents a domain rule, unit
+  conversion, timeout, TTL, byte length, rate limit, status threshold, layout
+  implementation value, or validation boundary
+- prefer semantic constants or small helpers such as `millisecondsPerSecond`,
+  `addSeconds(...)`, `minimumGoogleIdTokenLength`, or `sandictsMarkSizePx`
+- keep obvious `0` and `1` counters, Tailwind utility scale classes, package
+  versions, generated code, and literal fixture data inline when extraction
+  would reduce readability
+- document repeated conventions in
+  `docs/ai/architecture/code-style-pattern.md`
+
+## HTTP Decorator Contract
+
+For Sandicts backend controllers:
+
+- create reusable decorators for repeated, semantic HTTP metadata such as a
+  required Bearer access token header
+- keep one-off Swagger metadata in the controller
+- place module-specific decorators in the module HTTP `shared/` folder until
+  multiple modules use the same contract
 
 ## Jira Fast Path
 

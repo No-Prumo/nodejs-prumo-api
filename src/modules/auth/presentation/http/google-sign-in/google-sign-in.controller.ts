@@ -3,6 +3,7 @@ import {
   Controller,
   Headers,
   HttpCode,
+  HttpStatus,
   Inject,
   Ip,
   Post,
@@ -12,8 +13,12 @@ import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
 import type { Response } from 'express';
 import { ZodResponse } from 'nestjs-zod';
-import { authConfig, type AuthConfig } from '../../../../../config';
+import { authConfig, type AuthConfig } from '@config';
 import { GoogleSignInUseCase } from '../../../application/use-cases/google-sign-in/google-sign-in.use-case';
+import {
+  authRateLimitWindowMilliseconds,
+  googleSignInRateLimit,
+} from '../shared/auth-http-rate-limit.constants';
 import { buildRefreshTokenCookieOptions } from '../shared/auth-cookie.helper';
 import {
   GoogleSignInBodyDto,
@@ -30,15 +35,20 @@ class GoogleSignInController {
   ) {}
 
   @Post('sign-in')
-  @HttpCode(200)
-  @Throttle({ default: { limit: 20, ttl: 15 * 60 * 1000 } })
+  @HttpCode(HttpStatus.OK)
+  @Throttle({
+    default: {
+      limit: googleSignInRateLimit,
+      ttl: authRateLimitWindowMilliseconds,
+    },
+  })
   @ApiOperation({
     summary: 'Sign in with Google',
     description:
       'Validates a Google Sign-In or One Tap ID token and creates an auth session.',
   })
   @ZodResponse({
-    status: 200,
+    status: HttpStatus.OK,
     description: 'Authenticated session response',
     type: GoogleSignInResponseDto,
   })

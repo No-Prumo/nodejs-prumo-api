@@ -1,10 +1,12 @@
 import { createHash, randomBytes, timingSafeEqual } from 'node:crypto';
 import { Injectable } from '@nestjs/common';
 
+const magicLinkTokenByteLength = 32;
+
 @Injectable()
 class MagicLinkTokenService {
   generateToken(): string {
-    return randomBytes(32).toString('base64url');
+    return randomBytes(magicLinkTokenByteLength).toString('base64url');
   }
 
   hash(rawToken: string): string {

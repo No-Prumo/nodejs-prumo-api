@@ -5,7 +5,13 @@ import {
   AuthSessionResponseSchema,
 } from '../shared/auth-session-response.schemas';
 
-const googleIdTokenSchema = z.string().trim().min(10).max(4096);
+const minimumGoogleIdTokenLength = 10;
+const maximumGoogleIdTokenLength = 4096;
+const googleIdTokenSchema = z
+  .string()
+  .trim()
+  .min(minimumGoogleIdTokenLength)
+  .max(maximumGoogleIdTokenLength);
 
 const GoogleSignInBodySchema = z
   .object({

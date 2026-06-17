@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { secondsPerDay } from '@shared/time/time.constants';
 import {
   appEnvironmentValues,
   nodeEnvironmentValues,
@@ -7,6 +8,20 @@ import { getPackageMetadata } from '../app/package-metadata';
 import { loggerLevelInputValues } from '../logger/logger-level';
 
 const packageMetadata = getPackageMetadata();
+const minimumNonEmptyStringLength = 1;
+const minimumAccessTokenSecretLength = 32;
+const minimumPortNumber = 1;
+const maximumPortNumber = 65535;
+const defaultApiPort = 3000;
+const defaultPostgresPort = 5432;
+const defaultAccessTokenTtlSeconds = 900;
+const defaultMagicLinkTtlSeconds = 900;
+const refreshTokenIdleTtlDays = 14;
+const refreshTokenAbsoluteTtlDays = 30;
+const defaultRefreshTokenIdleTtlSeconds =
+  secondsPerDay * refreshTokenIdleTtlDays;
+const defaultRefreshTokenAbsoluteTtlSeconds =
+  secondsPerDay * refreshTokenAbsoluteTtlDays;
 
 const booleanFromEnv = z.preprocess((value) => {
   if (typeof value === 'boolean') {
@@ -30,23 +45,31 @@ const booleanFromEnv = z.preprocess((value) => {
   return value;
 }, z.boolean());
 
-const portFromEnv = z.coerce.number().int().min(1).max(65535);
+const portFromEnv = z.coerce
+  .number()
+  .int()
+  .min(minimumPortNumber)
+  .max(maximumPortNumber);
 const positiveSecondsFromEnv = z.coerce.number().int().positive();
 
 const envSchema = z
   .object({
     NODE_ENV: z.enum(nodeEnvironmentValues).default('development'),
     APP_ENV: z.enum(appEnvironmentValues).optional(),
-    APP_VERSION: z.string().trim().min(1).optional(),
-    PORT: portFromEnv.default(3000),
-    APP_HOST: z.string().trim().min(1).default('0.0.0.0'),
+    APP_VERSION: z.string().trim().min(minimumNonEmptyStringLength).optional(),
+    PORT: portFromEnv.default(defaultApiPort),
+    APP_HOST: z
+      .string()
+      .trim()
+      .min(minimumNonEmptyStringLength)
+      .default('0.0.0.0'),
     APP_GLOBAL_PREFIX: z.string().trim().default(''),
     DATABASE_URL: z.string().url(),
-    POSTGRES_HOST: z.string().trim().min(1),
-    POSTGRES_PORT: portFromEnv.default(5432),
-    POSTGRES_USER: z.string().trim().min(1),
-    POSTGRES_PASSWORD: z.string().min(1),
-    POSTGRES_DB: z.string().trim().min(1),
+    POSTGRES_HOST: z.string().trim().min(minimumNonEmptyStringLength),
+    POSTGRES_PORT: portFromEnv.default(defaultPostgresPort),
+    POSTGRES_USER: z.string().trim().min(minimumNonEmptyStringLength),
+    POSTGRES_PASSWORD: z.string().min(minimumNonEmptyStringLength),
+    POSTGRES_DB: z.string().trim().min(minimumNonEmptyStringLength),
     LOG_LEVEL: z.enum(loggerLevelInputValues).optional(),
     LOG_PRETTY: booleanFromEnv.optional(),
     DOCS_ENABLED: booleanFromEnv.default(true),
@@ -55,31 +78,41 @@ const envSchema = z
     OBSERVABILITY_SERVICE_NAME: z
       .string()
       .trim()
-      .min(1)
+      .min(minimumNonEmptyStringLength)
       .default(packageMetadata.name),
-    AUTH_ACCESS_TOKEN_SECRET: z.string().trim().min(32).optional(),
-    AUTH_ACCESS_TOKEN_TTL_SECONDS: positiveSecondsFromEnv.default(900),
-    AUTH_GOOGLE_CLIENT_ID: z.string().trim().min(1).optional(),
+    AUTH_ACCESS_TOKEN_SECRET: z
+      .string()
+      .trim()
+      .min(minimumAccessTokenSecretLength)
+      .optional(),
+    AUTH_ACCESS_TOKEN_TTL_SECONDS: positiveSecondsFromEnv.default(
+      defaultAccessTokenTtlSeconds,
+    ),
+    AUTH_GOOGLE_CLIENT_ID: z
+      .string()
+      .trim()
+      .min(minimumNonEmptyStringLength)
+      .optional(),
     AUTH_MAGIC_LINK_TTL_SECONDS: z.coerce
       .number()
       .int()
       .positive()
-      .default(900),
+      .default(defaultMagicLinkTtlSeconds),
     AUTH_REFRESH_TOKEN_IDLE_TTL_SECONDS: positiveSecondsFromEnv.default(
-      60 * 60 * 24 * 14,
+      defaultRefreshTokenIdleTtlSeconds,
     ),
     AUTH_REFRESH_TOKEN_ABSOLUTE_TTL_SECONDS: positiveSecondsFromEnv.default(
-      60 * 60 * 24 * 30,
+      defaultRefreshTokenAbsoluteTtlSeconds,
     ),
     AUTH_REFRESH_TOKEN_COOKIE_NAME: z
       .string()
       .trim()
-      .min(1)
+      .min(minimumNonEmptyStringLength)
       .default('sandicts_refresh_token'),
     AUTH_REFRESH_TOKEN_COOKIE_PATH: z
       .string()
       .trim()
-      .min(1)
+      .min(minimumNonEmptyStringLength)
       .default('/auth/refresh'),
     AUTH_COOKIE_SAME_SITE: z.enum(['lax', 'strict', 'none']).default('lax'),
     AUTH_COOKIE_SECURE: booleanFromEnv.optional(),

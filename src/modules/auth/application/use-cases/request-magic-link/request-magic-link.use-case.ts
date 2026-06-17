@@ -1,5 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { authConfig, type AuthConfig } from '../../../../../config';
+import { authConfig, type AuthConfig } from '@config';
+import { addSeconds } from '@shared/time/time.helpers';
 import { EMAIL_GATEWAY, type EmailGateway } from '../../ports/email-gateway';
 import {
   MAGIC_LINK_CHALLENGES_REPOSITORY,
@@ -7,17 +8,13 @@ import {
 } from '../../ports/magic-link-challenges.repository';
 import { normalizeEmail } from '../../services/email/normalize-email';
 import { MagicLinkTokenService } from '../../services/tokens/magic-link-token.service';
+import type {
+  RequestMagicLinkUseCaseRequest,
+  RequestMagicLinkUseCaseResponse,
+} from './request-magic-link.use-case.types';
 
 const magicLinkRequestMessage =
   'If the email can sign in, a magic link will be sent.';
-
-type RequestMagicLinkUseCaseRequest = {
-  email: string;
-};
-
-type RequestMagicLinkUseCaseResponse = {
-  message: string;
-};
 
 @Injectable()
 class RequestMagicLinkUseCase {
@@ -36,7 +33,7 @@ class RequestMagicLinkUseCase {
   ): Promise<RequestMagicLinkUseCaseResponse> {
     const normalizedEmail = normalizeEmail(request.email);
     const token = this.magicLinkTokenService.generateToken();
-    const expiresAt = this.addSeconds(
+    const expiresAt = addSeconds(
       new Date(),
       this.authSettings.magicLinkTtlSeconds,
     );
@@ -57,11 +54,6 @@ class RequestMagicLinkUseCase {
       message: magicLinkRequestMessage,
     };
   }
-
-  private addSeconds(date: Date, seconds: number): Date {
-    return new Date(date.getTime() + seconds * 1000);
-  }
 }
 
 export { RequestMagicLinkUseCase, magicLinkRequestMessage, normalizeEmail };
-export type { RequestMagicLinkUseCaseRequest, RequestMagicLinkUseCaseResponse };

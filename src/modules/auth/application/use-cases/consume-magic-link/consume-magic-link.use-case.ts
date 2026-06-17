@@ -1,5 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { AppError } from '../../../../../shared/errors/app-error';
+import { authErrorReasons } from '@auth/application/errors/auth-error-reasons';
+import { invalidMagicLinkToken } from '@auth/application/errors/auth-errors';
 import {
   ACCOUNTS_REPOSITORY,
   type AccountsRepository,
@@ -9,26 +10,11 @@ import {
   type MagicLinkChallengesRepository,
 } from '../../ports/magic-link-challenges.repository';
 import { MagicLinkTokenService } from '../../services/tokens/magic-link-token.service';
-import {
-  CreateAuthSessionUseCase,
-  type CreateAuthSessionUseCaseResponse,
-} from '../create-auth-session/create-auth-session.use-case';
-
-type ConsumeMagicLinkUseCaseRequest = {
-  token: string;
-  userAgent?: string | null;
-  ipAddress?: string | null;
-};
-
-type ConsumeMagicLinkUseCaseResponse = {
-  account: CreateAuthSessionUseCaseResponse['account'];
-  session: CreateAuthSessionUseCaseResponse['session'];
-  accessToken: string;
-  accessTokenExpiresAt: Date;
-  refreshToken: string;
-  refreshTokenIdleExpiresAt: Date;
-  refreshTokenAbsoluteExpiresAt: Date;
-};
+import { CreateAuthSessionUseCase } from '../create-auth-session/create-auth-session.use-case';
+import type {
+  ConsumeMagicLinkUseCaseRequest,
+  ConsumeMagicLinkUseCaseResponse,
+} from './consume-magic-link.use-case.types';
 
 @Injectable()
 class ConsumeMagicLinkUseCase {
@@ -51,7 +37,10 @@ class ConsumeMagicLinkUseCase {
       );
 
     if (!challenge) {
-      throw new AppError('unauthorized', 'Magic link is invalid or expired');
+      throw invalidMagicLinkToken({
+        action: 'consume_magic_link',
+        reason: authErrorReasons.challengeNotFoundExpiredOrConsumed,
+      });
     }
 
     const account = await this.accountsRepository.resolveOrCreateByEmail({
@@ -79,4 +68,3 @@ class ConsumeMagicLinkUseCase {
 }
 
 export { ConsumeMagicLinkUseCase };
-export type { ConsumeMagicLinkUseCaseRequest, ConsumeMagicLinkUseCaseResponse };

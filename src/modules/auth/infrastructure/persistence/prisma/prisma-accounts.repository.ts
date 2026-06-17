@@ -1,20 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../../../../../infra/prisma/prisma.service';
+import { PrismaService } from '@infra/prisma/prisma.service';
 import type {
   AccountRecord,
   AccountsRepository,
   CreateAccountData,
 } from '../../../application/ports/accounts.repository';
-
-type PrismaAccountRecord = {
-  id: string;
-  email: string;
-  normalizedEmail: string;
-  displayName: string | null;
-  status: 'ACTIVE' | 'BLOCKED' | 'DISABLED';
-  createdAt: Date;
-  updatedAt: Date;
-};
+import type { PrismaAccountRecord } from './prisma-accounts.repository.types';
 
 @Injectable()
 class PrismaAccountsRepository implements AccountsRepository {

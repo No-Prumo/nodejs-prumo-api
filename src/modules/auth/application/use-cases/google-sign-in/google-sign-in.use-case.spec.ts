@@ -1,8 +1,10 @@
-import { buildAuthConfig, validateEnv } from '../../../../../config';
-import { AppError } from '../../../../../shared/errors/app-error';
-import { InMemoryAccountsRepository } from '../../../infrastructure/persistence/in-memory/in-memory-accounts.repository';
-import { InMemoryAuthSessionsRepository } from '../../../infrastructure/persistence/in-memory/in-memory-auth-sessions.repository';
-import { InMemoryExternalIdentitiesRepository } from '../../../infrastructure/persistence/in-memory/in-memory-external-identities.repository';
+import { authErrorReasons } from '@auth/application/errors/auth-error-reasons';
+import { invalidGoogleCredential } from '@auth/application/errors/auth-errors';
+import { authProviderCodes } from '@auth/domain/auth-provider';
+import { InMemoryAccountsRepository } from '@auth/infrastructure/persistence/in-memory/in-memory-accounts.repository';
+import { InMemoryAuthSessionsRepository } from '@auth/infrastructure/persistence/in-memory/in-memory-auth-sessions.repository';
+import { InMemoryExternalIdentitiesRepository } from '@auth/infrastructure/persistence/in-memory/in-memory-external-identities.repository';
+import { buildTestAuthConfig } from '@test-support/auth/build-test-auth-config';
 import type {
   GoogleIdTokenVerifier,
   VerifiedGoogleIdentity,
@@ -12,17 +14,9 @@ import { TokenService } from '../../services/tokens/token.service';
 import { CreateAuthSessionUseCase } from '../create-auth-session/create-auth-session.use-case';
 import { GoogleSignInUseCase } from './google-sign-in.use-case';
 
-const authSettings = buildAuthConfig(
-  validateEnv({
-    AUTH_GOOGLE_CLIENT_ID: 'google-web-client-id.apps.googleusercontent.com',
-    DATABASE_URL: 'postgresql://postgres:sandicts@localhost:5432/sandicts',
-    POSTGRES_DB: 'sandicts',
-    POSTGRES_HOST: 'localhost',
-    POSTGRES_PASSWORD: 'sandicts',
-    POSTGRES_PORT: '5432',
-    POSTGRES_USER: 'postgres',
-  }),
-);
+const authSettings = buildTestAuthConfig({
+  AUTH_GOOGLE_CLIENT_ID: 'google-web-client-id.apps.googleusercontent.com',
+});
 
 const verifiedGoogleIdentity: VerifiedGoogleIdentity = {
   subject: 'google-sub-123',
@@ -77,13 +71,16 @@ describe('GoogleSignInUseCase', () => {
       verifyGoogleIdToken,
     } = makeSut();
     verifyGoogleIdToken.mockRejectedValue(
-      new AppError('unauthorized', 'Invalid authentication credentials'),
+      invalidGoogleCredential({
+        action: 'verify_google_id_token',
+        reason: authErrorReasons.verificationFailed,
+      }),
     );
 
     await expect(
       useCase.execute({ credential: 'invalid-google-token' }),
     ).rejects.toMatchObject({
-      code: 'unauthorized',
+      code: 'invalid_google_credential',
     });
     expect(accountsRepository.accounts).toHaveLength(0);
     expect(authSessionsRepository.authSessions).toHaveLength(0);
@@ -99,7 +96,7 @@ describe('GoogleSignInUseCase', () => {
     await expect(
       useCase.execute({ credential: 'unverified-email-token' }),
     ).rejects.toMatchObject({
-      code: 'unauthorized',
+      code: 'invalid_google_credential',
     });
     expect(externalIdentitiesRepository.externalIdentities).toHaveLength(0);
     expect(authSessionsRepository.authSessions).toHaveLength(0);
@@ -122,7 +119,7 @@ describe('GoogleSignInUseCase', () => {
     });
     await externalIdentitiesRepository.create({
       accountId: linkedAccount.id,
-      provider: 'google',
+      provider: authProviderCodes.google,
       providerSubject: verifiedGoogleIdentity.subject,
     });
 
@@ -163,7 +160,7 @@ describe('GoogleSignInUseCase', () => {
     expect(externalIdentitiesRepository.externalIdentities).toHaveLength(1);
     expect(externalIdentitiesRepository.externalIdentities[0]).toMatchObject({
       accountId: result.account.id,
-      provider: 'google',
+      provider: authProviderCodes.google,
       providerSubject: verifiedGoogleIdentity.subject,
     });
     expect(authSessionsRepository.authSessions).toHaveLength(1);
@@ -213,14 +210,14 @@ describe('GoogleSignInUseCase', () => {
     });
     await externalIdentitiesRepository.create({
       accountId: existingAccount.id,
-      provider: 'google',
+      provider: authProviderCodes.google,
       providerSubject: 'other-google-sub',
     });
 
     await expect(
       useCase.execute({ credential: 'valid-google-token' }),
     ).rejects.toMatchObject({
-      code: 'conflict',
+      code: 'external_identity_conflict',
     });
     expect(externalIdentitiesRepository.externalIdentities).toHaveLength(1);
     expect(authSessionsRepository.authSessions).toHaveLength(0);

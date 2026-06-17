@@ -1,39 +1,20 @@
-import { buildAuthConfig, validateEnv } from '../../../../../config';
-import { InMemoryAccountsRepository } from '../../../infrastructure/persistence/in-memory/in-memory-accounts.repository';
-import { InMemoryAuthSessionsRepository } from '../../../infrastructure/persistence/in-memory/in-memory-auth-sessions.repository';
-import type { AccountRecord } from '../../ports/accounts.repository';
+import { buildAccountRecord } from '@test-support/auth/build-account-record';
+import { buildTestAuthConfig } from '@test-support/auth/build-test-auth-config';
+import { InMemoryAccountsRepository } from '@auth/infrastructure/persistence/in-memory/in-memory-accounts.repository';
+import { InMemoryAuthSessionsRepository } from '@auth/infrastructure/persistence/in-memory/in-memory-auth-sessions.repository';
 import { RefreshTokenHasher } from '../../services/tokens/refresh-token-hasher';
 import { TokenService } from '../../services/tokens/token.service';
 import { CreateAuthSessionUseCase } from '../create-auth-session/create-auth-session.use-case';
 import { SignOutAllUseCase } from './sign-out-all.use-case';
 
-const account: AccountRecord = {
-  id: 'account-id',
-  email: 'user@example.com',
-  normalizedEmail: 'user@example.com',
-  displayName: 'User',
-  status: 'active',
-  createdAt: new Date('2026-01-01T00:00:00.000Z'),
-  updatedAt: new Date('2026-01-01T00:00:00.000Z'),
-};
-
-const otherAccount: AccountRecord = {
-  ...account,
+const account = buildAccountRecord();
+const otherAccount = buildAccountRecord({
   id: 'other-account-id',
   email: 'other@example.com',
   normalizedEmail: 'other@example.com',
-};
+});
 
-const authSettings = buildAuthConfig(
-  validateEnv({
-    DATABASE_URL: 'postgresql://postgres:sandicts@localhost:5432/sandicts',
-    POSTGRES_DB: 'sandicts',
-    POSTGRES_HOST: 'localhost',
-    POSTGRES_PASSWORD: 'sandicts',
-    POSTGRES_PORT: '5432',
-    POSTGRES_USER: 'postgres',
-  }),
-);
+const authSettings = buildTestAuthConfig();
 
 describe('SignOutAllUseCase', () => {
   function makeSut() {
