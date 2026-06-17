@@ -46,3 +46,4 @@ Explain the cause identified in code, flow, or configuration.
 
 - relevant note
 - relevant note
+- Branch cleanup: delete branch after merge enabled
