@@ -44,7 +44,10 @@ That approach is acceptable for global personal behavior, but it should not be t
 
 Project-specific Codex skills should live in `.codex/skills/`.
 
-Durable AI-facing project documentation should live in `docs/ai/`.
+Durable backend-specific AI-facing project documentation should live in `docs/ai/`.
+
+Shared product, business-rule, glossary, MVP scope, and Jira planning
+documentation should live in `sandicts/sandicts-docs`.
 
 This keeps Codex behavior versioned with the code, reviewable in pull requests, reproducible across computers, and aligned with project changes.
 
@@ -57,10 +60,13 @@ Store these in the repository:
 - API, validation, error handling, logging, and configuration rules
 - CI/CD and pull request rules
 - debugging workflows specific to this codebase
-- business and product rules needed to implement backend behavior
-- AI-facing documentation that should be shared by every dev and machine
+- backend-specific rules needed to implement backend behavior
+- AI-facing backend documentation that should be shared by every backend dev and machine
 
-When a project rule changes, update the related skill or `docs/ai/` document in the same pull request when relevant.
+When a backend rule changes, update the related skill or `docs/ai/` document in the same pull request when relevant.
+
+When a shared product or business rule changes, update the relevant document in
+`sandicts/sandicts-docs` instead of copying that rule into this repository.
 
 ## Local-Only Content
 
@@ -99,6 +105,10 @@ docs/
   ai/
     codex-skills-strategy.md
     index.md
+    product/
+      README.md
+    business/
+      README.md
 ```
 
 Each folder under `.codex/skills/` is one Codex skill. The nested `agents/openai.yaml` file is UI/discovery metadata for that skill, not a separate agent.
@@ -111,7 +121,8 @@ Do not create placeholder skills. Add a new project skill only when it captures 
 - Classify each one as global, project-specific, or private.
 - Move only project-specific, shareable skills into `.codex/skills/`.
 - Remove secrets, local paths, and personal preferences before committing.
-- Link project skills to the relevant `docs/ai/` source-of-truth documents.
+- Link project skills to the relevant backend `docs/ai/` source-of-truth documents.
+- Link shared product and business-rule work to `sandicts/sandicts-docs`.
 - Update `docs/ai/index.md` when adding durable project context.
 - Test from the second computer or a clean clone.
 - Keep the external shared folder only for global or personal skills.

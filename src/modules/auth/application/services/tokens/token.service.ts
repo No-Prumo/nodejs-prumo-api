@@ -147,7 +147,8 @@ function isVerifiedAccessTokenClaims(
     typeof value.iat === 'number' &&
     typeof value.exp === 'number' &&
     (value.role === undefined || typeof value.role === 'string') &&
-    (value.partnerId === undefined || typeof value.partnerId === 'string')
+    (value.organizationId === undefined ||
+      typeof value.organizationId === 'string')
   );
 }
 

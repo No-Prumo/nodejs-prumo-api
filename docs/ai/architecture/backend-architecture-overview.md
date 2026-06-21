@@ -132,12 +132,12 @@ Unexpected failures bubble to the global exception filter and are logged through
 
 Recommended modules:
 
-- `accounts`: players, partner users, staff users, roles, authentication-facing account flows
-- `establishments`: partners, courts, sports, opening hours, partner profile
+- `accounts`: players, Organization users, staff users, roles, authentication-facing account flows
+- `establishments`: Organizations, courts, sports, opening hours, Organization profile
 - `scheduling`: availability, blocks, calendar views, Google Calendar sync
 - `reservations`: booking lifecycle, participants, cancellation, no-show, reservation state
 - `billing`: payment intents, provider checkout, webhooks, refunds, provider state
-- `finance`: receivables, payouts, statements, reconciliation, partner financial views
+- `finance`: receivables, payouts, statements, reconciliation, Organization financial views
 - `tournaments`: tournament creation, registrations, brackets, matches, results
 - `social`: invites, open matches, contacts, player-to-player coordination
 - `notifications`: email, WhatsApp, push, templates, delivery state

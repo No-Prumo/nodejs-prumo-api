@@ -5,8 +5,8 @@ such as footvolley, beach tennis, beach volleyball, and similar court-based
 sports.
 
 The backend is intended to support the operational core of the product:
-partner onboarding, court availability, reservations, open matches,
-tournaments, payment state, B2B partner management, and a secure authentication
+organization onboarding, court availability, reservations, open matches,
+tournaments, payment state, future Academy management, and a secure authentication
 foundation for web first and mobile later.
 
 ## Table of Contents
@@ -41,20 +41,21 @@ Core user groups:
 
 - `Player`: books courts, joins open matches, enters tournaments, and builds a
   sports profile over time.
-- `Partner`: courts, schools, arenas, clubs, coaches, or organizers that manage
-  availability, reservations, students, events, and financial visibility.
-- `Admin`: internal Sandicts operator, introduced only when real operational
+- `Organization`: courts, venues, arenas, clubs, or organizers that manage
+  availability, reservations, courts, events, and financial visibility.
+- `Academy`: training, coaches, classes, students, and plans context.
+- `Admin App`: internal Sandicts operator context, introduced only when real operational
   flows require manual review, support, moderation, or controlled status
   changes.
 
 Main product areas:
 
-- court and partner discovery
+- court and organization discovery
 - court availability and reservations
 - open match creation and joining
 - tournament registration and operation
 - basic payment state tracking
-- partner management for students, memberships, schedules, and financial views
+- future Academy management for students, memberships, classes, and coaches
 
 The MVP bias is a useful marketplace core. Blockchain/Web3 rewards may be added
 later, but booking, payment, tournament, and authentication flows must not
@@ -87,7 +88,7 @@ Implemented:
 
 Not implemented yet:
 
-- reservation, partner, court, match, tournament, payment, and finance modules
+- reservation, organization, court, match, tournament, payment, and finance modules
 - refresh, sign-out, sign-out-all, and auth/me endpoints
 - complete product API surface
 - E2E test suite
@@ -985,8 +986,8 @@ CI uses:
 
 ### Add A New Feature Module
 
-1. Read `docs/ai/product/sandicts-product-context.md`.
-2. Read `docs/ai/business/sandicts-business-rules.md`.
+1. Read `sandicts/sandicts-docs:docs/product/sandicts-product-context.md`.
+2. Read `sandicts/sandicts-docs:docs/business-rules/sandicts-business-rules.md`.
 3. Read `docs/ai/architecture/backend-architecture-overview.md`.
 4. Read `docs/ai/architecture/module-pattern.md`.
 5. Create the module under `src/modules/<feature>`.
@@ -1021,7 +1022,7 @@ CI uses:
 
 ### Change Business Rules
 
-1. Read `docs/ai/business/sandicts-business-rules.md`.
+1. Read `sandicts/sandicts-docs:docs/business-rules/sandicts-business-rules.md`.
 2. Read the relevant product or architecture docs linked from `docs/ai/index.md`.
 3. Implement the backend behavior.
 4. Use `business_rule_violation` for valid requests that break domain policy.
@@ -1061,14 +1062,14 @@ Current source-of-truth docs:
 - `docs/ai/architecture/module-pattern.md`
 - `docs/ai/architecture/repository-pattern.md`
 - `docs/ai/architecture/use-case-pattern.md`
-- `docs/ai/business/sandicts-business-rules.md`
+- `sandicts/sandicts-docs:docs/business-rules/sandicts-business-rules.md`
 - `docs/ai/config/configuration-foundation.md`
 - `docs/ai/config/typescript-module-resolution.md`
 - `docs/ai/ci-cd/ci-governance.md`
 - `docs/ai/ci-cd/ci-operational-rules.md`
 - `docs/ai/codex-skills-strategy.md`
 - `docs/ai/logging/logging-foundation.md`
-- `docs/ai/product/sandicts-product-context.md`
+- `sandicts/sandicts-docs:docs/product/sandicts-product-context.md`
 
 Repository-owned Codex skills live under `.codex/skills`:
 

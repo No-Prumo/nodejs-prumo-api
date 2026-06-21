@@ -37,7 +37,7 @@ Short catalog. Routing hints (`read-when`, `do-not-read-when`, `related`, `canon
 | [`docs/ai/architecture/module-pattern.md`](architecture/module-pattern.md)                                 | Nest feature module pattern                                 |
 | [`docs/ai/architecture/repository-pattern.md`](architecture/repository-pattern.md)                         | Repository port and Prisma adapter pattern                  |
 | [`docs/ai/architecture/use-case-pattern.md`](architecture/use-case-pattern.md)                             | Application use case pattern                                |
-| [`docs/ai/business/sandicts-business-rules.md`](business/sandicts-business-rules.md)                       | Sandicts business rules and backend invariants              |
+| [`docs/ai/business/README.md`](business/README.md)                                               | Pointer to shared Sandicts business rules                   |
 | [`docs/ai/config/configuration-foundation.md`](config/configuration-foundation.md)                         | Backend config baseline, source of truth                    |
 | [`docs/ai/config/typescript-module-resolution.md`](config/typescript-module-resolution.md)                 | TypeScript/Nest module resolution decision                  |
 | [`docs/ai/testing/test-organization.md`](testing/test-organization.md)                                     | Test fixtures, builders, and helper placement               |
@@ -47,41 +47,45 @@ Short catalog. Routing hints (`read-when`, `do-not-read-when`, `related`, `canon
 | [`docs/ai/codex-skills-strategy.md`](codex-skills-strategy.md)                                             | Codex skills ownership and repository strategy              |
 | [`docs/ai/task-finalization-workflow.md`](task-finalization-workflow.md)                                   | Task finish, commit, and PR title workflow                  |
 | [`docs/ai/logging/logging-foundation.md`](logging/logging-foundation.md)                                   | Logging baseline with nestjs-pino                           |
-| [`docs/ai/product/sandicts-product-context.md`](product/sandicts-product-context.md)                       | Sandicts product context and MVP direction                  |
-| [`docs/ai/product/sandicts-mvp-scope.md`](product/sandicts-mvp-scope.md)                                   | Approved MVP scope and explicit exclusions                  |
-| [`docs/ai/product/sandicts-mvp-functional-spec.md`](product/sandicts-mvp-functional-spec.md)               | Detailed MVP functional spec; read on demand                |
-| [`docs/ai/product/sandicts-jira-planning-workflow.md`](product/sandicts-jira-planning-workflow.md)         | Jira roadmap, backlog, and issue-writing rules              |
-| [`docs/ai/product/sandicts-scope-checklist.md`](product/sandicts-scope-checklist.md)                       | Working checklist for MVP, V2, and backlog                  |
-| [`docs/ai/product/sandicts-v2-backlog.md`](product/sandicts-v2-backlog.md)                                 | V2 and later product backlog                                |
-| [`docs/ai/product/shared-documentation-strategy.md`](product/shared-documentation-strategy.md)             | Shared product docs ownership decision                      |
+| [`docs/ai/product/README.md`](product/README.md)                                                 | Pointer to shared product, scope, glossary, and Jira docs   |
 | [`docs/frontend/README.md`](../frontend/README.md)                                                         | Pointer to frontend docs in `sandicts/reactjs-sandicts-web` |
 
 ## Common AI Reading Paths
 
+Shared Sandicts docs live in the sibling `sandicts-docs` repository. Use these
+repository locators when product, scope, glossary, Jira, or business-rule
+context is needed:
+
+- `sandicts/sandicts-docs:docs/ai/index.md`
+- `sandicts/sandicts-docs:docs/glossary/domain-glossary.md`
+- `sandicts/sandicts-docs:docs/product/sandicts-product-context.md`
+- `sandicts/sandicts-docs:docs/product/sandicts-mvp-scope.md`
+- `sandicts/sandicts-docs:docs/business-rules/sandicts-business-rules.md`
+
 For a new feature module, read:
 
-1. `docs/ai/product/sandicts-product-context.md`
-2. `docs/ai/product/sandicts-mvp-scope.md`
-3. `docs/ai/business/sandicts-business-rules.md`
+1. `sandicts/sandicts-docs:docs/product/sandicts-product-context.md`
+2. `sandicts/sandicts-docs:docs/product/sandicts-mvp-scope.md`
+3. `sandicts/sandicts-docs:docs/business-rules/sandicts-business-rules.md`
 4. `docs/ai/architecture/backend-architecture-overview.md`
 5. `docs/ai/architecture/module-pattern.md`
 
 For product scope decisions, read:
 
-1. `docs/ai/product/sandicts-product-context.md`
-2. `docs/ai/product/sandicts-mvp-scope.md`
-3. `docs/ai/product/sandicts-v2-backlog.md`
-4. `docs/ai/product/sandicts-scope-checklist.md`
-5. `docs/ai/business/sandicts-business-rules.md`
+1. `sandicts/sandicts-docs:docs/product/sandicts-product-context.md`
+2. `sandicts/sandicts-docs:docs/product/sandicts-mvp-scope.md`
+3. `sandicts/sandicts-docs:docs/product/sandicts-v2-backlog.md`
+4. `sandicts/sandicts-docs:docs/product/sandicts-scope-checklist.md`
+5. `sandicts/sandicts-docs:docs/business-rules/sandicts-business-rules.md`
 
 For Jira roadmap, backlog, or issue planning, read:
 
-1. `docs/ai/product/sandicts-product-context.md`
-2. `docs/ai/product/sandicts-mvp-scope.md`
-3. `docs/ai/product/sandicts-jira-planning-workflow.md`
+1. `sandicts/sandicts-docs:docs/product/sandicts-product-context.md`
+2. `sandicts/sandicts-docs:docs/product/sandicts-mvp-scope.md`
+3. `sandicts/sandicts-docs:docs/product/sandicts-jira-planning-workflow.md`
 4. `sandicts/reactjs-sandicts-web:docs/frontend/sandicts-mvp-delivery-roadmap.md` when frontend or fullstack sequencing is involved
 5. `sandicts/reactjs-sandicts-web:docs/frontend/sandicts-page-functional-spec.md` only when the issue depends on page, route, permission, or user-flow details
-6. `docs/ai/business/sandicts-business-rules.md` only when the issue changes product/business behavior
+6. `sandicts/sandicts-docs:docs/business-rules/sandicts-business-rules.md` only when the issue changes product/business behavior
 
 For frontend planning, read:
 
@@ -89,11 +93,11 @@ For frontend planning, read:
 2. `sandicts/reactjs-sandicts-web:docs/frontend/sandicts-frontend-tech-decisions.md`
 3. `sandicts/reactjs-sandicts-web:docs/frontend/sandicts-frontend-planning.md`
 4. `sandicts/reactjs-sandicts-web:docs/frontend/sandicts-mvp-delivery-roadmap.md`
-5. `docs/ai/product/sandicts-product-context.md`
-6. `docs/ai/product/sandicts-mvp-scope.md`
+5. `sandicts/sandicts-docs:docs/product/sandicts-product-context.md`
+6. `sandicts/sandicts-docs:docs/product/sandicts-mvp-scope.md`
 7. `sandicts/reactjs-sandicts-web:docs/frontend/sandicts-page-functional-spec.md` only for page inventory, routes, permissions, or flow behavior
 8. `sandicts/reactjs-sandicts-web:docs/frontend/sandicts-mvp-screens-spec.md` only for Figma or detailed screen-state work
-9. `docs/ai/product/sandicts-jira-planning-workflow.md` only when creating or editing Jira issues
+9. `sandicts/sandicts-docs:docs/product/sandicts-jira-planning-workflow.md` only when creating or editing Jira issues
 
 For a new endpoint, read:
 

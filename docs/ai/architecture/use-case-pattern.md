@@ -146,7 +146,7 @@ Examples:
 - email already registered: `conflict`
 - reservation slot unavailable: `business_rule_violation`
 - player not found: `resource_not_found`
-- partner user accessing another partner: `forbidden`
+- Organization user accessing another Organization: `forbidden`
 
 Do not throw Nest `HttpException` from a use case.
 

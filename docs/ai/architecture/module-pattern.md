@@ -194,7 +194,7 @@ Consider splitting when:
 
 Example:
 
-- `billing` and `finance` should stay separate because provider charge state and partner financial reporting evolve differently.
+- `billing` and `finance` should stay separate because provider charge state and Organization financial reporting evolve differently.
 
 ## When To Keep A Module Together
 

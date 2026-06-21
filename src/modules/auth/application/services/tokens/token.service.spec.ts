@@ -38,6 +38,7 @@ describe('TokenService', () => {
     const issuedToken = service.issueAccessToken({
       sub: 'account-id',
       sessionId: 'session-id',
+      organizationId: 'organization-id',
     });
     const [encodedHeader, encodedPayload, encodedSignature] =
       issuedToken.token.split('.');
@@ -50,8 +51,13 @@ describe('TokenService', () => {
       typ: 'JWT',
     });
     expect(
-      decodeJwtPart<{ sub: string; sessionId: string }>(encodedPayload),
+      decodeJwtPart<{
+        organizationId: string;
+        sessionId: string;
+        sub: string;
+      }>(encodedPayload),
     ).toMatchObject({
+      organizationId: 'organization-id',
       sub: 'account-id',
       sessionId: 'session-id',
     });
@@ -63,9 +69,11 @@ describe('TokenService', () => {
     const issuedToken = service.issueAccessToken({
       sub: 'account-id',
       sessionId: 'session-id',
+      organizationId: 'organization-id',
     });
 
     expect(service.verifyAccessToken(issuedToken.token)).toMatchObject({
+      organizationId: 'organization-id',
       sub: 'account-id',
       sessionId: 'session-id',
     });
