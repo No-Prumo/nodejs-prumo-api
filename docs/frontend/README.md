@@ -14,7 +14,13 @@ docs:
 docs/frontend
 ```
 
-This backend repository remains the source of truth for product scope,
-business rules, backend architecture, API behavior, and shared Jira planning.
-When a backend doc needs frontend context, read the matching file from the
-frontend repository instead of restoring duplicate copies here.
+Shared product scope, business rules, glossary, and Jira planning now live in:
+
+```text
+sandicts/sandicts-docs
+```
+
+This backend repository remains the source of truth for backend architecture,
+API behavior, generated contracts, and backend operational rules. When a
+backend doc needs frontend context, read the matching file from the frontend
+repository instead of restoring duplicate copies here.

@@ -9,11 +9,11 @@ description: Use when working in the Sandicts API repository and the user asks f
 
 Generate consistent Jira task drafts, pull request descriptions, and commit messages for Sandicts API work.
 
-Use repository evidence first: the user request, changed files, `git diff`, `git status`, `docs/ai/index.md`, and any relevant source-of-truth document under `docs/ai/`.
+Use repository evidence first: the user request, changed files, `git diff`, `git status`, `docs/ai/index.md`, and any relevant source-of-truth document in either backend `docs/ai/` or shared `sandicts/sandicts-docs`.
 
 When finishing a task, preparing commits, opening a PR, updating a PR title, or producing a delivery summary, read `docs/ai/task-finalization-workflow.md` first.
 
-For Jira roadmap, backlog, Epic, Story, Task, Subtask, Bug, or issue-planning requests, read `docs/ai/product/sandicts-jira-planning-workflow.md` first. When frontend or fullstack Jira work is involved, read the canonical frontend planning docs from the sibling `sandicts/reactjs-sandicts-web` repository, especially `sandicts/reactjs-sandicts-web:docs/frontend/sandicts-frontend-planning.md`; read `sandicts/reactjs-sandicts-web:docs/frontend/sandicts-page-functional-spec.md` only when the issue depends on page, route, permission, or user-flow details. When the user asks for backlog planning instead of a single delivery artifact, follow that workflow and do not force PR description or commit message sections unless the user asks for them.
+For Jira roadmap, backlog, Epic, Story, Task, Subtask, Bug, or issue-planning requests, read `sandicts/sandicts-docs:docs/product/sandicts-jira-planning-workflow.md` first. When frontend or fullstack Jira work is involved, read the canonical frontend planning docs from the sibling `sandicts/reactjs-sandicts-web` repository, especially `sandicts/reactjs-sandicts-web:docs/frontend/sandicts-frontend-planning.md`; read `sandicts/reactjs-sandicts-web:docs/frontend/sandicts-page-functional-spec.md` only when the issue depends on page, route, permission, or user-flow details. When the user asks for backlog planning instead of a single delivery artifact, follow that workflow and do not force PR description or commit message sections unless the user asks for them.
 
 ## Output Contract
 
@@ -172,7 +172,7 @@ Rules:
 - Mark validation checkboxes as checked only for commands or manual validation actually completed.
 - Leave unchecked any validations that were not run.
 - Keep implementation details useful but not noisy.
-- If the change modifies project rules, mention the updated `docs/ai/` or `.codex/skills/` file.
+- If the change modifies project rules, mention the updated owning document in backend `docs/ai/`, shared `sandicts/sandicts-docs`, or `.codex/skills/`.
 - If there are known gaps, call them out under `Notes` or the most relevant template section.
 
 ## Commit Message
@@ -211,5 +211,6 @@ Before generating final text:
 
 - Inspect `git status --short` and `git diff --stat` when changes exist locally.
 - Inspect relevant file diffs when the task depends on exact implementation details.
-- Read relevant `docs/ai/` context when architecture, CI/CD, logging, config, API contracts, or business rules are involved.
+- Read relevant backend `docs/ai/` context for architecture, CI/CD, logging, config, or API contracts.
+- Read relevant `sandicts/sandicts-docs` context for product scope, Jira planning, entity naming, or business rules.
 - Separate facts from assumptions. Label assumptions explicitly when needed.

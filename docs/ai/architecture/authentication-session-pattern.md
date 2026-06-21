@@ -53,7 +53,7 @@ Future candidates:
 - email and password if product direction changes after the passwordless MVP
 - Apple sign-in when the mobile app enters the roadmap
 - passkeys when the product has enough adoption to justify the UX and support work
-- MFA for partner admins and financial actions
+- MFA for Organization admins and financial actions
 
 Avoid SMS OTP as a primary method. It adds cost, operational complexity, carrier issues, and weaker security properties than app/email/passwordless alternatives.
 
@@ -76,7 +76,7 @@ Do not create separate session logic per auth method.
 
 Recommended conceptual model:
 
-- `Account`: login identity shared by player, partner user, or staff user
+- `Account`: login identity shared by player, Organization user, or staff user
 - `ExternalIdentity`: provider identity such as Google
 - `AuthSession`: refresh-token-backed internal session
 - `MagicLinkChallenge`: one-time email login challenge
@@ -86,7 +86,7 @@ Do not add a password credential table for the passwordless web MVP. Add `Creden
 Domain-specific profiles should remain separate:
 
 - `PlayerProfile`
-- `PartnerUserProfile`
+- `OrganizationUserProfile`
 - `StaffProfile`
 
 Reason:
@@ -110,7 +110,7 @@ Allowed claims:
 - `sub`
 - `sessionId`
 - `role` or role summary
-- `partnerId` when the active context is partner-scoped
+- `organizationId` when the active context is Organization-scoped
 - token issued-at and expiration claims
 
 Do not put sensitive or frequently changing data in the access token.
@@ -325,7 +325,7 @@ Account-linking policy:
 - if account already has the same Google `sub`, sign in
 - if no account exists and Google email is verified, create account
 - if account exists with same verified email but no Google identity, allow automatic link only for low-risk player accounts
-- require reauthentication before linking provider identity for partner admins, staff, or financial roles
+- require reauthentication before linking provider identity for Organization admins, staff, or financial roles
 
 Google Calendar is separate:
 

@@ -5,7 +5,7 @@ type AccessTokenClaims = {
   sub: string;
   sessionId: string;
   role?: string;
-  partnerId?: string;
+  organizationId?: string;
 };
 
 type IssuedAccessToken = {

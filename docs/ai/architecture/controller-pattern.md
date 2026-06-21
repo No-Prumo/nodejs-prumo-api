@@ -137,7 +137,7 @@ Do not return `200` for creation just because it is easy.
 The controller may extract:
 
 - authenticated account id
-- partner id from auth context
+- Organization id from auth context
 - route params
 - query filters
 - body payload
@@ -149,7 +149,7 @@ Example:
 ```ts
 return this.createReservation.execute({
   actorId: currentUser.id,
-  partnerId: params.partnerId,
+  organizationId: params.organizationId,
   courtId: body.courtId,
   startsAt: body.startsAt,
 });

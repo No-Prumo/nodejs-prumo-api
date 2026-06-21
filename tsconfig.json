@@ -11,14 +11,13 @@
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
     "target": "ES2023",
-    "baseUrl": ".",
     "paths": {
-      "@auth/*": ["src/modules/auth/*"],
-      "@config": ["src/config/index.ts"],
-      "@generated/*": ["src/generated/*"],
-      "@infra/*": ["src/infra/*"],
-      "@shared/*": ["src/shared/*"],
-      "@test-support/*": ["test/support/*"]
+      "@auth/*": ["./src/modules/auth/*"],
+      "@config": ["./src/config/index.ts"],
+      "@generated/*": ["./src/generated/*"],
+      "@infra/*": ["./src/infra/*"],
+      "@shared/*": ["./src/shared/*"],
+      "@test-support/*": ["./test/support/*"]
     },
     "sourceMap": true,
     "outDir": "./dist",
