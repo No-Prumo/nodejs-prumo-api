@@ -5,6 +5,7 @@ role: source-of-truth
 priority: high
 canonical: docs/ai/task-finalization-workflow.md
 related:
+  - sandicts/sandicts-docs:docs/ai/pull-request-standard.md
   - .codex/skills/jira-pr-commit-writer/SKILL.md
   - .github/pull_request_template.md
   - docs/ai/ci-cd/ci-governance.md
@@ -131,6 +132,8 @@ Jira key rule:
 
 ## Pull Request Title Standard
 
+Follow `sandicts/sandicts-docs:docs/ai/pull-request-standard.md`.
+
 Use the Jira key first:
 
 ```text
@@ -150,6 +153,15 @@ Examples:
 Rules:
 
 - Put the primary Jira key at the start of the title.
+- The primary Jira key must be the first characters in the title.
+- Never open or leave a Sandicts PR titled with `[codex]`, only a branch name,
+  or no Jira key.
+- If a publishing helper or GitHub UI proposes a different title, rewrite it to
+  the Sandicts format before creating the PR.
+- Do not rely on `gh pr create --fill` or optional connector fields to infer a
+  compliant PR title.
+- Use the same title format in the frontend, backend, and shared docs
+  repositories.
 - Use the same type vocabulary as commit messages.
 - Use a clear scope when it helps scanning.
 - Use lowercase summaries except for product names, acronyms, and proper nouns.
@@ -159,7 +171,8 @@ Rules:
 
 ## Pull Request Description Standard
 
-Always use `.github/pull_request_template.md`.
+Follow `sandicts/sandicts-docs:docs/ai/pull-request-standard.md` and always
+use `.github/pull_request_template.md`.
 
 Rules:
 
@@ -170,17 +183,31 @@ Rules:
 - Confirm GitHub is set to delete the source branch after the PR is merged.
 - Mention known gaps, skipped validations, or docs-only rationale explicitly.
 - Update the PR body if the scope changes after opening the PR.
+- Keep the same PR body section structure across Sandicts repositories.
+  Repository-specific differences belong in `Validation` and `Notes`.
+- Do not create or leave a PR with a blank body, omitted body, raw placeholders,
+  or a shortened alternative body.
 
 ## Validation Rule
 
 Validation should match risk:
 
-- Docs-only: run `git diff --check` and inspect rendered or structured docs when
-  relevant.
+- Backend docs-only: run `git diff --check` and inspect rendered or structured
+  docs when relevant.
 - Skills/docs affecting agent behavior: verify routing metadata and read paths.
-- CI changes: run a local logic check and watch the GitHub Actions result.
-- Backend behavior: run lint, typecheck, tests, and build when relevant.
-- Security/dependency changes: run dependency audit.
+- Backend API, application, auth, persistence, or config behavior: run
+  `npm run typecheck`, `npm run test:ci`, `npm run lint:ci`, and
+  `npm run build`.
+- Swagger/OpenAPI or startup-sensitive changes: add a smoke check when
+  practical.
+- Security/dependency changes: run the repository dependency audit command or
+  document why it was not applicable.
+- Frontend repository changes: follow
+  `sandicts/reactjs-sandicts-web:docs/ai/task-finalization-workflow.md`.
+- Shared docs repository changes: run `git diff --check` and inspect changed
+  docs or skill metadata; do not mark lint, typecheck, tests, build, or
+  dependency audit complete unless that repository has those commands configured
+  and they actually ran.
 
 Do not mark a validation as complete in the PR unless it actually ran.
 

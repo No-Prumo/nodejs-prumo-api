@@ -11,7 +11,9 @@ Generate consistent Jira task drafts, pull request descriptions, and commit mess
 
 Use repository evidence first: the user request, changed files, `git diff`, `git status`, `docs/ai/index.md`, and any relevant source-of-truth document in either backend `docs/ai/` or shared `sandicts/sandicts-docs`.
 
-When finishing a task, preparing commits, opening a PR, updating a PR title, or producing a delivery summary, read `docs/ai/task-finalization-workflow.md` first.
+When finishing a task, preparing commits, opening a PR, updating a PR title, or
+producing a delivery summary, read `docs/ai/task-finalization-workflow.md` and
+`sandicts/sandicts-docs:docs/ai/pull-request-standard.md` first.
 
 For Jira roadmap, backlog, Epic, Story, Task, Subtask, Bug, or issue-planning requests, read `sandicts/sandicts-docs:docs/product/sandicts-jira-planning-workflow.md` first. When frontend or fullstack Jira work is involved, read the canonical frontend planning docs from the sibling `sandicts/reactjs-sandicts-web` repository, especially `sandicts/reactjs-sandicts-web:docs/frontend/sandicts-frontend-planning.md`; read `sandicts/reactjs-sandicts-web:docs/frontend/sandicts-page-functional-spec.md` only when the issue depends on page, route, permission, or user-flow details. When the user asks for backlog planning instead of a single delivery artifact, follow that workflow and do not force PR description or commit message sections unless the user asks for them.
 
@@ -27,7 +29,9 @@ Default language:
 
 - Use English for all generated Jira titles, Jira descriptions, PR titles, PR descriptions, commit messages, release notes, and delivery summaries, even when the conversation is in another language.
 - Only use another language when the user explicitly requests that language in the same message.
-- Follow the repository PR template exactly for PR descriptions.
+- Follow the repository PR template and
+  `sandicts/sandicts-docs:docs/ai/pull-request-standard.md` exactly for PR
+  descriptions.
 - Follow the Jira task template in this skill exactly for Jira descriptions.
 
 Copy/paste formatting:
@@ -94,10 +98,6 @@ Rules:
 - Include links or paths to relevant docs when they materially affect the task.
 - Do not include secrets, tokens, credentials, local machine paths, or private details.
 
-## PR Description
-
-Always inspect and follow `.github/pull_request_template.md` before writing the PR description. Preserve the section names and order from the template exactly.
-
 ## PR Title
 
 Use this format:
@@ -109,60 +109,39 @@ Use this format:
 Rules:
 
 - Put the primary Jira key first.
+- The primary Jira key must be the first characters in the PR title.
+- Never use `[codex]`, a branch name, or a title without a Jira key.
+- If a generic publishing tool suggests another title, override it with this
+  Sandicts format before opening or updating the PR.
+- Do not rely on `gh pr create --fill` or optional connector fields to infer a
+  compliant PR title.
+- Follow the same PR title format in every Sandicts repository.
 - Use the same type vocabulary as commit messages.
 - Use a scope when it improves scanning.
 - If multiple Jira tasks are included, put the primary key in the title and list related keys in the PR body.
 - Example: `[KAN-108] docs(process): define task finalization workflow`.
 
-Current default project template:
+## PR Description
 
-```md
-## Summary
+Always inspect `.github/pull_request_template.md` and preserve the template
+headings and order exactly.
 
-<describe the PR change>
+Use the same PR body structure across Sandicts repositories. Repository-specific
+differences belong in the `Validation` and `Notes` sections, not in a different
+template shape.
 
-## Problem
+Never create or leave a PR with a blank body, omitted body, raw template
+placeholders, or a shortened alternative body.
 
-<explain the bug, incorrect behavior, missing organization, or delivery problem>
+Backend validation defaults:
 
-## Root cause
-
-<explain the cause identified in code, flow, docs, skills, or configuration>
-
-## Changes
-
-- <item 1>
-- <item 2>
-- <item 3>
-
-## Files added or updated
-
-- `path/to/file`
-- `path/to/file`
-
-## Impact
-
-### Fixed
-
-- <item>
-
-### Not changed
-
-- <item>
-
-## Validation
-
-- [ ] lint
-- [ ] typecheck
-- [ ] tests
-- [ ] build
-- [ ] dependency audit (CI: Dependency audit)
-- [ ] manual validation completed
-
-## Notes
-
-- <relevant note>
-```
+- docs-only: `git diff --check`
+- backend app/API: `npm run typecheck`, `npm run test:ci`,
+  `npm run lint:ci`, `npm run build`
+- dependency/security: run the repository dependency audit command or document
+  why it was not applicable
+- smoke validation: run when the task changes public API contracts,
+  Swagger/OpenAPI, auth/session behavior, or startup-sensitive configuration
 
 Rules:
 
