@@ -58,6 +58,12 @@ class InMemoryAuthSessionsRepository implements AuthSessionsRepository {
     );
   }
 
+  findById(sessionId: string): Promise<AuthSessionRecord | null> {
+    return Promise.resolve(
+      this.authSessions.find((session) => session.id === sessionId) ?? null,
+    );
+  }
+
   revokeActiveSessionsByAccountId(
     accountId: string,
     revokedAt: Date,

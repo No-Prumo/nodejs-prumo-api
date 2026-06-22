@@ -19,6 +19,7 @@ import {
   authRateLimitWindowMilliseconds,
   googleSignInRateLimit,
 } from '../shared/auth-http-rate-limit.constants';
+import { ApiAuthErrorResponses } from '../shared/api-auth-error-responses.decorator';
 import { buildRefreshTokenCookieOptions } from '../shared/auth-cookie.helper';
 import {
   GoogleSignInBodyDto,
@@ -46,6 +47,13 @@ class GoogleSignInController {
     summary: 'Sign in with Google',
     description:
       'Validates a Google Sign-In or One Tap ID token and creates an auth session.',
+  })
+  @ApiAuthErrorResponses({
+    unauthorized: ['invalid_google_credential'],
+    forbidden: ['account_auth_forbidden'],
+    conflict: ['external_identity_conflict'],
+    includeValidation: true,
+    includeRateLimit: true,
   })
   @ZodResponse({
     status: HttpStatus.OK,

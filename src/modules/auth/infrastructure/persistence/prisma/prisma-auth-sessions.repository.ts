@@ -60,6 +60,14 @@ class PrismaAuthSessionsRepository implements AuthSessionsRepository {
     return token ? this.mapRefreshToken(token) : null;
   }
 
+  async findById(sessionId: string): Promise<AuthSessionRecord | null> {
+    const session = await this.prisma.authSession.findUnique({
+      where: { id: sessionId },
+    });
+
+    return session ? this.mapSession(session) : null;
+  }
+
   async revokeActiveSessionsByAccountId(
     accountId: string,
     revokedAt: Date,

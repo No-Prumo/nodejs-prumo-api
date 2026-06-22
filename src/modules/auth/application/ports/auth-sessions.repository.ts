@@ -60,6 +60,7 @@ type RotateRefreshTokenData = {
 
 type AuthSessionsRepository = {
   create(data: CreateAuthSessionData): Promise<AuthSessionRecord>;
+  findById(sessionId: string): Promise<AuthSessionRecord | null>;
   findRefreshTokenByHash(
     refreshTokenHash: string,
   ): Promise<AuthRefreshTokenRecord | null>;

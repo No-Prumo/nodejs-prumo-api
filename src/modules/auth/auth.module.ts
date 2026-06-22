@@ -10,6 +10,7 @@ import { RefreshTokenHasher } from './application/services/tokens/refresh-token-
 import { TokenService } from './application/services/tokens/token.service';
 import { ConsumeMagicLinkUseCase } from './application/use-cases/consume-magic-link/consume-magic-link.use-case';
 import { CreateAuthSessionUseCase } from './application/use-cases/create-auth-session/create-auth-session.use-case';
+import { GetCurrentAuthSessionUseCase } from './application/use-cases/get-current-auth-session/get-current-auth-session.use-case';
 import { GoogleSignInUseCase } from './application/use-cases/google-sign-in/google-sign-in.use-case';
 import { RefreshAuthSessionUseCase } from './application/use-cases/refresh-auth-session/refresh-auth-session.use-case';
 import { RequestMagicLinkUseCase } from './application/use-cases/request-magic-link/request-magic-link.use-case';
@@ -22,6 +23,7 @@ import { PrismaAuthSessionsRepository } from './infrastructure/persistence/prism
 import { PrismaExternalIdentitiesRepository } from './infrastructure/persistence/prisma/prisma-external-identities.repository';
 import { PrismaMagicLinkChallengesRepository } from './infrastructure/persistence/prisma/prisma-magic-link-challenges.repository';
 import { ConsumeMagicLinkController } from './presentation/http/consume-magic-link/consume-magic-link.controller';
+import { GetCurrentAuthSessionController } from './presentation/http/get-current-auth-session/get-current-auth-session.controller';
 import { GoogleSignInController } from './presentation/http/google-sign-in/google-sign-in.controller';
 import { RefreshAuthSessionController } from './presentation/http/refresh-auth-session/refresh-auth-session.controller';
 import { RequestMagicLinkController } from './presentation/http/request-magic-link/request-magic-link.controller';
@@ -36,10 +38,12 @@ import { SignOutController } from './presentation/http/sign-out/sign-out.control
     RefreshAuthSessionController,
     SignOutController,
     SignOutAllController,
+    GetCurrentAuthSessionController,
   ],
   providers: [
     ConsumeMagicLinkUseCase,
     CreateAuthSessionUseCase,
+    GetCurrentAuthSessionUseCase,
     GoogleSignInUseCase,
     MagicLinkTokenService,
     RefreshAuthSessionUseCase,
