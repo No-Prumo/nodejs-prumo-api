@@ -18,6 +18,7 @@ import {
   authRateLimitWindowMilliseconds,
   refreshAuthSessionRateLimit,
 } from '../shared/auth-http-rate-limit.constants';
+import { ApiAuthErrorResponses } from '../shared/api-auth-error-responses.decorator';
 import {
   buildRefreshTokenCookieOptions,
   readCookieValue,
@@ -45,6 +46,17 @@ class RefreshAuthSessionController {
     summary: 'Refresh auth session',
     description:
       'Rotates the refresh token cookie and returns a new access token.',
+  })
+  @ApiAuthErrorResponses({
+    unauthorized: [
+      'invalid_refresh_token',
+      'refresh_token_expired',
+      'refresh_token_reused',
+      'refresh_token_revoked',
+      'auth_session_inactive',
+    ],
+    forbidden: ['account_auth_forbidden'],
+    includeRateLimit: true,
   })
   @ZodResponse({
     status: HttpStatus.OK,

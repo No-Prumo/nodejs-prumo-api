@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, Optional } from '@nestjs/common';
 import { OAuth2Client } from 'google-auth-library';
 import { authErrorReasons } from '@auth/application/errors/auth-error-reasons';
 import { invalidGoogleCredential } from '@auth/application/errors/auth-errors';
@@ -21,6 +21,7 @@ class GoogleIdTokenVerifierGateway implements GoogleIdTokenVerifier {
   constructor(
     @Inject(authConfig.KEY)
     private readonly authSettings: AuthConfig,
+    @Optional()
     private readonly oauthClient: GoogleOAuthClient = new OAuth2Client(),
   ) {}
 

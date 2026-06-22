@@ -81,6 +81,9 @@ Implemented:
 - authentication/session domain foundation
 - public email magic link request and consume controllers
 - Google Sign-In and Google One Tap backend authentication endpoint
+- refresh token rotation endpoint
+- sign-out and sign-out-all endpoints
+- current auth session inspection endpoint
 - unit and integration coverage for configuration, logging, error handling,
   refresh token hashing, access token issuing, session creation, and Google
   authentication
@@ -89,12 +92,11 @@ Implemented:
 Not implemented yet:
 
 - reservation, organization, court, match, tournament, payment, and finance modules
-- refresh, sign-out, sign-out-all, and auth/me endpoints
 - complete product API surface
 - E2E test suite
 
-Current public routes are the initial email magic link and Google
-authentication endpoints.
+Current public auth routes include magic link, Google authentication, refresh,
+sign-out, sign-out-all, and current-session inspection.
 
 ## Tech Stack
 
@@ -635,10 +637,143 @@ Response contract:
 Security behavior:
 
 - The backend validates the Google token server-side with `AUTH_GOOGLE_CLIENT_ID`.
-- Invalid tokens and unverified Google emails return `401 unauthorized`.
+- Invalid tokens and unverified Google emails return `401 invalid_google_credential`.
+- Blocked or disabled accounts return `403 account_auth_forbidden`.
 - Google `sub` is the provider identity key; Google email is never used as the
   provider identity key.
 - Google Calendar scopes are not part of sign-in.
+
+### `POST /auth/refresh`
+
+Rotates the backend-owned refresh token cookie and returns a new access token
+with the same public account/session shape used by Google sign-in and magic link
+consume.
+
+```bash
+curl -X POST "http://localhost:3000/auth/refresh" \
+  -H "Cookie: sandicts_refresh_token=opaque-refresh-token"
+```
+
+Request contract:
+
+| Source | Field | Rules |
+| --- | --- | --- |
+| cookie | `sandicts_refresh_token` | opaque refresh token set by the backend |
+
+Response contract:
+
+```json
+{
+  "account": {
+    "id": "account-id",
+    "email": "player@example.com",
+    "displayName": "Player Name"
+  },
+  "session": {
+    "id": "session-id"
+  },
+  "accessToken": "new.access.token",
+  "accessTokenExpiresAt": "2026-01-01T00:15:00.000Z"
+}
+```
+
+Security behavior:
+
+- The raw refresh token is never returned in the response body.
+- The previous refresh token is marked rotated and replaced on every successful
+  refresh.
+- Reusing a rotated token revokes the token family and returns
+  `401 refresh_token_reused`.
+- Invalid, expired, revoked, or inactive refresh state returns a specific safe
+  `401` auth code such as `invalid_refresh_token`,
+  `refresh_token_expired`, `refresh_token_revoked`, or
+  `auth_session_inactive`.
+
+### `POST /auth/sign-out`
+
+Revokes the current auth session identified by the Bearer access token and
+clears the refresh token cookie for the current browser.
+
+```bash
+curl -X POST "http://localhost:3000/auth/sign-out" \
+  -H "Authorization: Bearer access.token.signature"
+```
+
+Request contract:
+
+| Source | Field | Rules |
+| --- | --- | --- |
+| header | `Authorization` | `Bearer <accessToken>` |
+
+Response contract:
+
+```txt
+204 No Content
+```
+
+Invalid or missing Bearer access tokens return `401 invalid_access_token`.
+
+### `POST /auth/sign-out-all`
+
+Revokes all active auth sessions for the authenticated account and clears the
+refresh token cookie for the current browser.
+
+```bash
+curl -X POST "http://localhost:3000/auth/sign-out-all" \
+  -H "Authorization: Bearer access.token.signature"
+```
+
+Request contract:
+
+| Source | Field | Rules |
+| --- | --- | --- |
+| header | `Authorization` | `Bearer <accessToken>` |
+
+Response contract:
+
+```txt
+204 No Content
+```
+
+Invalid or missing Bearer access tokens return `401 invalid_access_token`.
+
+### `GET /auth/me`
+
+Returns the current authenticated account and active auth session for frontend
+session hydration. This endpoint does not issue or rotate tokens.
+
+```bash
+curl "http://localhost:3000/auth/me" \
+  -H "Authorization: Bearer access.token.signature"
+```
+
+Request contract:
+
+| Source | Field | Rules |
+| --- | --- | --- |
+| header | `Authorization` | `Bearer <accessToken>` |
+
+Response contract:
+
+```json
+{
+  "account": {
+    "id": "account-id",
+    "email": "player@example.com",
+    "displayName": "Player Name"
+  },
+  "session": {
+    "id": "session-id"
+  }
+}
+```
+
+Security behavior:
+
+- The response never includes a refresh token or a new access token.
+- Invalid or expired access tokens return `401 invalid_access_token`.
+- Valid access tokens for inactive sessions return `401 auth_session_inactive`.
+- Blocked or disabled accounts return `403 account_auth_forbidden`.
 
 ## Database And Prisma
 
@@ -672,6 +807,7 @@ Current models:
 - `Account`
 - `ExternalIdentity`
 - `AuthSession`
+- `AuthRefreshToken`
 - `MagicLinkChallenge`
 
 Current enums:
@@ -729,6 +865,9 @@ Current capabilities:
 - refresh token hashing
 - access token issuing
 - public magic link request and consume endpoints
+- Google sign-in endpoint
+- refresh token rotation endpoint
+- current-session and sign-out endpoints
 - refresh token cookie option helpers
 - IP-based HTTP rate limiting through `@nestjs/throttler`
 
@@ -749,11 +888,6 @@ Current HTTP endpoints:
 POST /auth/magic-link/request
 POST /auth/magic-link/consume
 POST /auth/google/sign-in
-```
-
-Planned next HTTP endpoints:
-
-```txt
 POST /auth/refresh
 POST /auth/sign-out
 POST /auth/sign-out-all
@@ -772,6 +906,9 @@ Security rules:
   login for the passwordless web MVP unless product direction changes.
 - If cookies become cross-site with `SameSite=None`, revisit CSRF protection
   before public launch.
+- Frontend integration still needs an explicit CORS/credentials follow-up so
+  the browser can send backend-owned refresh cookies safely between the local
+  web app and API origins.
 - Move rate-limit storage to a distributed backend and add normalized-email
   tracking before running multiple API instances in production.
 
@@ -854,7 +991,17 @@ Normalized error codes:
 - `validation_error`
 - `rate_limited`
 - `unauthorized`
+- `invalid_google_credential`
+- `invalid_magic_link_token`
+- `invalid_access_token`
+- `invalid_refresh_token`
+- `refresh_token_expired`
+- `refresh_token_reused`
+- `refresh_token_revoked`
+- `auth_session_inactive`
 - `forbidden`
+- `account_auth_forbidden`
+- `external_identity_conflict`
 - `resource_not_found`
 - `conflict`
 - `business_rule_violation`
@@ -867,9 +1014,19 @@ Mapping highlights:
 - `ZodSchemaDeclarationException` -> `500 internal_error`
 - throttled HTTP requests -> `429 rate_limited`
 - `AppError('unauthorized')` -> `401`
+- `AppError('invalid_google_credential')` -> `401`
+- `AppError('invalid_magic_link_token')` -> `401`
+- `AppError('invalid_access_token')` -> `401`
+- `AppError('invalid_refresh_token')` -> `401`
+- `AppError('refresh_token_expired')` -> `401`
+- `AppError('refresh_token_reused')` -> `401`
+- `AppError('refresh_token_revoked')` -> `401`
+- `AppError('auth_session_inactive')` -> `401`
 - `AppError('forbidden')` -> `403`
+- `AppError('account_auth_forbidden')` -> `403`
 - `AppError('resource_not_found')` -> `404`
 - `AppError('conflict')` -> `409`
+- `AppError('external_identity_conflict')` -> `409`
 - `AppError('business_rule_violation')` -> `422`
 
 Rules:
