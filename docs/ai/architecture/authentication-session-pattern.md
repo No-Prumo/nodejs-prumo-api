@@ -9,6 +9,7 @@ related:
   - docs/ai/architecture/module-pattern.md
   - docs/ai/architecture/controller-pattern.md
   - docs/ai/architecture/use-case-pattern.md
+  - docs/ai/architecture/transactional-email-provider-decision.md
   - docs/ai/api/error-handling-foundation.md
   - docs/ai/api/zod-swagger-foundation.md
   - docs/ai/logging/logging-foundation.md
@@ -20,6 +21,7 @@ read-when:
   - adding a new authentication method
   - changing session lifetime, cookies, or token storage
   - integrating Google sign-in
+  - changing magic link email delivery
 do-not-read-when:
   - changing only non-authenticated public endpoints
   - changing only reservation, payment, tournament, or finance rules with no auth behavior change
@@ -288,6 +290,18 @@ Reason for `POST` consumption:
 
 - email scanners and link preview tools may open links automatically
 - a frontend landing page can receive the token and then intentionally submit it
+
+Email delivery decision:
+
+- Resend is the MVP production/staging provider for magic link delivery
+- local development and E2E should use Mailpit SMTP capture instead of sending
+  real email
+- provider-specific code must stay behind the `EMAIL_GATEWAY` application port
+- provider details, API keys, raw provider errors, and raw magic link tokens must
+  not leak into public responses or logs
+
+The source-of-truth provider decision is
+`docs/ai/architecture/transactional-email-provider-decision.md`.
 
 ## Google Sign-In And One Tap
 
