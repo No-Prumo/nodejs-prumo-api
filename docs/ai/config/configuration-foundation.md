@@ -6,10 +6,12 @@ priority: high
 canonical: docs/ai/config/configuration-foundation.md
 related:
   - docs/ai/index.md
+  - docs/ai/architecture/transactional-email-provider-decision.md
 scope: nestjs-config, env-validation, zod, bootstrap, typed-config
 read-when:
   - adding new environment variables
   - changing application bootstrap
+  - adding transactional email provider config
   - integrating database, logger, docs, or observability settings
   - removing direct process.env access
   - implementing new infrastructure modules
@@ -137,6 +139,15 @@ Current domain folders:
 - `docs`: OpenAPI/docs toggles and pathing
 - `logger`: neutral logging settings and level normalization
 - `observability`: neutral observability toggles and service identity
+
+Planned domain from KAN-102:
+
+- `email`: transactional email provider selection, sender identity, frontend
+  magic link base URL, Resend API credentials, and SMTP capture settings for
+  local/E2E
+
+Do not add Resend-specific settings to the `auth` config domain. Auth owns magic
+link lifetime and session behavior; email owns delivery.
 
 ### `src/config/configuration.module.ts`
 
@@ -364,6 +375,34 @@ Notes:
 - auth lifetimes are positive integer seconds
 - `AUTH_COOKIE_SECURE` defaults to `true` in production and otherwise follows
   the explicit env value or local default
+
+Planned transactional email contract from KAN-102:
+
+```env
+EMAIL_DELIVERY_PROVIDER=smtp
+EMAIL_FROM_ADDRESS=auth@sandicts.test
+EMAIL_FROM_NAME=Sandicts
+EMAIL_REPLY_TO_ADDRESS=
+WEB_APP_BASE_URL=http://localhost:3001
+
+RESEND_API_KEY=
+
+SMTP_HOST=localhost
+SMTP_PORT=1025
+SMTP_SECURE=false
+SMTP_USER=
+SMTP_PASSWORD=
+```
+
+Notes:
+
+- these variables should be added when KAN-103 implements provider selection
+- `EMAIL_DELIVERY_PROVIDER=resend` is required for staging/production Resend
+  delivery
+- `EMAIL_DELIVERY_PROVIDER=smtp` should be used for Mailpit local/E2E capture
+- `RESEND_API_KEY` is required only when the selected provider is Resend
+- SMTP auth variables are required only when the selected SMTP server needs them
+- `WEB_APP_BASE_URL` is required for magic link URL construction
 
 ## Consumption pattern
 

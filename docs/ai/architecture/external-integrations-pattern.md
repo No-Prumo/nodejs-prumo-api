@@ -8,12 +8,14 @@ related:
   - docs/ai/architecture/backend-architecture-overview.md
   - docs/ai/architecture/use-case-pattern.md
   - docs/ai/architecture/repository-pattern.md
+  - docs/ai/architecture/transactional-email-provider-decision.md
   - docs/ai/logging/logging-foundation.md
   - docs/ai/api/error-handling-foundation.md
 scope: payments, google-calendar, webhooks, gateways, external-providers
 read-when:
   - integrating payment providers
   - integrating Google Calendar
+  - integrating email providers
   - adding webhooks
   - adding external API clients
   - deciding idempotency or retry behavior
@@ -61,6 +63,23 @@ Rules:
 - modules wire the concrete adapter
 - provider responses are mapped into application-level results
 - raw provider payloads do not leak into controllers by default
+
+## Email Provider Rules
+
+Transactional email follows the same port and adapter boundary.
+
+For magic link auth:
+
+- the application port is `EMAIL_GATEWAY`
+- the MVP production provider is Resend
+- local development and E2E should use Mailpit SMTP capture
+- use cases should pass application-level email data, not provider payloads
+- provider message ids may be logged only as safe internal metadata
+- raw magic link tokens, API keys, provider payloads, and provider internals must
+  not be exposed in public responses
+
+The detailed provider decision lives in
+`docs/ai/architecture/transactional-email-provider-decision.md`.
 
 ## Payment Provider Rules
 

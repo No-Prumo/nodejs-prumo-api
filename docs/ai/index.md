@@ -36,6 +36,7 @@ Short catalog. Routing hints (`read-when`, `do-not-read-when`, `related`, `canon
 | [`docs/ai/architecture/external-integrations-pattern.md`](architecture/external-integrations-pattern.md)   | External gateway and webhook pattern                        |
 | [`docs/ai/architecture/module-pattern.md`](architecture/module-pattern.md)                                 | Nest feature module pattern                                 |
 | [`docs/ai/architecture/repository-pattern.md`](architecture/repository-pattern.md)                         | Repository port and Prisma adapter pattern                  |
+| [`docs/ai/architecture/transactional-email-provider-decision.md`](architecture/transactional-email-provider-decision.md) | Resend/Mailpit decision for magic link email delivery       |
 | [`docs/ai/architecture/use-case-pattern.md`](architecture/use-case-pattern.md)                             | Application use case pattern                                |
 | [`docs/ai/business/README.md`](business/README.md)                                               | Pointer to shared Sandicts business rules                   |
 | [`docs/ai/config/configuration-foundation.md`](config/configuration-foundation.md)                         | Backend config baseline, source of truth                    |
@@ -109,10 +110,11 @@ For a new endpoint, read:
 For authentication work, read:
 
 1. `docs/ai/architecture/authentication-session-pattern.md`
-2. `docs/ai/architecture/controller-pattern.md`
-3. `docs/ai/architecture/use-case-pattern.md`
-4. `docs/ai/api/error-handling-foundation.md`
-5. `docs/ai/testing/test-organization.md` when adding or changing auth tests
+2. `docs/ai/architecture/transactional-email-provider-decision.md` when changing magic link email delivery
+3. `docs/ai/architecture/controller-pattern.md`
+4. `docs/ai/architecture/use-case-pattern.md`
+5. `docs/ai/api/error-handling-foundation.md`
+6. `docs/ai/testing/test-organization.md` when adding or changing auth tests
 
 For persistence or providers, read:
 

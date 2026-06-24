@@ -354,6 +354,34 @@ Default log levels:
 | `AUTH_COOKIE_SAME_SITE` | No | `lax` | Cookie SameSite policy: `lax`, `strict`, or `none`. |
 | `AUTH_COOKIE_SECURE` | No | `true` when `NODE_ENV=production` | Cookie `Secure` attribute. |
 
+### Planned Transactional Email
+
+KAN-102 selects Resend as the MVP transactional email provider for magic links.
+The implementation should keep Resend behind the existing `EMAIL_GATEWAY`
+application port so the provider can be changed later without changing auth use
+cases or controllers.
+
+These variables are planned for the provider implementation and are not yet
+validated by the current env schema:
+
+| Variable | Required | Description |
+| --- | --- | --- |
+| `EMAIL_DELIVERY_PROVIDER` | Yes | Selects Resend for staging/production or SMTP for local/E2E capture. |
+| `EMAIL_FROM_ADDRESS` | Yes outside unit tests | Sender address used for auth emails. |
+| `EMAIL_FROM_NAME` | No | Human-readable sender name, defaulting to `Sandicts`. |
+| `EMAIL_REPLY_TO_ADDRESS` | No | Optional reply-to address. |
+| `WEB_APP_BASE_URL` | Yes for magic links | Frontend origin used to build magic link URLs. |
+| `RESEND_API_KEY` | Required for Resend | Resend API credential. |
+| `SMTP_HOST` | Required for SMTP capture | SMTP host, usually Mailpit locally. |
+| `SMTP_PORT` | Required for SMTP capture | SMTP port, usually `1025` for Mailpit. |
+| `SMTP_SECURE` | No | Whether SMTP uses TLS. |
+| `SMTP_USER` | Optional | SMTP username when required. |
+| `SMTP_PASSWORD` | Optional | SMTP password when required. |
+
+Local development and E2E should use Mailpit SMTP capture rather than sending
+real emails. Unit tests should keep using fakes or in-memory email gateways.
+Do not log raw magic link tokens.
+
 ## Scripts
 
 | Script | Description |
@@ -882,6 +910,16 @@ MVP authentication direction:
 - refresh token rotation on every refresh
 - revocation by session, account, and token family
 
+Magic link delivery direction:
+
+- Resend is the chosen MVP provider for staging/production transactional auth
+  email
+- Mailpit SMTP capture is the planned local/E2E delivery path
+- `EMAIL_GATEWAY` remains the application boundary so Resend can be replaced in
+  a future migration
+- provider payloads, API keys, internal errors, and raw magic link tokens must
+  not leak through controllers, public responses, or logs
+
 Current HTTP endpoints:
 
 ```txt
@@ -896,6 +934,8 @@ GET  /auth/me
 
 The source-of-truth design is
 `docs/ai/architecture/authentication-session-pattern.md`.
+The source-of-truth provider decision is
+`docs/ai/architecture/transactional-email-provider-decision.md`.
 
 Security rules:
 
@@ -1201,7 +1241,7 @@ Common reading paths:
 | --- | --- |
 | New feature module | `product/sandicts-product-context.md`, `business/sandicts-business-rules.md`, `architecture/backend-architecture-overview.md`, `architecture/module-pattern.md` |
 | New endpoint | `architecture/controller-pattern.md`, `api/zod-swagger-foundation.md`, `architecture/use-case-pattern.md`, `api/error-handling-foundation.md` |
-| Authentication work | `architecture/authentication-session-pattern.md`, `architecture/controller-pattern.md`, `architecture/use-case-pattern.md`, `api/error-handling-foundation.md` |
+| Authentication work | `architecture/authentication-session-pattern.md`, `architecture/transactional-email-provider-decision.md` for magic link email delivery, `architecture/controller-pattern.md`, `architecture/use-case-pattern.md`, `api/error-handling-foundation.md` |
 | Persistence/provider work | `architecture/repository-pattern.md`, `architecture/external-integrations-pattern.md`, `logging/logging-foundation.md` |
 | Config changes | `config/configuration-foundation.md`, `config/typescript-module-resolution.md` |
 | Logging changes | `logging/logging-foundation.md` |
@@ -1218,6 +1258,7 @@ Current source-of-truth docs:
 - `docs/ai/architecture/external-integrations-pattern.md`
 - `docs/ai/architecture/module-pattern.md`
 - `docs/ai/architecture/repository-pattern.md`
+- `docs/ai/architecture/transactional-email-provider-decision.md`
 - `docs/ai/architecture/use-case-pattern.md`
 - `sandicts/sandicts-docs:docs/business-rules/sandicts-business-rules.md`
 - `docs/ai/config/configuration-foundation.md`
