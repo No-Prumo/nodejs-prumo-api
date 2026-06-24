@@ -128,8 +128,9 @@ For Codex skills or AI operating instructions, read:
 For finishing a Jira task, committing, or opening a PR, read:
 
 1. `docs/ai/task-finalization-workflow.md`
-2. `.codex/skills/jira-pr-commit-writer/SKILL.md`
-3. `.github/pull_request_template.md`
+2. `sandicts/sandicts-docs:docs/ai/pull-request-standard.md`
+3. `.codex/skills/jira-pr-commit-writer/SKILL.md`
+4. `.github/pull_request_template.md`
 
 For dependency audit failures or vulnerability remediation, read:
 
