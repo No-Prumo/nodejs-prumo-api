@@ -42,7 +42,6 @@ For docs-only or setup work, describe why the repository needed this change.
 - [ ] tests (CI: Test)
 - [ ] build (CI: Build)
 - [ ] dependency audit (CI: Dependency audit)
-- [ ] docs-only validation (`git diff --check`)
 - [ ] manual validation completed
 
 ## Notes
