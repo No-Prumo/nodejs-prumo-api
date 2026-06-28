@@ -10,8 +10,8 @@ import {
 import { ApiNoContentResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import type { Response } from 'express';
 import { authConfig, type AuthConfig } from '@config';
+import { ApiErrorResponses } from '@infra/http/openapi/api-error-responses.decorator';
 import { SignOutAllUseCase } from '../../../application/use-cases/sign-out-all/sign-out-all.use-case';
-import { ApiAuthErrorResponses } from '../shared/api-auth-error-responses.decorator';
 import { ApiBearerAccessTokenHeader } from '../shared/api-bearer-access-token-header.decorator';
 import { buildClearRefreshTokenCookieOptions } from '../shared/auth-cookie.helper';
 import { readBearerToken } from '../shared/bearer-token.helper';
@@ -33,9 +33,10 @@ class SignOutAllController {
       'Revokes all active auth sessions for the authenticated account and clears the refresh cookie for the current browser.',
   })
   @ApiBearerAccessTokenHeader('Bearer access token for the current account.')
-  @ApiAuthErrorResponses({
+  @ApiErrorResponses({
     unauthorized: ['invalid_access_token'],
-    includeRateLimit: true,
+    tooManyRequests: ['rate_limited'],
+    internalServerError: ['internal_error'],
   })
   @ApiNoContentResponse({ description: 'All account sessions signed out' })
   async signOutAllSessions(

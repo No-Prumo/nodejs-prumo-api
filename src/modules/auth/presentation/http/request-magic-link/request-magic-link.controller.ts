@@ -2,12 +2,12 @@ import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
 import { ZodResponse } from 'nestjs-zod';
+import { ApiErrorResponses } from '@infra/http/openapi/api-error-responses.decorator';
 import { RequestMagicLinkUseCase } from '../../../application/use-cases/request-magic-link/request-magic-link.use-case';
 import {
   authRateLimitWindowMilliseconds,
   requestMagicLinkRateLimit,
 } from '../shared/auth-http-rate-limit.constants';
-import { ApiAuthErrorResponses } from '../shared/api-auth-error-responses.decorator';
 import {
   RequestMagicLinkBodyDto,
   RequestMagicLinkResponseDto,
@@ -31,11 +31,11 @@ class RequestMagicLinkController {
     description:
       'Accepts a magic link request without revealing account existence.',
   })
-  @ApiAuthErrorResponses({
-    includeValidation: true,
-    includeRateLimit: true,
+  @ApiErrorResponses({
+    badRequest: ['validation_error'],
+    tooManyRequests: ['rate_limited'],
     serviceUnavailable: ['email_delivery_unavailable'],
-    includeInternalError: true,
+    internalServerError: ['internal_error'],
   })
   @ZodResponse({
     status: HttpStatus.ACCEPTED,

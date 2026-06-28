@@ -14,22 +14,17 @@ import {
 } from 'nestjs-zod';
 import { AppError } from '@shared/errors/app-error';
 import { type ErrorCode, isErrorCode } from '@shared/errors/error-codes';
+import {
+  getDefaultErrorCodeForStatus,
+  getPublicErrorStatus,
+} from '../errors/http-error-contract';
 import type {
   HttpExceptionResponseBody,
   NormalizedException,
 } from './global-exception.filter.types';
 
 const REQUEST_ID_HEADERS = ['X-Request-Id', 'X-Correlation-Id'] as const;
-const badRequestStatusCode: number = HttpStatus.BAD_REQUEST;
-const unauthorizedStatusCode: number = HttpStatus.UNAUTHORIZED;
-const forbiddenStatusCode: number = HttpStatus.FORBIDDEN;
-const notFoundStatusCode: number = HttpStatus.NOT_FOUND;
-const conflictStatusCode: number = HttpStatus.CONFLICT;
-const goneStatusCode: number = HttpStatus.GONE;
-const tooManyRequestsStatusCode: number = HttpStatus.TOO_MANY_REQUESTS;
-const unprocessableEntityStatusCode: number = HttpStatus.UNPROCESSABLE_ENTITY;
 const internalServerErrorStatusCode: number = HttpStatus.INTERNAL_SERVER_ERROR;
-const serviceUnavailableStatusCode: number = HttpStatus.SERVICE_UNAVAILABLE;
 
 @Catch()
 class GlobalExceptionFilter implements ExceptionFilter {
@@ -106,7 +101,7 @@ class GlobalExceptionFilter implements ExceptionFilter {
           message: exception.message,
           path,
           requestId,
-          statusCode: mapAppErrorCodeToStatus(exception.code),
+          statusCode: getPublicErrorStatus(exception.code),
           timestamp,
         },
         shouldLog: exception.details !== undefined,
@@ -182,7 +177,7 @@ function getHttpExceptionCode(
     return exceptionResponse.code;
   }
 
-  return mapHttpStatusToErrorCode(statusCode);
+  return getDefaultErrorCodeForStatus(statusCode);
 }
 
 function getHttpExceptionMessage(
@@ -290,64 +285,6 @@ function isInternalHttpException(exception: HttpException) {
     exception instanceof ZodSchemaDeclarationException ||
     exception.getStatus() >= internalServerErrorStatusCode
   );
-}
-
-function mapAppErrorCodeToStatus(code: AppError['code']) {
-  switch (code) {
-    case 'unauthorized':
-    case 'invalid_google_credential':
-    case 'invalid_magic_link_token':
-    case 'invalid_access_token':
-    case 'invalid_refresh_token':
-    case 'refresh_token_expired':
-    case 'refresh_token_reused':
-    case 'refresh_token_revoked':
-    case 'auth_session_inactive':
-      return unauthorizedStatusCode;
-    case 'forbidden':
-    case 'account_auth_forbidden':
-      return forbiddenStatusCode;
-    case 'resource_not_found':
-      return notFoundStatusCode;
-    case 'conflict':
-    case 'external_identity_conflict':
-    case 'magic_link_already_used':
-    case 'magic_link_superseded':
-      return conflictStatusCode;
-    case 'magic_link_expired':
-      return goneStatusCode;
-    case 'email_delivery_unavailable':
-      return serviceUnavailableStatusCode;
-    case 'business_rule_violation':
-      return unprocessableEntityStatusCode;
-  }
-}
-
-function mapHttpStatusToErrorCode(statusCode: number): ErrorCode {
-  switch (statusCode) {
-    case badRequestStatusCode:
-      return 'bad_request';
-    case unauthorizedStatusCode:
-      return 'unauthorized';
-    case forbiddenStatusCode:
-      return 'forbidden';
-    case notFoundStatusCode:
-      return 'resource_not_found';
-    case conflictStatusCode:
-      return 'conflict';
-    case goneStatusCode:
-      return 'resource_not_found';
-    case tooManyRequestsStatusCode:
-      return 'rate_limited';
-    case unprocessableEntityStatusCode:
-      return 'business_rule_violation';
-    case serviceUnavailableStatusCode:
-      return 'internal_error';
-    default:
-      return statusCode >= internalServerErrorStatusCode
-        ? 'internal_error'
-        : 'bad_request';
-  }
 }
 
 export { GlobalExceptionFilter };

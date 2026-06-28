@@ -13,12 +13,12 @@ import { Throttle } from '@nestjs/throttler';
 import type { Response } from 'express';
 import { ZodResponse } from 'nestjs-zod';
 import { authConfig, type AuthConfig } from '@config';
+import { ApiErrorResponses } from '@infra/http/openapi/api-error-responses.decorator';
 import { RefreshAuthSessionUseCase } from '../../../application/use-cases/refresh-auth-session/refresh-auth-session.use-case';
 import {
   authRateLimitWindowMilliseconds,
   refreshAuthSessionRateLimit,
 } from '../shared/auth-http-rate-limit.constants';
-import { ApiAuthErrorResponses } from '../shared/api-auth-error-responses.decorator';
 import {
   buildRefreshTokenCookieOptions,
   readCookieValue,
@@ -47,7 +47,7 @@ class RefreshAuthSessionController {
     description:
       'Rotates the refresh token cookie and returns a new access token.',
   })
-  @ApiAuthErrorResponses({
+  @ApiErrorResponses({
     unauthorized: [
       'invalid_refresh_token',
       'refresh_token_expired',
@@ -56,7 +56,8 @@ class RefreshAuthSessionController {
       'auth_session_inactive',
     ],
     forbidden: ['account_auth_forbidden'],
-    includeRateLimit: true,
+    tooManyRequests: ['rate_limited'],
+    internalServerError: ['internal_error'],
   })
   @ZodResponse({
     status: HttpStatus.OK,

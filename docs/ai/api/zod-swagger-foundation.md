@@ -5,6 +5,7 @@ role: source-of-truth
 priority: high
 canonical: docs/ai/api/zod-swagger-foundation.md
 related:
+  - docs/ai/api/semantic-api-contracts.md
   - docs/ai/config/configuration-foundation.md
   - docs/ai/index.md
 scope: nestjs-zod, swagger, openapi, controller-validation, request-response-contracts
@@ -122,6 +123,7 @@ For every new endpoint with external input:
 3. use DTOs in `@Param()`, `@Query()`, and `@Body()`
 4. define a response schema and DTO
 5. annotate the route with `@ZodResponse(...)`
+6. declare exact predictable errors with `@ApiErrorResponses(...)`
 
 Do not:
 
@@ -139,7 +141,7 @@ Contracts:
 
 - body: `email`
 - `202` response: `{ status: "accepted" }`
-- expected error responses use the shared auth error decorators
+- expected errors use the shared `ApiErrorResponses` decorator
 
 ## Invariants
 

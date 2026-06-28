@@ -14,12 +14,12 @@ import { Throttle } from '@nestjs/throttler';
 import type { Response } from 'express';
 import { ZodResponse } from 'nestjs-zod';
 import { authConfig, type AuthConfig } from '@config';
+import { ApiErrorResponses } from '@infra/http/openapi/api-error-responses.decorator';
 import { GoogleSignInUseCase } from '../../../application/use-cases/google-sign-in/google-sign-in.use-case';
 import {
   authRateLimitWindowMilliseconds,
   googleSignInRateLimit,
 } from '../shared/auth-http-rate-limit.constants';
-import { ApiAuthErrorResponses } from '../shared/api-auth-error-responses.decorator';
 import { buildRefreshTokenCookieOptions } from '../shared/auth-cookie.helper';
 import {
   GoogleSignInBodyDto,
@@ -48,12 +48,13 @@ class GoogleSignInController {
     description:
       'Validates a Google Sign-In or One Tap ID token and creates an auth session.',
   })
-  @ApiAuthErrorResponses({
+  @ApiErrorResponses({
+    badRequest: ['validation_error'],
     unauthorized: ['invalid_google_credential'],
     forbidden: ['account_auth_forbidden'],
     conflict: ['external_identity_conflict'],
-    includeValidation: true,
-    includeRateLimit: true,
+    tooManyRequests: ['rate_limited'],
+    internalServerError: ['internal_error'],
   })
   @ZodResponse({
     status: HttpStatus.OK,

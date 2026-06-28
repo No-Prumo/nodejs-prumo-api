@@ -1,8 +1,8 @@
 import { Controller, Get, Headers, HttpStatus } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ZodResponse } from 'nestjs-zod';
+import { ApiErrorResponses } from '@infra/http/openapi/api-error-responses.decorator';
 import { GetCurrentAuthSessionUseCase } from '../../../application/use-cases/get-current-auth-session/get-current-auth-session.use-case';
-import { ApiAuthErrorResponses } from '../shared/api-auth-error-responses.decorator';
 import { ApiBearerAccessTokenHeader } from '../shared/api-bearer-access-token-header.decorator';
 import { readBearerToken } from '../shared/bearer-token.helper';
 import { GetCurrentAuthSessionResponseDto } from './get-current-auth-session.schemas';
@@ -21,10 +21,11 @@ class GetCurrentAuthSessionController {
       'Returns the authenticated account and active auth session for a Bearer access token.',
   })
   @ApiBearerAccessTokenHeader('Bearer access token for the current session.')
-  @ApiAuthErrorResponses({
+  @ApiErrorResponses({
     unauthorized: ['invalid_access_token', 'auth_session_inactive'],
     forbidden: ['account_auth_forbidden'],
-    includeRateLimit: true,
+    tooManyRequests: ['rate_limited'],
+    internalServerError: ['internal_error'],
   })
   @ZodResponse({
     status: HttpStatus.OK,
