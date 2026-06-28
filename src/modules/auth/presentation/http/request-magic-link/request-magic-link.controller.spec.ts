@@ -7,7 +7,7 @@ describe('RequestMagicLinkController', () => {
       execute: vi
         .fn<() => Promise<RequestMagicLinkUseCaseResponse>>()
         .mockResolvedValue({
-          message: 'If the email can sign in, a magic link will be sent.',
+          status: 'accepted',
         }),
     };
     const controller = new RequestMagicLinkController(
@@ -17,7 +17,7 @@ describe('RequestMagicLinkController', () => {
     await expect(
       controller.request({ email: 'user@example.com' }),
     ).resolves.toEqual({
-      message: 'If the email can sign in, a magic link will be sent.',
+      status: 'accepted',
     });
     expect(requestMagicLink.execute).toHaveBeenCalledWith({
       email: 'user@example.com',

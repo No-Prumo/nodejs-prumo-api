@@ -138,7 +138,8 @@ Reference route:
 Contracts:
 
 - body: `email`
-- response: `message`
+- `202` response: `{ status: "accepted" }`
+- expected error responses use the shared auth error decorators
 
 ## Invariants
 

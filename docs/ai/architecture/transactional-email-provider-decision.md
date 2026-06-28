@@ -36,12 +36,12 @@ cost, compliance, or operational needs change.
 
 ## Current Boundary
 
-Current auth code already has the correct seam:
+Current auth code uses this seam:
 
 ```txt
 RequestMagicLinkUseCase
   -> EMAIL_GATEWAY
-  -> infrastructure email adapter
+  -> ResendEmailGateway | SmtpEmailGateway | DevelopmentEmailGateway
 ```
 
 Rules:
@@ -54,6 +54,10 @@ Rules:
 - keep raw magic link tokens out of logs
 - keep provider failures mapped to safe application errors and structured
   internal logs
+- expose provider delivery failures as `503 email_delivery_unavailable`, never
+  as provider-specific public errors
+- build links from the validated `WEB_APP_BASE_URL` origin and the canonical
+  `/sign-in/magic-link` frontend path
 
 ## Provider Comparison
 
@@ -129,9 +133,7 @@ Before production delivery:
 Dedicated IPs, custom bounce processing, and advanced deliverability monitoring
 are not MVP requirements.
 
-## Follow-Ups
-
-KAN-103 should implement:
+## Implemented By KAN-103
 
 - Resend email adapter behind `EMAIL_GATEWAY`
 - SMTP/Mailpit capture adapter for local and E2E environments
@@ -139,6 +141,8 @@ KAN-103 should implement:
 - magic link URL construction from the configured frontend base URL
 - safe provider error mapping and logs
 - focused adapter/use case tests
+
+## Follow-Ups
 
 KAN-106 should implement:
 

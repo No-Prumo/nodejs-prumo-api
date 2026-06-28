@@ -28,7 +28,11 @@ describe('buildLoggerConfig', () => {
       APP_ENV: 'staging',
       AUTH_ACCESS_TOKEN_SECRET: 'production-secret-with-enough-length',
       AUTH_GOOGLE_CLIENT_ID: 'google-web-client-id.apps.googleusercontent.com',
+      EMAIL_DELIVERY_PROVIDER: 'resend',
+      EMAIL_FROM_ADDRESS: 'auth@sandicts.com',
       NODE_ENV: 'production',
+      RESEND_API_KEY: 'resend-api-key',
+      WEB_APP_BASE_URL: 'https://app.sandicts.com',
     });
 
     expect(buildLoggerConfig(env)).toEqual({

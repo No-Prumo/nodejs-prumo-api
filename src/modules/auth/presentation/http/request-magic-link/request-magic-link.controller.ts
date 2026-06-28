@@ -7,6 +7,7 @@ import {
   authRateLimitWindowMilliseconds,
   requestMagicLinkRateLimit,
 } from '../shared/auth-http-rate-limit.constants';
+import { ApiAuthErrorResponses } from '../shared/api-auth-error-responses.decorator';
 import {
   RequestMagicLinkBodyDto,
   RequestMagicLinkResponseDto,
@@ -18,7 +19,7 @@ class RequestMagicLinkController {
   constructor(private readonly requestMagicLink: RequestMagicLinkUseCase) {}
 
   @Post('request')
-  @HttpCode(HttpStatus.OK)
+  @HttpCode(HttpStatus.ACCEPTED)
   @Throttle({
     default: {
       limit: requestMagicLinkRateLimit,
@@ -27,11 +28,18 @@ class RequestMagicLinkController {
   })
   @ApiOperation({
     summary: 'Request magic link',
-    description: 'Returns a generic success response for valid email input.',
+    description:
+      'Accepts a magic link request without revealing account existence.',
+  })
+  @ApiAuthErrorResponses({
+    includeValidation: true,
+    includeRateLimit: true,
+    serviceUnavailable: ['email_delivery_unavailable'],
+    includeInternalError: true,
   })
   @ZodResponse({
-    status: HttpStatus.OK,
-    description: 'Generic magic link request response',
+    status: HttpStatus.ACCEPTED,
+    description: 'Magic link request accepted',
     type: RequestMagicLinkResponseDto,
   })
   request(

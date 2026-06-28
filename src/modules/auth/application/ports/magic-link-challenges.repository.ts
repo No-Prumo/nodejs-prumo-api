@@ -18,17 +18,39 @@ type CreateMagicLinkChallengeData = {
   expiresAt: Date;
 };
 
+type ConsumeMagicLinkChallengeResult =
+  | {
+      status: 'consumed';
+      challenge: MagicLinkChallengeRecord;
+    }
+  | {
+      status: 'invalid';
+    }
+  | {
+      status: 'expired';
+    }
+  | {
+      status: 'already_used';
+    }
+  | {
+      status: 'revoked';
+    };
+
 type MagicLinkChallengesRepository = {
-  create(data: CreateMagicLinkChallengeData): Promise<MagicLinkChallengeRecord>;
+  replaceActive(
+    data: CreateMagicLinkChallengeData,
+    replacedAt: Date,
+  ): Promise<MagicLinkChallengeRecord>;
   consumeByTokenHash(
     tokenHash: string,
     consumedAt: Date,
-  ): Promise<MagicLinkChallengeRecord | null>;
+  ): Promise<ConsumeMagicLinkChallengeResult>;
 };
 
 export { MAGIC_LINK_CHALLENGES_REPOSITORY };
 export type {
   CreateMagicLinkChallengeData,
+  ConsumeMagicLinkChallengeResult,
   MagicLinkChallengeRecord,
   MagicLinkChallengesRepository,
 };

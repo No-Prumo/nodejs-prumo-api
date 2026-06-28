@@ -15,7 +15,7 @@ class RequestMagicLinkBodyDto extends createZodDto(
 
 const RequestMagicLinkResponseSchema = z
   .object({
-    message: z.string(),
+    status: z.literal('accepted'),
   })
   .meta({ id: 'RequestMagicLinkResponse' });
 

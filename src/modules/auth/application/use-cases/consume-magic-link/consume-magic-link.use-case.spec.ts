@@ -55,11 +55,14 @@ describe('ConsumeMagicLinkUseCase', () => {
     email = 'user@example.com',
     expiresAt = new Date(Date.now() + validMagicLinkWindowMilliseconds),
   ) {
-    return challengesRepository.create({
-      email,
-      tokenHash: magicLinkTokenService.hash(token),
-      expiresAt,
-    });
+    return challengesRepository.replaceActive(
+      {
+        email,
+        tokenHash: magicLinkTokenService.hash(token),
+        expiresAt,
+      },
+      new Date(),
+    );
   }
 
   it('creates an account and internal auth session for a valid token', async () => {
@@ -107,7 +110,7 @@ describe('ConsumeMagicLinkUseCase', () => {
     expect(result.account.id).toBe(existingAccount.id);
   });
 
-  it('rejects invalid, expired, and already used tokens', async () => {
+  it('returns semantic errors for invalid, expired, and already used tokens', async () => {
     const { challengesRepository, magicLinkTokenService, useCase } = makeSut();
     const expiredToken = magicLinkTokenService.generateToken();
     const usedToken = magicLinkTokenService.generateToken();
@@ -132,13 +135,35 @@ describe('ConsumeMagicLinkUseCase', () => {
     await expect(
       useCase.execute({ token: expiredToken }),
     ).rejects.toMatchObject({
-      code: 'invalid_magic_link_token',
+      code: 'magic_link_expired',
     });
 
     await useCase.execute({ token: usedToken });
 
     await expect(useCase.execute({ token: usedToken })).rejects.toMatchObject({
-      code: 'invalid_magic_link_token',
+      code: 'magic_link_already_used',
+    });
+  });
+
+  it('returns a semantic error when a newer request superseded the token', async () => {
+    const { challengesRepository, magicLinkTokenService, useCase } = makeSut();
+    const supersededToken = magicLinkTokenService.generateToken();
+    const currentToken = magicLinkTokenService.generateToken();
+    await createChallenge(
+      challengesRepository,
+      magicLinkTokenService,
+      supersededToken,
+    );
+    await createChallenge(
+      challengesRepository,
+      magicLinkTokenService,
+      currentToken,
+    );
+
+    await expect(
+      useCase.execute({ token: supersededToken }),
+    ).rejects.toMatchObject({
+      code: 'magic_link_superseded',
     });
   });
 });

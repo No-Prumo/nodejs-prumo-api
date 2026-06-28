@@ -16,6 +16,19 @@ export {
   type DatabaseConfig,
 } from './database/database.config';
 export { docsConfig, type DocsConfig } from './docs/docs.config';
+export {
+  emailDeliveryProviderValues,
+  getDefaultEmailDeliveryProvider,
+  type EmailDeliveryProvider,
+} from './email/email-delivery-provider';
+export {
+  buildEmailConfig,
+  emailConfig,
+  type DevelopmentEmailConfig,
+  type EmailConfig,
+  type ResendEmailConfig,
+  type SmtpEmailConfig,
+} from './email/email.config';
 export { envSchema, getEnv, validateEnv, type Env } from './env/env.schema';
 export {
   getDefaultLogLevel,

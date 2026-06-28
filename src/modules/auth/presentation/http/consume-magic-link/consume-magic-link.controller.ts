@@ -19,6 +19,7 @@ import {
   authRateLimitWindowMilliseconds,
   consumeMagicLinkRateLimit,
 } from '../shared/auth-http-rate-limit.constants';
+import { ApiAuthErrorResponses } from '../shared/api-auth-error-responses.decorator';
 import { buildRefreshTokenCookieOptions } from '../shared/auth-cookie.helper';
 import {
   ConsumeMagicLinkBodyDto,
@@ -45,6 +46,15 @@ class ConsumeMagicLinkController {
   @ApiOperation({
     summary: 'Consume magic link',
     description: 'Consumes a one-time token and creates an auth session.',
+  })
+  @ApiAuthErrorResponses({
+    unauthorized: ['invalid_magic_link_token'],
+    forbidden: ['account_auth_forbidden'],
+    conflict: ['magic_link_already_used', 'magic_link_superseded'],
+    gone: ['magic_link_expired'],
+    includeValidation: true,
+    includeRateLimit: true,
+    includeInternalError: true,
   })
   @ZodResponse({
     status: HttpStatus.OK,

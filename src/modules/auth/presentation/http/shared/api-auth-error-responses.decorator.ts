@@ -8,8 +8,11 @@ import {
 type ApiAuthErrorResponsesOptions = {
   conflict?: readonly string[];
   forbidden?: readonly string[];
+  gone?: readonly string[];
+  includeInternalError?: boolean;
   includeRateLimit?: boolean;
   includeValidation?: boolean;
+  serviceUnavailable?: readonly string[];
   unauthorized?: readonly string[];
 };
 
@@ -60,11 +63,45 @@ function ApiAuthErrorResponses(options: ApiAuthErrorResponsesOptions) {
     );
   }
 
+  if (options.gone && options.gone.length > 0) {
+    decorators.push(
+      ApiResponse({
+        status: HttpStatus.GONE,
+        description: `Auth resource is no longer available. Codes: ${formatCodes(
+          options.gone,
+        )}.`,
+        type: AuthErrorResponseDto,
+      }),
+    );
+  }
+
   if (options.includeRateLimit) {
     decorators.push(
       ApiResponse({
         status: HttpStatus.TOO_MANY_REQUESTS,
         description: 'Rate limit exceeded. Code: rate_limited.',
+        type: AuthErrorResponseDto,
+      }),
+    );
+  }
+
+  if (options.serviceUnavailable && options.serviceUnavailable.length > 0) {
+    decorators.push(
+      ApiResponse({
+        status: HttpStatus.SERVICE_UNAVAILABLE,
+        description: `Auth dependency is unavailable. Codes: ${formatCodes(
+          options.serviceUnavailable,
+        )}.`,
+        type: AuthErrorResponseDto,
+      }),
+    );
+  }
+
+  if (options.includeInternalError) {
+    decorators.push(
+      ApiResponse({
+        status: HttpStatus.INTERNAL_SERVER_ERROR,
+        description: 'Unexpected internal failure. Code: internal_error.',
         type: AuthErrorResponseDto,
       }),
     );

@@ -264,9 +264,13 @@ POST /auth/magic-link/consume
 Request rules:
 
 - accept normalized email
-- always return a generic success response
+- return `202 Accepted` with `{ "status": "accepted" }` after the delivery
+  provider accepts the request
 - do not reveal whether the account exists
-- rate-limit by IP and normalized email
+- return semantic operational failures such as `429 rate_limited` and
+  `503 email_delivery_unavailable`; generic account behavior must not hide
+  service failures
+- rate-limit by IP for the current single-instance MVP foundation
 - create a one-time challenge if sign-in is allowed
 - send a short-lived link by email
 
@@ -276,13 +280,18 @@ Challenge rules:
 - store only token hash
 - single use
 - short TTL, usually 10 to 15 minutes
+- a new request revokes the previous active challenge for the same normalized
+  email, so only the latest link remains usable
 - bind optional metadata such as redirect target, IP, user agent, and purpose
 
 Consume rules:
 
 - final authentication must happen through `POST`
 - do not consume the token with a direct backend `GET`
-- reject expired, used, or invalid tokens
+- return `401 invalid_magic_link_token` when no challenge exists
+- return `410 magic_link_expired` for an expired challenge
+- return `409 magic_link_already_used` for a consumed challenge
+- return `409 magic_link_superseded` when a newer request replaced the link
 - mark challenge as used before or atomically with session creation
 - create account on first successful magic link only if product allows passwordless sign-up
 
@@ -296,6 +305,8 @@ Email delivery decision:
 - Resend is the MVP production/staging provider for magic link delivery
 - local development and E2E should use Mailpit SMTP capture instead of sending
   real email
+- links target the trusted frontend route
+  `/sign-in/magic-link?token=<opaque-token>`, built from `WEB_APP_BASE_URL`
 - provider-specific code must stay behind the `EMAIL_GATEWAY` application port
 - provider details, API keys, raw provider errors, and raw magic link tokens must
   not leak into public responses or logs
@@ -431,7 +442,10 @@ Use `AppError` from application code.
 Recommended mappings:
 
 - invalid credentials -> `unauthorized`
-- expired or invalid magic link -> `unauthorized`
+- unknown magic link -> `401 invalid_magic_link_token`
+- expired magic link -> `410 magic_link_expired`
+- consumed or superseded magic link -> `409`
+- unavailable email delivery -> `503 email_delivery_unavailable`
 - refresh token invalid or expired -> `unauthorized`
 - account blocked -> `forbidden`
 - email already used in explicit sign-up -> `conflict`
