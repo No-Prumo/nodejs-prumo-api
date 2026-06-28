@@ -14,12 +14,12 @@ import { Throttle } from '@nestjs/throttler';
 import type { Response } from 'express';
 import { ZodResponse } from 'nestjs-zod';
 import { authConfig, type AuthConfig } from '@config';
+import { ApiErrorResponses } from '@infra/http/openapi/api-error-responses.decorator';
 import { ConsumeMagicLinkUseCase } from '../../../application/use-cases/consume-magic-link/consume-magic-link.use-case';
 import {
   authRateLimitWindowMilliseconds,
   consumeMagicLinkRateLimit,
 } from '../shared/auth-http-rate-limit.constants';
-import { ApiAuthErrorResponses } from '../shared/api-auth-error-responses.decorator';
 import { buildRefreshTokenCookieOptions } from '../shared/auth-cookie.helper';
 import {
   ConsumeMagicLinkBodyDto,
@@ -47,14 +47,14 @@ class ConsumeMagicLinkController {
     summary: 'Consume magic link',
     description: 'Consumes a one-time token and creates an auth session.',
   })
-  @ApiAuthErrorResponses({
+  @ApiErrorResponses({
+    badRequest: ['validation_error'],
     unauthorized: ['invalid_magic_link_token'],
     forbidden: ['account_auth_forbidden'],
     conflict: ['magic_link_already_used', 'magic_link_superseded'],
     gone: ['magic_link_expired'],
-    includeValidation: true,
-    includeRateLimit: true,
-    includeInternalError: true,
+    tooManyRequests: ['rate_limited'],
+    internalServerError: ['internal_error'],
   })
   @ZodResponse({
     status: HttpStatus.OK,

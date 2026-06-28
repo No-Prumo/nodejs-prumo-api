@@ -28,6 +28,7 @@ Short catalog. Routing hints (`read-when`, `do-not-read-when`, `related`, `canon
 | Document                                                                                                   | Role                                                        |
 | ---------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------- |
 | [`docs/ai/api/error-handling-foundation.md`](api/error-handling-foundation.md)                             | Global HTTP error handling baseline                         |
+| [`docs/ai/api/semantic-api-contracts.md`](api/semantic-api-contracts.md)                                   | Semantic statuses, public errors, and OpenAPI drift rules   |
 | [`docs/ai/api/zod-swagger-foundation.md`](api/zod-swagger-foundation.md)                                   | API validation and Swagger baseline                         |
 | [`docs/ai/architecture/authentication-session-pattern.md`](architecture/authentication-session-pattern.md) | Auth methods, sessions, and refresh tokens                  |
 | [`docs/ai/architecture/backend-architecture-overview.md`](architecture/backend-architecture-overview.md)   | Backend architecture source of truth                        |
@@ -103,9 +104,10 @@ For frontend planning, read:
 For a new endpoint, read:
 
 1. `docs/ai/architecture/controller-pattern.md`
-2. `docs/ai/api/zod-swagger-foundation.md`
-3. `docs/ai/architecture/use-case-pattern.md`
-4. `docs/ai/api/error-handling-foundation.md`
+2. `docs/ai/api/semantic-api-contracts.md`
+3. `docs/ai/api/zod-swagger-foundation.md`
+4. `docs/ai/architecture/use-case-pattern.md`
+5. `docs/ai/api/error-handling-foundation.md`
 
 For authentication work, read:
 

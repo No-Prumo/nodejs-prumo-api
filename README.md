@@ -409,6 +409,8 @@ payloads must not be logged.
 | `npm run format` | Runs Prettier on TypeScript source and test files. |
 | `npm run lint` | Generates Prisma Client and runs ESLint with `--fix`. |
 | `npm run lint:ci` | Generates Prisma Client and runs ESLint without writing fixes. |
+| `npm run openapi:generate` | Builds the API and regenerates the committed OpenAPI artifact. |
+| `npm run openapi:check` | Regenerates OpenAPI and fails when the committed artifact is stale. |
 | `npm run typecheck` | Generates Prisma Client and runs `tsc --noEmit`. |
 | `npm run test` | Generates Prisma Client and runs Vitest once. |
 | `npm run test:ci` | Generates Prisma Client and runs Vitest with `--passWithNoTests`. |
@@ -432,6 +434,7 @@ payloads must not be logged.
   docs/
     ai/
     frontend/
+  openapi/
   prisma/
     migrations/
     models/
@@ -453,6 +456,7 @@ Main responsibilities:
 | `.github/workflows` | CI/CD workflows. |
 | `docs/ai` | Durable project context and source-of-truth technical/product docs. |
 | `docs/frontend` | Pointer to frontend docs now owned by `sandicts/reactjs-sandicts-web`. |
+| `openapi/sandicts-api.json` | Canonical generated OpenAPI artifact consumed by frontend code generation. |
 | `prisma/schema.prisma` | Main Prisma generator and datasource configuration. |
 | `prisma/models` | Domain-grouped Prisma models. |
 | `prisma/migrations` | Database migrations. |
@@ -539,6 +543,8 @@ HTTP contracts use one source of truth:
 - Global `ZodValidationPipe` validates `params`, `query`, and `body`.
 - `@ZodResponse()` validates outgoing responses and feeds Swagger docs.
 - Swagger/OpenAPI is generated from the same Zod-backed DTOs.
+- `@ApiErrorResponses()` documents exact predictable codes for each error status.
+- `npm run openapi:check` prevents the committed OpenAPI artifact from drifting.
 
 Global HTTP setup lives in:
 
@@ -559,6 +565,7 @@ Endpoint rules:
 - Use DTOs in `@Param()`, `@Query()`, and `@Body()`.
 - Define a response schema and DTO.
 - Annotate successful responses with `@ZodResponse(...)`.
+- Annotate predictable failures with `@ApiErrorResponses(...)`.
 - Use `.meta({ id: 'StableSchemaName' })` for stable OpenAPI schema names.
 - Do not duplicate contracts with class-validator DTOs.
 
@@ -1181,6 +1188,7 @@ Jobs:
 | `governance` | Validates source branch naming and allowed target branch. |
 | `quality` | Runs `npm run lint:ci` and `npm run typecheck`. |
 | `test` | Runs `npm run test:ci`. |
+| `contract` | Runs `npm run openapi:check`. |
 | `build` | Runs `npm run build`. |
 | `security` | Runs `npm audit --audit-level=moderate`. |
 

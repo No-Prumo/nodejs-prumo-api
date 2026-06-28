@@ -5,6 +5,7 @@ role: source-of-truth
 priority: high
 canonical: docs/ai/api/error-handling-foundation.md
 related:
+  - docs/ai/api/semantic-api-contracts.md
   - docs/ai/api/zod-swagger-foundation.md
   - docs/ai/logging/logging-foundation.md
 scope: nestjs, exception-filters, app-errors, http-error-contracts
@@ -94,6 +95,11 @@ Current normalized codes are:
 - `conflict`
 - `business_rule_violation`
 - `internal_error`
+
+The executable `code -> HTTP status` mapping lives in
+`src/infra/http/errors/http-error-contract.ts`. The global filter and OpenAPI
+decorators consume that mapping instead of maintaining separate status
+switches.
 
 Rules:
 
@@ -254,7 +260,6 @@ Default status mapping:
 
 Good second-step improvements when the project grows:
 
-- add Swagger documentation for common error responses
 - add integration tests for real controller failures
 - refine validation issue formatting if the API needs a stricter public schema
 
