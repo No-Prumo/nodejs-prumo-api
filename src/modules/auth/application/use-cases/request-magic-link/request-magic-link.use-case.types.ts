@@ -3,7 +3,7 @@ type RequestMagicLinkUseCaseRequest = {
 };
 
 type RequestMagicLinkUseCaseResponse = {
-  message: string;
+  status: 'accepted';
 };
 
 export type { RequestMagicLinkUseCaseRequest, RequestMagicLinkUseCaseResponse };

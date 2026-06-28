@@ -137,14 +137,10 @@ Current domain folders:
 - `auth`: token lifetimes, magic link lifetime, and refresh cookie settings
 - `database`: database connection metadata without ORM coupling
 - `docs`: OpenAPI/docs toggles and pathing
+- `email`: transactional email provider, sender identity, trusted frontend
+  origin, Resend credential, and SMTP connection settings
 - `logger`: neutral logging settings and level normalization
 - `observability`: neutral observability toggles and service identity
-
-Planned domain from KAN-102:
-
-- `email`: transactional email provider selection, sender identity, frontend
-  magic link base URL, Resend API credentials, and SMTP capture settings for
-  local/E2E
 
 Do not add Resend-specific settings to the `auth` config domain. Auth owns magic
 link lifetime and session behavior; email owns delivery.
@@ -285,6 +281,21 @@ Current shape:
 - `refreshTokenCookie.secure`
 - `refreshTokenCookie.httpOnly`
 
+### `email`
+
+Purpose:
+
+- select the transactional auth email adapter
+- provide sender and reply-to identity
+- provide the trusted frontend origin used by magic link URLs
+- keep Resend and SMTP settings inside infrastructure configuration
+
+Provider policy:
+
+- `local` -> `smtp`
+- `test` -> `development` by default, with explicit `smtp` allowed for E2E
+- `staging` and `production` -> explicit `resend`
+
 ### `logger`
 
 Purpose:
@@ -358,27 +369,7 @@ AUTH_REFRESH_TOKEN_COOKIE_NAME=sandicts_refresh_token
 AUTH_REFRESH_TOKEN_COOKIE_PATH=/auth/refresh
 AUTH_COOKIE_SAME_SITE=lax
 AUTH_COOKIE_SECURE=false
-```
 
-Notes:
-
-- `expandVariables: true` allows composed values in `.env`
-- `APP_ENV` separates local/staging/production intent from `NODE_ENV`
-- `APP_VERSION` may be omitted and falls back to `package.json`
-- `DATABASE_URL` is validated as URL text
-- booleans accept `true/false`, `1/0`, `yes/no`, `on/off`
-- ports are coerced to integers and validated in range `1..65535`
-- `AUTH_ACCESS_TOKEN_SECRET` is required in production and falls back only for
-  local/test development
-- `AUTH_GOOGLE_CLIENT_ID` is required in production and is used to validate
-  Google Sign-In and Google One Tap ID token audiences
-- auth lifetimes are positive integer seconds
-- `AUTH_COOKIE_SECURE` defaults to `true` in production and otherwise follows
-  the explicit env value or local default
-
-Planned transactional email contract from KAN-102:
-
-```env
 EMAIL_DELIVERY_PROVIDER=smtp
 EMAIL_FROM_ADDRESS=auth@sandicts.test
 EMAIL_FROM_NAME=Sandicts
@@ -396,13 +387,27 @@ SMTP_PASSWORD=
 
 Notes:
 
-- these variables should be added when KAN-103 implements provider selection
+- `expandVariables: true` allows composed values in `.env`
+- `APP_ENV` separates local/staging/production intent from `NODE_ENV`
+- `APP_VERSION` may be omitted and falls back to `package.json`
+- `DATABASE_URL` is validated as URL text
+- booleans accept `true/false`, `1/0`, `yes/no`, `on/off`
+- ports are coerced to integers and validated in range `1..65535`
+- `AUTH_ACCESS_TOKEN_SECRET` is required in production and falls back only for
+  local/test development
+- `AUTH_GOOGLE_CLIENT_ID` is required in production and is used to validate
+  Google Sign-In and Google One Tap ID token audiences
+- auth lifetimes are positive integer seconds
+- `AUTH_COOKIE_SECURE` defaults to `true` in production and otherwise follows
+  the explicit env value or local default
 - `EMAIL_DELIVERY_PROVIDER=resend` is required for staging/production Resend
   delivery
-- `EMAIL_DELIVERY_PROVIDER=smtp` should be used for Mailpit local/E2E capture
+- local defaults use `EMAIL_DELIVERY_PROVIDER=smtp` with Mailpit on port `1025`
+- unit tests default to the in-memory `development` adapter
 - `RESEND_API_KEY` is required only when the selected provider is Resend
-- SMTP auth variables are required only when the selected SMTP server needs them
-- `WEB_APP_BASE_URL` is required for magic link URL construction
+- SMTP username and password must be configured together
+- `WEB_APP_BASE_URL` must be an HTTP(S) origin without credentials, path, query,
+  or hash and must use HTTPS in staging/production
 
 ## Consumption pattern
 

@@ -37,6 +37,46 @@ function invalidMagicLinkToken(context: AuthErrorContext = {}): AppError {
   );
 }
 
+function magicLinkExpired(context: AuthErrorContext = {}): AppError {
+  return authError('magic_link_expired', 'Magic link has expired', {
+    severity: 'auth',
+    ...context,
+  });
+}
+
+function magicLinkAlreadyUsed(context: AuthErrorContext = {}): AppError {
+  return authError(
+    'magic_link_already_used',
+    'Magic link has already been used',
+    {
+      severity: 'auth',
+      ...context,
+    },
+  );
+}
+
+function magicLinkSuperseded(context: AuthErrorContext = {}): AppError {
+  return authError(
+    'magic_link_superseded',
+    'Magic link was replaced by a newer request',
+    {
+      severity: 'auth',
+      ...context,
+    },
+  );
+}
+
+function emailDeliveryUnavailable(context: AuthErrorContext = {}): AppError {
+  return authError(
+    'email_delivery_unavailable',
+    'Email delivery is temporarily unavailable',
+    {
+      severity: 'auth',
+      ...context,
+    },
+  );
+}
+
 function invalidRefreshToken(context: AuthErrorContext = {}): AppError {
   return authError('invalid_refresh_token', INVALID_AUTHENTICATION_MESSAGE, {
     severity: 'auth',
@@ -134,11 +174,15 @@ export {
   accountAuthForbidden,
   accountNotFound,
   authSessionInactive,
+  emailDeliveryUnavailable,
   externalIdentityConflict,
   invalidAccessToken,
   invalidGoogleCredential,
   invalidMagicLinkToken,
   invalidRefreshToken,
+  magicLinkAlreadyUsed,
+  magicLinkExpired,
+  magicLinkSuperseded,
   refreshTokenExpired,
   refreshTokenReused,
   refreshTokenRevoked,

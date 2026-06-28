@@ -77,6 +77,10 @@ Current normalized codes are:
 - `unauthorized`
 - `invalid_google_credential`
 - `invalid_magic_link_token`
+- `magic_link_expired`
+- `magic_link_already_used`
+- `magic_link_superseded`
+- `email_delivery_unavailable`
 - `invalid_access_token`
 - `invalid_refresh_token`
 - `refresh_token_expired`
@@ -100,8 +104,11 @@ Rules:
   codes are safe public auth failures that still avoid exposing raw token or
   storage internals
 - `invalid_google_credential` is for invalid Google Sign-In or One Tap ID tokens
-- `invalid_magic_link_token` is for invalid, expired, or already consumed magic
-  link tokens
+- `invalid_magic_link_token` is for a token that does not identify a challenge
+- `magic_link_expired`, `magic_link_already_used`, and
+  `magic_link_superseded` expose safe lifecycle states needed by the frontend
+- `email_delivery_unavailable` means the configured email dependency could not
+  accept delivery; it never exposes provider errors or payloads
 - `external_identity_conflict` is for safe auth-provider linking conflicts
 - domain and application should prefer `business_rule_violation` for expected business failures
 - `internal_error` is reserved for unexpected or internal-only failures
@@ -116,7 +123,9 @@ The global exception filter should:
 - emit a structured warning for `AppError` mapped to `4xx` when the error has
   internal `details`
 - not emit extra logs for normal `HttpException` `4xx`
-- emit an extra structured log only for unexpected or internal `5xx`
+- emit a structured warning for safe expected dependency failures such as
+  `email_delivery_unavailable`
+- emit an error log for unexpected or internal `5xx`
 
 Reason:
 
@@ -193,6 +202,10 @@ Map known codes in the filter:
 - `unauthorized` -> `401`
 - `invalid_google_credential` -> `401`
 - `invalid_magic_link_token` -> `401`
+- `magic_link_expired` -> `410`
+- `magic_link_already_used` -> `409`
+- `magic_link_superseded` -> `409`
+- `email_delivery_unavailable` -> `503`
 - `invalid_access_token` -> `401`
 - `invalid_refresh_token` -> `401`
 - `refresh_token_expired` -> `401`
@@ -217,8 +230,10 @@ Default status mapping:
 - `403` -> `forbidden`
 - `404` -> `resource_not_found`
 - `409` -> `conflict`
+- `410` -> `resource_not_found`
 - `429` -> `rate_limited`
 - `422` -> `business_rule_violation`
+- `503` -> `internal_error`
 - `500+` -> `internal_error`
 
 ### Zod exceptions

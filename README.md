@@ -207,6 +207,18 @@ AUTH_REFRESH_TOKEN_COOKIE_NAME=sandicts_refresh_token
 AUTH_REFRESH_TOKEN_COOKIE_PATH=/auth/refresh
 AUTH_COOKIE_SAME_SITE=lax
 AUTH_COOKIE_SECURE=false
+
+EMAIL_DELIVERY_PROVIDER=smtp
+EMAIL_FROM_ADDRESS=auth@sandicts.test
+EMAIL_FROM_NAME=Sandicts
+EMAIL_REPLY_TO_ADDRESS=
+WEB_APP_BASE_URL=http://localhost:3001
+RESEND_API_KEY=
+SMTP_HOST=localhost
+SMTP_PORT=1025
+SMTP_SECURE=false
+SMTP_USER=
+SMTP_PASSWORD=
 ```
 
 Notes:
@@ -220,10 +232,10 @@ Notes:
 - In production, `AUTH_GOOGLE_CLIENT_ID` is required and must be the Google web
   OAuth client ID used by Google Sign-In and Google One Tap.
 
-### 3. Start PostgreSQL
+### 3. Start PostgreSQL And Mailpit
 
 ```bash
-docker compose up -d postgres
+docker compose up -d postgres mailpit
 ```
 
 The local PostgreSQL service uses:
@@ -232,6 +244,11 @@ The local PostgreSQL service uses:
 - container: `sandicts-postgres`
 - volume: `sandicts-postgres-data`
 - healthcheck: `pg_isready`
+
+Mailpit captures local email without delivering it to a real inbox:
+
+- SMTP: `localhost:1025`
+- web UI: `http://localhost:8025`
 
 ### 4. Generate Prisma Client
 
@@ -270,9 +287,12 @@ Expected response:
 
 ```json
 {
-  "message": "If the email can sign in, a magic link will be sent."
+  "status": "accepted"
 }
 ```
+
+The endpoint returns `202 Accepted`. Inspect the captured email at
+`http://localhost:8025`.
 
 ## Environment Variables
 
@@ -354,33 +374,28 @@ Default log levels:
 | `AUTH_COOKIE_SAME_SITE` | No | `lax` | Cookie SameSite policy: `lax`, `strict`, or `none`. |
 | `AUTH_COOKIE_SECURE` | No | `true` when `NODE_ENV=production` | Cookie `Secure` attribute. |
 
-### Planned Transactional Email
+### Transactional Email
 
-KAN-102 selects Resend as the MVP transactional email provider for magic links.
-The implementation should keep Resend behind the existing `EMAIL_GATEWAY`
-application port so the provider can be changed later without changing auth use
-cases or controllers.
+Resend is the staging/production provider and SMTP/Mailpit is the local/E2E
+delivery path. Both adapters are selected behind `EMAIL_GATEWAY`.
 
-These variables are planned for the provider implementation and are not yet
-validated by the current env schema:
+| Variable | Required | Default | Description |
+| --- | --- | --- | --- |
+| `EMAIL_DELIVERY_PROVIDER` | Staging/production | Environment-specific | `smtp` locally, `development` in unit tests, and `resend` in staging/production. |
+| `EMAIL_FROM_ADDRESS` | Staging/production | `auth@sandicts.test` locally | Sender address used for auth emails. |
+| `EMAIL_FROM_NAME` | No | `Sandicts` | Human-readable sender name. |
+| `EMAIL_REPLY_TO_ADDRESS` | No | none | Optional reply-to address. |
+| `WEB_APP_BASE_URL` | Staging/production | `http://localhost:3001` locally | Trusted frontend origin used to build `/sign-in/magic-link`. |
+| `RESEND_API_KEY` | When provider is Resend | none | Resend API credential. |
+| `SMTP_HOST` | SMTP outside local defaults | `localhost` | SMTP host, usually Mailpit locally. |
+| `SMTP_PORT` | No | `1025` | SMTP port. |
+| `SMTP_SECURE` | No | `false` | Whether SMTP uses immediate TLS. |
+| `SMTP_USER` | No | none | SMTP username; must be paired with `SMTP_PASSWORD`. |
+| `SMTP_PASSWORD` | No | none | SMTP password; must be paired with `SMTP_USER`. |
 
-| Variable | Required | Description |
-| --- | --- | --- |
-| `EMAIL_DELIVERY_PROVIDER` | Yes | Selects Resend for staging/production or SMTP for local/E2E capture. |
-| `EMAIL_FROM_ADDRESS` | Yes outside unit tests | Sender address used for auth emails. |
-| `EMAIL_FROM_NAME` | No | Human-readable sender name, defaulting to `Sandicts`. |
-| `EMAIL_REPLY_TO_ADDRESS` | No | Optional reply-to address. |
-| `WEB_APP_BASE_URL` | Yes for magic links | Frontend origin used to build magic link URLs. |
-| `RESEND_API_KEY` | Required for Resend | Resend API credential. |
-| `SMTP_HOST` | Required for SMTP capture | SMTP host, usually Mailpit locally. |
-| `SMTP_PORT` | Required for SMTP capture | SMTP port, usually `1025` for Mailpit. |
-| `SMTP_SECURE` | No | Whether SMTP uses TLS. |
-| `SMTP_USER` | Optional | SMTP username when required. |
-| `SMTP_PASSWORD` | Optional | SMTP password when required. |
-
-Local development and E2E should use Mailpit SMTP capture rather than sending
-real emails. Unit tests should keep using fakes or in-memory email gateways.
-Do not log raw magic link tokens.
+`WEB_APP_BASE_URL` must be an origin without path, query, hash, or credentials
+and must use HTTPS in staging/production. Raw magic link tokens and provider
+payloads must not be logged.
 
 ## Scripts
 
@@ -565,8 +580,8 @@ export { CreateThingDto, CreateThingSchema };
 
 ### `POST /auth/magic-link/request`
 
-Requests a one-time email magic link and always returns a generic response for
-valid email input.
+Accepts a one-time email magic link request without revealing whether an account
+exists. Operational failures still return semantic error statuses.
 
 ```bash
 curl -X POST "http://localhost:3000/auth/magic-link/request" \
@@ -584,9 +599,19 @@ Response contract:
 
 ```json
 {
-  "message": "If the email can sign in, a magic link will be sent."
+  "status": "accepted"
 }
 ```
+
+Status contract:
+
+| Status | Code | Meaning |
+| --- | --- | --- |
+| `202` | success | Request accepted for delivery. |
+| `400` | `validation_error` | Request body is invalid. |
+| `429` | `rate_limited` | Request rate limit exceeded. |
+| `503` | `email_delivery_unavailable` | Configured email delivery is temporarily unavailable. |
+| `500` | `internal_error` | Unexpected internal failure. |
 
 ### `POST /auth/magic-link/consume`
 
@@ -621,6 +646,20 @@ Response contract:
   "accessTokenExpiresAt": "2026-01-01T00:15:00.000Z"
 }
 ```
+
+Status contract:
+
+| Status | Code | Meaning |
+| --- | --- | --- |
+| `200` | success | Internal auth session created. |
+| `400` | `validation_error` | Request body is invalid. |
+| `401` | `invalid_magic_link_token` | Token does not identify a challenge. |
+| `403` | `account_auth_forbidden` | Account cannot authenticate. |
+| `409` | `magic_link_already_used` | Token was already consumed. |
+| `409` | `magic_link_superseded` | A newer request replaced this link. |
+| `410` | `magic_link_expired` | Token lifetime ended. |
+| `429` | `rate_limited` | Consume rate limit exceeded. |
+| `500` | `internal_error` | Unexpected internal failure. |
 
 ### `POST /auth/google/sign-in`
 
@@ -898,6 +937,9 @@ Current capabilities:
 - current-session and sign-out endpoints
 - refresh token cookie option helpers
 - IP-based HTTP rate limiting through `@nestjs/throttler`
+- Resend and SMTP email adapters selected through typed configuration
+- Mailpit capture in the local Docker Compose stack
+- semantic magic link success and failure contracts in Swagger/OpenAPI
 
 MVP authentication direction:
 
@@ -914,7 +956,7 @@ Magic link delivery direction:
 
 - Resend is the chosen MVP provider for staging/production transactional auth
   email
-- Mailpit SMTP capture is the planned local/E2E delivery path
+- Mailpit SMTP capture is the implemented local/E2E delivery path
 - `EMAIL_GATEWAY` remains the application boundary so Resend can be replaced in
   a future migration
 - provider payloads, API keys, internal errors, and raw magic link tokens must
@@ -1033,6 +1075,10 @@ Normalized error codes:
 - `unauthorized`
 - `invalid_google_credential`
 - `invalid_magic_link_token`
+- `magic_link_expired`
+- `magic_link_already_used`
+- `magic_link_superseded`
+- `email_delivery_unavailable`
 - `invalid_access_token`
 - `invalid_refresh_token`
 - `refresh_token_expired`
@@ -1056,6 +1102,10 @@ Mapping highlights:
 - `AppError('unauthorized')` -> `401`
 - `AppError('invalid_google_credential')` -> `401`
 - `AppError('invalid_magic_link_token')` -> `401`
+- `AppError('magic_link_expired')` -> `410`
+- `AppError('magic_link_already_used')` -> `409`
+- `AppError('magic_link_superseded')` -> `409`
+- `AppError('email_delivery_unavailable')` -> `503`
 - `AppError('invalid_access_token')` -> `401`
 - `AppError('invalid_refresh_token')` -> `401`
 - `AppError('refresh_token_expired')` -> `401`

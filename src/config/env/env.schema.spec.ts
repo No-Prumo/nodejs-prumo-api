@@ -21,6 +21,10 @@ describe('validateEnv', () => {
       PORT: inputApiPort,
       LOG_PRETTY: 'false',
       DOCS_ENABLED: 'true',
+      EMAIL_DELIVERY_PROVIDER: 'resend',
+      EMAIL_FROM_ADDRESS: 'auth@sandicts.com',
+      RESEND_API_KEY: 'resend-api-key',
+      WEB_APP_BASE_URL: 'https://app.sandicts.com',
     });
 
     expect(env.NODE_ENV).toBe('development');
@@ -50,6 +54,10 @@ describe('validateEnv', () => {
         POSTGRES_PASSWORD: 'sandicts',
         POSTGRES_PORT: inputPostgresPort,
         POSTGRES_USER: 'postgres',
+        EMAIL_DELIVERY_PROVIDER: 'resend',
+        EMAIL_FROM_ADDRESS: 'auth@sandicts.com',
+        RESEND_API_KEY: 'resend-api-key',
+        WEB_APP_BASE_URL: 'https://app.sandicts.com',
       }),
     ).toThrow('Invalid environment variables');
 
@@ -65,8 +73,41 @@ describe('validateEnv', () => {
         POSTGRES_PASSWORD: 'sandicts',
         POSTGRES_PORT: inputPostgresPort,
         POSTGRES_USER: 'postgres',
+        EMAIL_DELIVERY_PROVIDER: 'resend',
+        EMAIL_FROM_ADDRESS: 'auth@sandicts.com',
+        RESEND_API_KEY: 'resend-api-key',
+        WEB_APP_BASE_URL: 'https://app.sandicts.com',
       }),
     ).not.toThrow();
+  });
+
+  it('validates provider-specific email configuration', () => {
+    const baseEnv = {
+      APP_ENV: 'staging',
+      DATABASE_URL: 'postgresql://postgres:sandicts@localhost:5432/sandicts',
+      POSTGRES_DB: 'sandicts',
+      POSTGRES_HOST: 'localhost',
+      POSTGRES_PASSWORD: 'sandicts',
+      POSTGRES_PORT: inputPostgresPort,
+      POSTGRES_USER: 'postgres',
+    };
+
+    expect(() =>
+      validateEnv({
+        ...baseEnv,
+        EMAIL_DELIVERY_PROVIDER: 'smtp',
+      }),
+    ).toThrow('EMAIL_DELIVERY_PROVIDER');
+
+    expect(() =>
+      validateEnv({
+        ...baseEnv,
+        EMAIL_DELIVERY_PROVIDER: 'resend',
+        EMAIL_FROM_ADDRESS: 'auth@sandicts.com',
+        RESEND_API_KEY: 'resend-api-key',
+        WEB_APP_BASE_URL: 'http://app.sandicts.com',
+      }),
+    ).toThrow('WEB_APP_BASE_URL');
   });
 
   it('throws when required env vars are invalid', () => {

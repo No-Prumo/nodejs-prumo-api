@@ -6,6 +6,7 @@ import {
   MAGIC_LINK_CHALLENGES_REPOSITORY,
   type MagicLinkChallengesRepository,
 } from '../../ports/magic-link-challenges.repository';
+import { MagicLinkUrlBuilder } from '../../services/email/magic-link-url.builder';
 import { normalizeEmail } from '../../services/email/normalize-email';
 import { MagicLinkTokenService } from '../../services/tokens/magic-link-token.service';
 import type {
@@ -13,8 +14,7 @@ import type {
   RequestMagicLinkUseCaseResponse,
 } from './request-magic-link.use-case.types';
 
-const magicLinkRequestMessage =
-  'If the email can sign in, a magic link will be sent.';
+const magicLinkRequestStatus = 'accepted' as const;
 
 @Injectable()
 class RequestMagicLinkUseCase {
@@ -23,6 +23,7 @@ class RequestMagicLinkUseCase {
     private readonly magicLinkChallengesRepository: MagicLinkChallengesRepository,
     @Inject(EMAIL_GATEWAY)
     private readonly emailGateway: EmailGateway,
+    private readonly magicLinkUrlBuilder: MagicLinkUrlBuilder,
     private readonly magicLinkTokenService: MagicLinkTokenService,
     @Inject(authConfig.KEY)
     private readonly authSettings: AuthConfig,
@@ -33,27 +34,31 @@ class RequestMagicLinkUseCase {
   ): Promise<RequestMagicLinkUseCaseResponse> {
     const normalizedEmail = normalizeEmail(request.email);
     const token = this.magicLinkTokenService.generateToken();
+    const requestedAt = new Date();
     const expiresAt = addSeconds(
-      new Date(),
+      requestedAt,
       this.authSettings.magicLinkTtlSeconds,
     );
 
-    await this.magicLinkChallengesRepository.create({
-      email: normalizedEmail,
-      tokenHash: this.magicLinkTokenService.hash(token),
-      expiresAt,
-    });
+    await this.magicLinkChallengesRepository.replaceActive(
+      {
+        email: normalizedEmail,
+        tokenHash: this.magicLinkTokenService.hash(token),
+        expiresAt,
+      },
+      requestedAt,
+    );
 
     await this.emailGateway.sendMagicLink({
       email: normalizedEmail,
-      token,
+      magicLinkUrl: this.magicLinkUrlBuilder.build(token),
       expiresAt,
     });
 
     return {
-      message: magicLinkRequestMessage,
+      status: magicLinkRequestStatus,
     };
   }
 }
 
-export { RequestMagicLinkUseCase, magicLinkRequestMessage, normalizeEmail };
+export { RequestMagicLinkUseCase, magicLinkRequestStatus, normalizeEmail };

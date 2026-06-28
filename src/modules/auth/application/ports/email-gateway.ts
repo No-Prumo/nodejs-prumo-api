@@ -2,7 +2,7 @@ const EMAIL_GATEWAY = Symbol('EMAIL_GATEWAY');
 
 type SendMagicLinkEmailRequest = {
   email: string;
-  token: string;
+  magicLinkUrl: string;
   expiresAt: Date;
 };
 

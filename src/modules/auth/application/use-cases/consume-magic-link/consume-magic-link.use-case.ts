@@ -1,6 +1,11 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { authErrorReasons } from '@auth/application/errors/auth-error-reasons';
-import { invalidMagicLinkToken } from '@auth/application/errors/auth-errors';
+import {
+  invalidMagicLinkToken,
+  magicLinkAlreadyUsed,
+  magicLinkExpired,
+  magicLinkSuperseded,
+} from '@auth/application/errors/auth-errors';
 import {
   ACCOUNTS_REPOSITORY,
   type AccountsRepository,
@@ -30,19 +35,41 @@ class ConsumeMagicLinkUseCase {
   async execute(
     request: ConsumeMagicLinkUseCaseRequest,
   ): Promise<ConsumeMagicLinkUseCaseResponse> {
-    const challenge =
+    const consumeResult =
       await this.magicLinkChallengesRepository.consumeByTokenHash(
         this.magicLinkTokenService.hash(request.token),
         new Date(),
       );
 
-    if (!challenge) {
+    if (consumeResult.status === 'invalid') {
       throw invalidMagicLinkToken({
         action: 'consume_magic_link',
         reason: authErrorReasons.challengeNotFoundExpiredOrConsumed,
       });
     }
 
+    if (consumeResult.status === 'expired') {
+      throw magicLinkExpired({
+        action: 'consume_magic_link',
+        reason: authErrorReasons.challengeExpired,
+      });
+    }
+
+    if (consumeResult.status === 'already_used') {
+      throw magicLinkAlreadyUsed({
+        action: 'consume_magic_link',
+        reason: authErrorReasons.challengeAlreadyUsed,
+      });
+    }
+
+    if (consumeResult.status === 'revoked') {
+      throw magicLinkSuperseded({
+        action: 'consume_magic_link',
+        reason: authErrorReasons.challengeRevoked,
+      });
+    }
+
+    const { challenge } = consumeResult;
     const account = await this.accountsRepository.resolveOrCreateByEmail({
       email: challenge.email,
       normalizedEmail: challenge.email,

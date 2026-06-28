@@ -25,9 +25,11 @@ const unauthorizedStatusCode: number = HttpStatus.UNAUTHORIZED;
 const forbiddenStatusCode: number = HttpStatus.FORBIDDEN;
 const notFoundStatusCode: number = HttpStatus.NOT_FOUND;
 const conflictStatusCode: number = HttpStatus.CONFLICT;
+const goneStatusCode: number = HttpStatus.GONE;
 const tooManyRequestsStatusCode: number = HttpStatus.TOO_MANY_REQUESTS;
 const unprocessableEntityStatusCode: number = HttpStatus.UNPROCESSABLE_ENTITY;
 const internalServerErrorStatusCode: number = HttpStatus.INTERNAL_SERVER_ERROR;
+const serviceUnavailableStatusCode: number = HttpStatus.SERVICE_UNAVAILABLE;
 
 @Catch()
 class GlobalExceptionFilter implements ExceptionFilter {
@@ -309,7 +311,13 @@ function mapAppErrorCodeToStatus(code: AppError['code']) {
       return notFoundStatusCode;
     case 'conflict':
     case 'external_identity_conflict':
+    case 'magic_link_already_used':
+    case 'magic_link_superseded':
       return conflictStatusCode;
+    case 'magic_link_expired':
+      return goneStatusCode;
+    case 'email_delivery_unavailable':
+      return serviceUnavailableStatusCode;
     case 'business_rule_violation':
       return unprocessableEntityStatusCode;
   }
@@ -327,10 +335,14 @@ function mapHttpStatusToErrorCode(statusCode: number): ErrorCode {
       return 'resource_not_found';
     case conflictStatusCode:
       return 'conflict';
+    case goneStatusCode:
+      return 'resource_not_found';
     case tooManyRequestsStatusCode:
       return 'rate_limited';
     case unprocessableEntityStatusCode:
       return 'business_rule_violation';
+    case serviceUnavailableStatusCode:
+      return 'internal_error';
     default:
       return statusCode >= internalServerErrorStatusCode
         ? 'internal_error'

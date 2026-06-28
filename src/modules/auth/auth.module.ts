@@ -1,10 +1,12 @@
 import { Module } from '@nestjs/common';
+import { emailConfig, type EmailConfig } from '@config';
 import { ACCOUNTS_REPOSITORY } from './application/ports/accounts.repository';
 import { AUTH_SESSIONS_REPOSITORY } from './application/ports/auth-sessions.repository';
 import { EMAIL_GATEWAY } from './application/ports/email-gateway';
 import { EXTERNAL_IDENTITIES_REPOSITORY } from './application/ports/external-identities.repository';
 import { GOOGLE_ID_TOKEN_VERIFIER } from './application/ports/google-id-token-verifier';
 import { MAGIC_LINK_CHALLENGES_REPOSITORY } from './application/ports/magic-link-challenges.repository';
+import { MagicLinkUrlBuilder } from './application/services/email/magic-link-url.builder';
 import { MagicLinkTokenService } from './application/services/tokens/magic-link-token.service';
 import { RefreshTokenHasher } from './application/services/tokens/refresh-token-hasher';
 import { TokenService } from './application/services/tokens/token.service';
@@ -16,7 +18,7 @@ import { RefreshAuthSessionUseCase } from './application/use-cases/refresh-auth-
 import { RequestMagicLinkUseCase } from './application/use-cases/request-magic-link/request-magic-link.use-case';
 import { SignOutAllUseCase } from './application/use-cases/sign-out-all/sign-out-all.use-case';
 import { SignOutUseCase } from './application/use-cases/sign-out/sign-out.use-case';
-import { DevelopmentEmailGateway } from './infrastructure/gateways/email/development-email.gateway';
+import { createEmailGateway } from './infrastructure/gateways/email/email-gateway.factory';
 import { GoogleIdTokenVerifierGateway } from './infrastructure/gateways/google/google-id-token-verifier.gateway';
 import { PrismaAccountsRepository } from './infrastructure/persistence/prisma/prisma-accounts.repository';
 import { PrismaAuthSessionsRepository } from './infrastructure/persistence/prisma/prisma-auth-sessions.repository';
@@ -45,6 +47,7 @@ import { SignOutController } from './presentation/http/sign-out/sign-out.control
     CreateAuthSessionUseCase,
     GetCurrentAuthSessionUseCase,
     GoogleSignInUseCase,
+    MagicLinkUrlBuilder,
     MagicLinkTokenService,
     RefreshAuthSessionUseCase,
     RequestMagicLinkUseCase,
@@ -74,7 +77,8 @@ import { SignOutController } from './presentation/http/sign-out/sign-out.control
     },
     {
       provide: EMAIL_GATEWAY,
-      useClass: DevelopmentEmailGateway,
+      inject: [emailConfig.KEY],
+      useFactory: (settings: EmailConfig) => createEmailGateway(settings),
     },
   ],
   exports: [CreateAuthSessionUseCase],

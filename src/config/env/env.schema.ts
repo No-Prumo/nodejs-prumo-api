@@ -3,7 +3,12 @@ import { secondsPerDay } from '@shared/time/time.constants';
 import {
   appEnvironmentValues,
   nodeEnvironmentValues,
+  resolveAppEnvironment,
 } from '../app/app-environment';
+import {
+  emailDeliveryProviderValues,
+  getDefaultEmailDeliveryProvider,
+} from '../email/email-delivery-provider';
 import { getPackageMetadata } from '../app/package-metadata';
 import { loggerLevelInputValues } from '../logger/logger-level';
 
@@ -14,6 +19,7 @@ const minimumPortNumber = 1;
 const maximumPortNumber = 65535;
 const defaultApiPort = 3000;
 const defaultPostgresPort = 5432;
+const defaultSmtpPort = 1025;
 const defaultAccessTokenTtlSeconds = 900;
 const defaultMagicLinkTtlSeconds = 900;
 const refreshTokenIdleTtlDays = 14;
@@ -51,6 +57,16 @@ const portFromEnv = z.coerce
   .min(minimumPortNumber)
   .max(maximumPortNumber);
 const positiveSecondsFromEnv = z.coerce.number().int().positive();
+const optionalStringFromEnv = z.preprocess(
+  (value) =>
+    typeof value === 'string' && value.trim().length === 0 ? undefined : value,
+  z.string().trim().min(minimumNonEmptyStringLength).optional(),
+);
+const optionalEmailFromEnv = z.preprocess(
+  (value) =>
+    typeof value === 'string' && value.trim().length === 0 ? undefined : value,
+  z.string().trim().email().optional(),
+);
 
 const envSchema = z
   .object({
@@ -116,6 +132,21 @@ const envSchema = z
       .default('/auth/refresh'),
     AUTH_COOKIE_SAME_SITE: z.enum(['lax', 'strict', 'none']).default('lax'),
     AUTH_COOKIE_SECURE: booleanFromEnv.optional(),
+    EMAIL_DELIVERY_PROVIDER: z.enum(emailDeliveryProviderValues).optional(),
+    EMAIL_FROM_ADDRESS: optionalEmailFromEnv,
+    EMAIL_FROM_NAME: z
+      .string()
+      .trim()
+      .min(minimumNonEmptyStringLength)
+      .default('Sandicts'),
+    EMAIL_REPLY_TO_ADDRESS: optionalEmailFromEnv,
+    WEB_APP_BASE_URL: optionalStringFromEnv.pipe(z.string().url().optional()),
+    RESEND_API_KEY: optionalStringFromEnv,
+    SMTP_HOST: optionalStringFromEnv,
+    SMTP_PORT: portFromEnv.default(defaultSmtpPort),
+    SMTP_SECURE: booleanFromEnv.default(false),
+    SMTP_USER: optionalStringFromEnv,
+    SMTP_PASSWORD: optionalStringFromEnv,
   })
   .superRefine((env, context) => {
     if (
@@ -139,7 +170,136 @@ const envSchema = z
         message: 'Required in production',
       });
     }
+
+    const environment = resolveAppEnvironment(env);
+    const emailProvider =
+      env.EMAIL_DELIVERY_PROVIDER ??
+      getDefaultEmailDeliveryProvider(environment);
+
+    if (environment === 'local' && emailProvider !== 'smtp') {
+      context.addIssue({
+        code: 'custom',
+        path: ['EMAIL_DELIVERY_PROVIDER'],
+        message: 'Local environment must use smtp delivery',
+      });
+    }
+
+    if (
+      (environment === 'staging' || environment === 'production') &&
+      emailProvider !== 'resend'
+    ) {
+      context.addIssue({
+        code: 'custom',
+        path: ['EMAIL_DELIVERY_PROVIDER'],
+        message: 'Staging and production environments must use resend delivery',
+      });
+    }
+
+    if (
+      (environment === 'staging' || environment === 'production') &&
+      env.EMAIL_DELIVERY_PROVIDER === undefined
+    ) {
+      context.addIssue({
+        code: 'custom',
+        path: ['EMAIL_DELIVERY_PROVIDER'],
+        message: 'Required in staging and production',
+      });
+    }
+
+    if (
+      (environment === 'staging' || environment === 'production') &&
+      env.EMAIL_FROM_ADDRESS === undefined
+    ) {
+      context.addIssue({
+        code: 'custom',
+        path: ['EMAIL_FROM_ADDRESS'],
+        message: 'Required in staging and production',
+      });
+    }
+
+    if (
+      (environment === 'staging' || environment === 'production') &&
+      env.WEB_APP_BASE_URL === undefined
+    ) {
+      context.addIssue({
+        code: 'custom',
+        path: ['WEB_APP_BASE_URL'],
+        message: 'Required in staging and production',
+      });
+    }
+
+    if (emailProvider === 'resend' && env.RESEND_API_KEY === undefined) {
+      context.addIssue({
+        code: 'custom',
+        path: ['RESEND_API_KEY'],
+        message: 'Required when EMAIL_DELIVERY_PROVIDER is resend',
+      });
+    }
+
+    if (
+      emailProvider === 'smtp' &&
+      environment !== 'local' &&
+      env.SMTP_HOST === undefined
+    ) {
+      context.addIssue({
+        code: 'custom',
+        path: ['SMTP_HOST'],
+        message: 'Required when EMAIL_DELIVERY_PROVIDER is smtp',
+      });
+    }
+
+    if ((env.SMTP_USER === undefined) !== (env.SMTP_PASSWORD === undefined)) {
+      context.addIssue({
+        code: 'custom',
+        path: ['SMTP_USER'],
+        message: 'SMTP_USER and SMTP_PASSWORD must be configured together',
+      });
+    }
+
+    if (env.WEB_APP_BASE_URL !== undefined) {
+      validateWebAppBaseUrl(env.WEB_APP_BASE_URL, environment, context);
+    }
   });
+
+function validateWebAppBaseUrl(
+  value: string,
+  environment: (typeof appEnvironmentValues)[number],
+  context: z.RefinementCtx,
+) {
+  const url = new URL(value);
+  const isSecureEnvironment =
+    environment === 'staging' || environment === 'production';
+
+  if (!['http:', 'https:'].includes(url.protocol)) {
+    context.addIssue({
+      code: 'custom',
+      path: ['WEB_APP_BASE_URL'],
+      message: 'Must use the http or https protocol',
+    });
+  }
+
+  if (isSecureEnvironment && url.protocol !== 'https:') {
+    context.addIssue({
+      code: 'custom',
+      path: ['WEB_APP_BASE_URL'],
+      message: 'Must use https in staging and production',
+    });
+  }
+
+  if (
+    url.username.length > 0 ||
+    url.password.length > 0 ||
+    url.pathname !== '/' ||
+    url.search.length > 0 ||
+    url.hash.length > 0
+  ) {
+    context.addIssue({
+      code: 'custom',
+      path: ['WEB_APP_BASE_URL'],
+      message: 'Must be an origin without credentials, path, query, or hash',
+    });
+  }
+}
 
 type Env = z.infer<typeof envSchema>;
 

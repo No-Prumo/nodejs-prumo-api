@@ -1,13 +1,15 @@
 import { buildTestAuthConfig } from '@test-support/auth/build-test-auth-config';
+import { buildTestEmailConfig } from '@test-support/email/build-test-email-config';
 import { InMemoryMagicLinkChallengesRepository } from '@auth/infrastructure/persistence/in-memory/in-memory-magic-link-challenges.repository';
 import { secondsToMilliseconds } from '@shared/time/time.helpers';
 import type {
   EmailGateway,
   SendMagicLinkEmailRequest,
 } from '../../ports/email-gateway';
+import { MagicLinkUrlBuilder } from '../../services/email/magic-link-url.builder';
 import { MagicLinkTokenService } from '../../services/tokens/magic-link-token.service';
 import {
-  magicLinkRequestMessage,
+  magicLinkRequestStatus,
   RequestMagicLinkUseCase,
 } from './request-magic-link.use-case';
 
@@ -16,6 +18,7 @@ const magicLinkTtlMilliseconds = secondsToMilliseconds(magicLinkTtlSeconds);
 const authSettings = buildTestAuthConfig({
   AUTH_MAGIC_LINK_TTL_SECONDS: `${magicLinkTtlSeconds}`,
 });
+const emailSettings = buildTestEmailConfig();
 
 class FakeEmailGateway implements EmailGateway {
   readonly sentMagicLinks: SendMagicLinkEmailRequest[] = [];
@@ -35,6 +38,7 @@ describe('RequestMagicLinkUseCase', () => {
     const useCase = new RequestMagicLinkUseCase(
       challengesRepository,
       emailGateway,
+      new MagicLinkUrlBuilder(emailSettings),
       tokenService,
       authSettings,
     );
@@ -55,7 +59,7 @@ describe('RequestMagicLinkUseCase', () => {
     });
 
     expect(result).toEqual({
-      message: magicLinkRequestMessage,
+      status: magicLinkRequestStatus,
     });
     expect(emailGateway.sentMagicLinks).toHaveLength(1);
     expect(emailGateway.sentMagicLinks[0]?.email).toBe('user@example.com');
@@ -75,15 +79,31 @@ describe('RequestMagicLinkUseCase', () => {
 
     expect(challenge).toBeDefined();
     expect(sentEmail).toBeDefined();
-    expect(challenge?.tokenHash).toBe(
-      tokenService.hash(sentEmail?.token ?? ''),
+    const sentToken = new URL(sentEmail?.magicLinkUrl ?? '').searchParams.get(
+      'token',
     );
-    expect(challenge?.tokenHash).not.toBe(sentEmail?.token);
+
+    expect(sentToken).not.toBeNull();
+    expect(challenge?.tokenHash).toBe(tokenService.hash(sentToken ?? ''));
+    expect(challenge?.tokenHash).not.toBe(sentToken);
     expect(challenge?.expiresAt.getTime()).toBeGreaterThanOrEqual(
       beforeRequest + magicLinkTtlMilliseconds,
     );
     expect(challenge?.expiresAt.getTime()).toBeLessThanOrEqual(
       Date.now() + magicLinkTtlMilliseconds,
     );
+  });
+
+  it('supersedes an active challenge when the email requests another link', async () => {
+    const { challengesRepository, useCase } = makeSut();
+
+    await useCase.execute({ email: 'user@example.com' });
+    await useCase.execute({ email: 'user@example.com' });
+
+    expect(challengesRepository.magicLinkChallenges).toHaveLength(2);
+    expect(
+      challengesRepository.magicLinkChallenges[0]?.revokedAt,
+    ).not.toBeNull();
+    expect(challengesRepository.magicLinkChallenges[1]?.revokedAt).toBeNull();
   });
 });

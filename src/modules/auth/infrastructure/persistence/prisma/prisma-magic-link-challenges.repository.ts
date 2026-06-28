@@ -1,34 +1,76 @@
 import { Injectable } from '@nestjs/common';
+import { Prisma } from '@generated/prisma/client';
 import { PrismaService } from '@infra/prisma/prisma.service';
 import type {
+  ConsumeMagicLinkChallengeResult,
   CreateMagicLinkChallengeData,
   MagicLinkChallengeRecord,
   MagicLinkChallengesRepository,
 } from '../../../application/ports/magic-link-challenges.repository';
 import type { PrismaMagicLinkChallengeRecord } from './prisma-magic-link-challenges.repository.types';
 
+const maximumReplaceActiveAttempts = 3;
+
 @Injectable()
 class PrismaMagicLinkChallengesRepository implements MagicLinkChallengesRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(
+  async replaceActive(
     data: CreateMagicLinkChallengeData,
+    replacedAt: Date,
   ): Promise<MagicLinkChallengeRecord> {
-    const challenge = await this.prisma.magicLinkChallenge.create({
-      data: {
-        email: data.email,
-        tokenHash: data.tokenHash,
-        expiresAt: data.expiresAt,
-      },
-    });
+    for (
+      let attempt = 1;
+      attempt <= maximumReplaceActiveAttempts;
+      attempt += 1
+    ) {
+      try {
+        const challenge = await this.prisma.$transaction(
+          async (transaction) => {
+            await transaction.magicLinkChallenge.updateMany({
+              where: {
+                email: data.email,
+                usedAt: null,
+                revokedAt: null,
+                expiresAt: { gt: replacedAt },
+              },
+              data: {
+                revokedAt: replacedAt,
+              },
+            });
 
-    return this.mapChallenge(challenge);
+            return transaction.magicLinkChallenge.create({
+              data: {
+                email: data.email,
+                tokenHash: data.tokenHash,
+                expiresAt: data.expiresAt,
+              },
+            });
+          },
+          {
+            isolationLevel: Prisma.TransactionIsolationLevel.Serializable,
+          },
+        );
+
+        return this.mapChallenge(challenge);
+      } catch (error) {
+        const shouldRetry =
+          isTransactionConflictError(error) &&
+          attempt < maximumReplaceActiveAttempts;
+
+        if (!shouldRetry) {
+          throw error;
+        }
+      }
+    }
+
+    throw new Error('Magic link challenge replacement attempts exhausted');
   }
 
   async consumeByTokenHash(
     tokenHash: string,
     consumedAt: Date,
-  ): Promise<MagicLinkChallengeRecord | null> {
+  ): Promise<ConsumeMagicLinkChallengeResult> {
     const updateResult = await this.prisma.magicLinkChallenge.updateMany({
       where: {
         tokenHash,
@@ -42,14 +84,37 @@ class PrismaMagicLinkChallengesRepository implements MagicLinkChallengesReposito
     });
 
     if (updateResult.count === 0) {
-      return null;
+      const challenge = await this.prisma.magicLinkChallenge.findUnique({
+        where: { tokenHash },
+      });
+
+      if (!challenge) {
+        return { status: 'invalid' };
+      }
+
+      if (challenge.usedAt !== null) {
+        return { status: 'already_used' };
+      }
+
+      if (challenge.revokedAt !== null) {
+        return { status: 'revoked' };
+      }
+
+      if (challenge.expiresAt <= consumedAt) {
+        return { status: 'expired' };
+      }
+
+      return { status: 'invalid' };
     }
 
-    const challenge = await this.prisma.magicLinkChallenge.findUnique({
+    const challenge = await this.prisma.magicLinkChallenge.findUniqueOrThrow({
       where: { tokenHash },
     });
 
-    return challenge ? this.mapChallenge(challenge) : null;
+    return {
+      status: 'consumed',
+      challenge: this.mapChallenge(challenge),
+    };
   }
 
   private mapChallenge(
@@ -65,6 +130,15 @@ class PrismaMagicLinkChallengesRepository implements MagicLinkChallengesReposito
       createdAt: challenge.createdAt,
     };
   }
+}
+
+function isTransactionConflictError(
+  error: unknown,
+): error is Prisma.PrismaClientKnownRequestError {
+  return (
+    error instanceof Prisma.PrismaClientKnownRequestError &&
+    error.code === 'P2034'
+  );
 }
 
 export { PrismaMagicLinkChallengesRepository };

@@ -203,6 +203,27 @@ describe('GlobalExceptionFilter', () => {
     );
   });
 
+  it.each([
+    ['magic_link_expired', HttpStatus.GONE],
+    ['magic_link_already_used', HttpStatus.CONFLICT],
+    ['magic_link_superseded', HttpStatus.CONFLICT],
+    ['email_delivery_unavailable', HttpStatus.SERVICE_UNAVAILABLE],
+  ] as const)('maps %s to its semantic HTTP status', (code, statusCode) => {
+    const logger = createLogger();
+    const filter = new GlobalExceptionFilter(logger.logger);
+    const request = createRequest('/auth/magic-link/consume');
+    const mockResponse = createResponse();
+    const host = createArgumentsHost(request, mockResponse.response);
+
+    filter.catch(new AppError(code, 'Safe public message'), host);
+
+    expect(mockResponse.statusCode).toBe(statusCode);
+    expect(getResponseBody(mockResponse)).toMatchObject({
+      code,
+      statusCode,
+    });
+  });
+
   it('normalizes HttpException 4xx without additional logging', () => {
     const logger = createLogger();
     const filter = new GlobalExceptionFilter(logger.logger);
