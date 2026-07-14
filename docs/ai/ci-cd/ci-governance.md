@@ -143,11 +143,14 @@ Rules:
 
 - source branch must match the naming convention or be one of the protected branches
 - target branch must be one of the protected branches
+- title must follow the Sandicts Jira-prefixed Conventional Commit format
+- description must use the repository PR template, keep required headings, replace raw placeholders, and include the matching primary Jira key
 - the same source rules apply to every protected target (`developer`, `staging`, and `master`); there is no separate “promotion-only” path exclusive to `master`
 - pull requests from invalid branch names must fail
+- pull requests with invalid titles or descriptions must fail
 - squash merge only
 
-Preferred PR title format:
+Required PR title format:
 
 - `[KAN-123] feat(auth): implement google auth`
 - `[KAN-456] fix(payment): reject invalid payment state`
@@ -184,9 +187,15 @@ CI must enforce:
    - fail if target branch is not `developer`, `staging`, or `master`
 
 3. Pull request title validation
-   - fail if PR title does not follow the expected pattern when enabled
+   - fail if PR title does not follow the expected pattern
 
-4. Required validation jobs
+4. Pull request description validation
+   - fail if PR body is empty
+   - fail if required template sections are missing
+   - fail if raw template placeholders remain
+   - fail if `Primary Jira` does not match the Jira key in the PR title
+
+5. Required validation jobs
    - lint
    - typecheck
    - tests
