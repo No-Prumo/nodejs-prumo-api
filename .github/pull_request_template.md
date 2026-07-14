@@ -1,3 +1,16 @@
+<!--
+PR title format required by CI Governance:
+[KAN-123] type(scope): short summary
+
+Example:
+[KAN-132] refactor(api-contract): Split API contract schemas
+
+PR description required by CI Governance:
+- Keep the template headings and order unchanged.
+- Replace raw placeholders before opening or updating the PR.
+- Set Primary Jira to the same Jira key used in the PR title.
+-->
+
 ## Summary
 
 Describe clearly what this pull request changes and the intended scope.
@@ -40,6 +53,7 @@ For docs-only or setup work, describe why the repository needed this change.
 - [ ] lint (CI: Quality)
 - [ ] typecheck (CI: Quality)
 - [ ] tests (CI: Test)
+- [ ] contract (CI: Contract)
 - [ ] build (CI: Build)
 - [ ] dependency audit (CI: Dependency audit)
 - [ ] manual validation completed

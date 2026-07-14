@@ -29,19 +29,27 @@ jobs:
     timeout-minutes: 5
 
     steps:
-      - name: Validate branch naming and PR target
+      - name: Validate branch naming, PR title, PR description, and PR target
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_BODY: ${{ github.event.pull_request.body }}
         run: |
           HEAD="${{ github.head_ref }}"
           BASE="${{ github.base_ref }}"
+          TITLE="$PR_TITLE"
+          BODY="$PR_BODY"
 
           echo "Source branch: $HEAD"
           echo "Target branch: $BASE"
+          echo "Pull request title: $TITLE"
 
           TEMP_BRANCH_REGEX='^(feature|fix|hotfix|docs|refactor|test|ci|chore|rc|codex)/KAN-[0-9]+-[a-z0-9]+(-[a-z0-9]+)*$'
+          PR_TITLE_REGEX='^\[KAN-[0-9]+\] (feat|fix|hotfix|docs|refactor|test|ci|chore|build|perf|style|revert)\([a-z0-9-]+\): .+$'
 
           is_valid_temp_branch=false
           is_valid_protected_branch=false
           is_valid_target=false
+          is_valid_pr_title=false
 
           if [[ "$HEAD" =~ $TEMP_BRANCH_REGEX ]]; then
             is_valid_temp_branch=true
@@ -55,9 +63,94 @@ jobs:
             is_valid_target=true
           fi
 
+          if [[ "$TITLE" =~ $PR_TITLE_REGEX ]]; then
+            is_valid_pr_title=true
+          fi
+
           if [[ "$is_valid_target" == "false" ]]; then
             echo "Invalid target branch: $BASE"
             echo "Allowed targets: developer, staging, master"
+            exit 1
+          fi
+
+          if [[ "$is_valid_pr_title" == "false" ]]; then
+            echo "Invalid pull request title: $TITLE"
+            echo "Expected format: [KAN-123] type(scope): short summary"
+            echo "Allowed types: feat, fix, hotfix, docs, refactor, test, ci, chore, build, perf, style, revert"
+            echo "Allowed scope format: lowercase letters, numbers, and hyphens"
+            echo "Example: [KAN-132] refactor(api-contract): Split API contract schemas"
+            exit 1
+          fi
+
+          if [[ -z "${BODY//[[:space:]]/}" ]]; then
+            echo "Invalid pull request description: body is empty"
+            echo "Use .github/pull_request_template.md and replace the placeholders with this PR's details."
+            exit 1
+          fi
+
+          required_sections=(
+            "## Summary"
+            "## Problem"
+            "## Root cause"
+            "## Changes"
+            "## Files added or updated"
+            "## Impact"
+            "## Validation"
+            "## Notes"
+          )
+
+          last_section_line=0
+          for section in "${required_sections[@]}"; do
+            section_line="$(grep -nF "$section" <<< "$BODY" | head -n 1 | cut -d: -f1)"
+            if [[ -z "$section_line" ]]; then
+              echo "Invalid pull request description: missing required section '$section'"
+              echo "Keep the standard PR template headings and order."
+              exit 1
+            fi
+
+            if (( section_line <= last_section_line )); then
+              echo "Invalid pull request description: section '$section' is out of order"
+              echo "Keep the standard PR template headings and order."
+              exit 1
+            fi
+
+            last_section_line="$section_line"
+          done
+
+          raw_text_placeholders=(
+            "Describe clearly what this pull request changes and the intended scope."
+            "Explain the issue, need, or workflow gap this pull request addresses."
+            "Explain the cause identified in code, flow, documentation, or configuration."
+            "For docs-only or setup work, describe why the repository needed this change."
+          )
+
+          for placeholder in "${raw_text_placeholders[@]}"; do
+            if grep -Fq -- "$placeholder" <<< "$BODY"; then
+              echo "Invalid pull request description: raw template placeholder remains:"
+              echo "  $placeholder"
+              exit 1
+            fi
+          done
+
+          raw_line_placeholder_patterns=(
+            '^[[:space:]]*-[[:space:]]*item([[:space:]][0-9]+)?[[:space:]]*$'
+            '^[[:space:]]*-[[:space:]]*`path/to/file`[[:space:]]*$'
+            '^[[:space:]]*-[[:space:]]*relevant note[[:space:]]*$'
+          )
+
+          for placeholder_pattern in "${raw_line_placeholder_patterns[@]}"; do
+            if grep -Eq -- "$placeholder_pattern" <<< "$BODY"; then
+              echo "Invalid pull request description: raw template bullet remains"
+              echo "Replace placeholder bullets with this PR's actual details."
+              exit 1
+            fi
+          done
+
+          TITLE_JIRA="$(sed -E 's/^\[(KAN-[0-9]+)\].*/\1/' <<< "$TITLE")"
+          PRIMARY_JIRA_REGEX='^[[:space:]]*-?[[:space:]]*Primary Jira:[[:space:]]+`?'"$TITLE_JIRA"'`?[[:space:]]*$'
+          if ! grep -Eq "$PRIMARY_JIRA_REGEX" <<< "$BODY"; then
+            echo "Invalid pull request description: Notes must include Primary Jira matching the PR title"
+            echo "Expected: Primary Jira: \`$TITLE_JIRA\`"
             exit 1
           fi
 

@@ -1185,7 +1185,7 @@ Jobs:
 
 | Job | Purpose |
 | --- | --- |
-| `governance` | Validates source branch naming and allowed target branch. |
+| `governance` | Validates source branch naming, PR title, PR description, and allowed target branch. |
 | `quality` | Runs `npm run lint:ci` and `npm run typecheck`. |
 | `test` | Runs `npm run test:ci`. |
 | `contract` | Runs `npm run openapi:check`. |

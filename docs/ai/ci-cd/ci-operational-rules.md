@@ -50,10 +50,11 @@ The workflow defines `DATABASE_URL` with a non-secret local PostgreSQL URL so Pr
 | `governance` | Governance                              |
 | `quality`    | Quality                                 |
 | `test`       | Test                                    |
+| `contract`   | Contract                                |
 | `build`      | Build                                   |
 | `security`   | Dependency audit                        |
 
-Dependency order: `quality`, `test`, `build`, and `security` each `needs: governance`.
+Dependency order: `quality`, `test`, `contract`, `build`, and `security` each `needs: governance`.
 
 ### Commands run
 
@@ -62,6 +63,7 @@ Dependency order: `quality`, `test`, `build`, and `security` each `needs: govern
 | Quality  | Lint      | `npm run lint:ci`                  |
 | Quality  | Typecheck | `npm run typecheck`                |
 | Test     | Tests     | `npm run test:ci`                  |
+| Contract | OpenAPI   | `npm run openapi:check`            |
 | Build    | Build     | `npm run build`                    |
 | Security | Audit     | `npm audit --audit-level=moderate` |
 
@@ -85,11 +87,24 @@ Allowed source branches that skip the temp-branch regex (exact match):
 
 Target validation: `BASE` must be one of `developer`, `staging`, `master`. There is no per-target promotion `case`; the same source rules apply to all targets.
 
+Pull request title pattern (inline in `ci-pr.yml`):
+
+```regex
+^\[KAN-[0-9]+\] (feat|fix|hotfix|docs|refactor|test|ci|chore|build|perf|style|revert)\([a-z0-9-]+\): .+$
+```
+
+Pull request description validation requires:
+
+- non-empty PR body
+- required template sections in order: `Summary`, `Problem`, `Root cause`, `Changes`, `Files added or updated`, `Impact`, `Validation`, and `Notes`
+- no raw template placeholders such as `Describe clearly...`, `- item`, `path/to/file`, or `relevant note`
+- `Primary Jira` in `Notes` matching the Jira key from the PR title
+
 ## GitHub branch protection (manual)
 
 Set the repository default branch to `master` (GitHub: Settings → General → Default branch) so clones and PR defaults align with policy.
 
-Configure rulesets or branch protection on `developer`, `staging`, and `master` to match policy in `ci-governance.md`. Required status checks should include the job display names above (`Governance`, `Quality`, `Test`, `Build`, `Dependency audit`) so merges are blocked until CI passes.
+Configure rulesets or branch protection on `developer`, `staging`, and `master` to match policy in `ci-governance.md`. Required status checks should include the job display names above (`Governance`, `Quality`, `Test`, `Contract`, `Build`, `Dependency audit`) so merges are blocked until CI passes.
 
 ## Other workflow files
 

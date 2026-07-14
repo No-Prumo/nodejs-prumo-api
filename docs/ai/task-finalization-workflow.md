@@ -168,6 +168,7 @@ Rules:
 - If a PR includes multiple Jira tasks, put the primary key in the title and
   list related Jira keys in the PR body.
 - Do not use branch names as PR titles.
+- CI Governance blocks PRs that do not follow this format.
 
 ## Pull Request Description Standard
 
@@ -187,6 +188,9 @@ Rules:
   Repository-specific differences belong in `Validation` and `Notes`.
 - Do not create or leave a PR with a blank body, omitted body, raw placeholders,
   or a shortened alternative body.
+- CI Governance blocks PRs with an empty body, missing required template
+  sections, raw placeholders, or a `Primary Jira` value that does not match the
+  Jira key in the PR title.
 
 ## Validation Rule
 
