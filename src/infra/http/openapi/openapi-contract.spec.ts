@@ -86,6 +86,44 @@ const expectedOperations = {
       '500': ['internal_error'],
     },
   },
+  'GET /players/me': {
+    success: ['200'],
+    errors: {
+      '401': ['invalid_access_token', 'auth_session_inactive'],
+      '403': ['account_auth_forbidden'],
+      '429': ['rate_limited'],
+      '500': ['internal_error'],
+    },
+  },
+  'POST /players/me': {
+    success: ['201'],
+    errors: {
+      '400': ['validation_error'],
+      '401': ['invalid_access_token', 'auth_session_inactive'],
+      '403': ['account_auth_forbidden'],
+      '409': ['conflict'],
+      '429': ['rate_limited'],
+      '500': ['internal_error'],
+    },
+  },
+  'PATCH /players/me': {
+    success: ['200'],
+    errors: {
+      '400': ['validation_error'],
+      '401': ['invalid_access_token', 'auth_session_inactive'],
+      '403': ['account_auth_forbidden'],
+      '404': ['resource_not_found'],
+      '429': ['rate_limited'],
+      '500': ['internal_error'],
+    },
+  },
+  'GET /sports': {
+    success: ['200'],
+    errors: {
+      '429': ['rate_limited'],
+      '500': ['internal_error'],
+    },
+  },
 } as const;
 
 describe('OpenAPI contract', () => {

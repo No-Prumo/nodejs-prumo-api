@@ -81,7 +81,7 @@ import { SignOutController } from './presentation/http/sign-out/sign-out.control
       useFactory: (settings: EmailConfig) => createEmailGateway(settings),
     },
   ],
-  exports: [CreateAuthSessionUseCase],
+  exports: [CreateAuthSessionUseCase, GetCurrentAuthSessionUseCase],
 })
 class AuthModule {}
 

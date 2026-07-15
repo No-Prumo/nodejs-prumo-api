@@ -36,6 +36,7 @@ model Account {
 
   externalIdentities ExternalIdentity[]
   authSessions       AuthSession[]
+  playerProfile      PlayerProfile?
 
   @@index([status])
   @@map("accounts")

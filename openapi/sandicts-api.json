@@ -1081,6 +1081,651 @@
           "Auth"
         ]
       }
+    },
+    "/sports": {
+      "get": {
+        "description": "Returns the MVP sports catalog and simple levels available for player profiles.",
+        "operationId": "ListSportsController_getSports",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Supported MVP sports and player levels",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListSportsResponse_Output"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded. Codes: `rate_limited`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiErrorResponse"
+                    }
+                  ],
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "enum": [
+                        429
+                      ]
+                    },
+                    "code": {
+                      "type": "string",
+                      "enum": [
+                        "rate_limited"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected internal failure. Codes: `internal_error`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiErrorResponse"
+                    }
+                  ],
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "enum": [
+                        500
+                      ]
+                    },
+                    "code": {
+                      "type": "string",
+                      "enum": [
+                        "internal_error"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "List supported sports",
+        "tags": [
+          "Sports"
+        ]
+      }
+    },
+    "/players/me": {
+      "get": {
+        "description": "Returns the authenticated player profile and completion state for post-login routing.",
+        "operationId": "GetCurrentPlayerProfileController_getCurrentProfile",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Bearer access token for the current session.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Current player profile and completion state",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CurrentPlayerProfileResponse_Output"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication failed. Codes: `invalid_access_token`, `auth_session_inactive`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiErrorResponse"
+                    }
+                  ],
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "enum": [
+                        401
+                      ]
+                    },
+                    "code": {
+                      "type": "string",
+                      "enum": [
+                        "invalid_access_token",
+                        "auth_session_inactive"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access forbidden. Codes: `account_auth_forbidden`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiErrorResponse"
+                    }
+                  ],
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "enum": [
+                        403
+                      ]
+                    },
+                    "code": {
+                      "type": "string",
+                      "enum": [
+                        "account_auth_forbidden"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded. Codes: `rate_limited`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiErrorResponse"
+                    }
+                  ],
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "enum": [
+                        429
+                      ]
+                    },
+                    "code": {
+                      "type": "string",
+                      "enum": [
+                        "rate_limited"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected internal failure. Codes: `internal_error`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiErrorResponse"
+                    }
+                  ],
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "enum": [
+                        500
+                      ]
+                    },
+                    "code": {
+                      "type": "string",
+                      "enum": [
+                        "internal_error"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Get current player profile",
+        "tags": [
+          "Players"
+        ]
+      },
+      "post": {
+        "description": "Creates the authenticated player profile with exactly one MVP main sport.",
+        "operationId": "CreateCurrentPlayerProfileController_create",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Bearer access token for the current session.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCurrentPlayerProfileBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Current player profile created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CurrentPlayerProfileResponse_Output"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request. Codes: `validation_error`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiErrorResponse"
+                    }
+                  ],
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "enum": [
+                        400
+                      ]
+                    },
+                    "code": {
+                      "type": "string",
+                      "enum": [
+                        "validation_error"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication failed. Codes: `invalid_access_token`, `auth_session_inactive`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiErrorResponse"
+                    }
+                  ],
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "enum": [
+                        401
+                      ]
+                    },
+                    "code": {
+                      "type": "string",
+                      "enum": [
+                        "invalid_access_token",
+                        "auth_session_inactive"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access forbidden. Codes: `account_auth_forbidden`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiErrorResponse"
+                    }
+                  ],
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "enum": [
+                        403
+                      ]
+                    },
+                    "code": {
+                      "type": "string",
+                      "enum": [
+                        "account_auth_forbidden"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Resource state conflict. Codes: `conflict`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiErrorResponse"
+                    }
+                  ],
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "enum": [
+                        409
+                      ]
+                    },
+                    "code": {
+                      "type": "string",
+                      "enum": [
+                        "conflict"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded. Codes: `rate_limited`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiErrorResponse"
+                    }
+                  ],
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "enum": [
+                        429
+                      ]
+                    },
+                    "code": {
+                      "type": "string",
+                      "enum": [
+                        "rate_limited"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected internal failure. Codes: `internal_error`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiErrorResponse"
+                    }
+                  ],
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "enum": [
+                        500
+                      ]
+                    },
+                    "code": {
+                      "type": "string",
+                      "enum": [
+                        "internal_error"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Create current player profile",
+        "tags": [
+          "Players"
+        ]
+      },
+      "patch": {
+        "description": "Updates the authenticated player profile. The MVP contract keeps a single main sport.",
+        "operationId": "UpdateCurrentPlayerProfileController_update",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "Bearer access token for the current session.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCurrentPlayerProfileBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Current player profile updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CurrentPlayerProfileResponse_Output"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request. Codes: `validation_error`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiErrorResponse"
+                    }
+                  ],
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "enum": [
+                        400
+                      ]
+                    },
+                    "code": {
+                      "type": "string",
+                      "enum": [
+                        "validation_error"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication failed. Codes: `invalid_access_token`, `auth_session_inactive`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiErrorResponse"
+                    }
+                  ],
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "enum": [
+                        401
+                      ]
+                    },
+                    "code": {
+                      "type": "string",
+                      "enum": [
+                        "invalid_access_token",
+                        "auth_session_inactive"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Access forbidden. Codes: `account_auth_forbidden`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiErrorResponse"
+                    }
+                  ],
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "enum": [
+                        403
+                      ]
+                    },
+                    "code": {
+                      "type": "string",
+                      "enum": [
+                        "account_auth_forbidden"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found. Codes: `resource_not_found`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiErrorResponse"
+                    }
+                  ],
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "enum": [
+                        404
+                      ]
+                    },
+                    "code": {
+                      "type": "string",
+                      "enum": [
+                        "resource_not_found"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Rate limit exceeded. Codes: `rate_limited`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiErrorResponse"
+                    }
+                  ],
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "enum": [
+                        429
+                      ]
+                    },
+                    "code": {
+                      "type": "string",
+                      "enum": [
+                        "rate_limited"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Unexpected internal failure. Codes: `internal_error`.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiErrorResponse"
+                    }
+                  ],
+                  "properties": {
+                    "statusCode": {
+                      "type": "integer",
+                      "enum": [
+                        500
+                      ]
+                    },
+                    "code": {
+                      "type": "string",
+                      "enum": [
+                        "internal_error"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Update current player profile",
+        "tags": [
+          "Players"
+        ]
+      }
     }
   },
   "info": {
@@ -1384,6 +2029,275 @@
         ],
         "id": "GetCurrentAuthSessionResponse_Output",
         "additionalProperties": false
+      },
+      "SportResponse_Output": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "$ref": "#/components/schemas/SportCode_Output"
+          },
+          "name": {
+            "type": "string"
+          },
+          "availableLevels": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PlayerLevel_Output"
+            }
+          }
+        },
+        "required": [
+          "code",
+          "name",
+          "availableLevels"
+        ],
+        "additionalProperties": false,
+        "id": "SportResponse_Output"
+      },
+      "SportCode_Output": {
+        "type": "string",
+        "enum": [
+          "futevolei",
+          "beach_tennis",
+          "beach_volleyball"
+        ],
+        "id": "SportCode_Output"
+      },
+      "PlayerLevel_Output": {
+        "type": "string",
+        "enum": [
+          "beginner",
+          "intermediate",
+          "advanced"
+        ],
+        "id": "PlayerLevel_Output"
+      },
+      "PlayerLevelOptionResponse_Output": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "$ref": "#/components/schemas/PlayerLevel_Output"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "name"
+        ],
+        "additionalProperties": false,
+        "id": "PlayerLevelOptionResponse_Output"
+      },
+      "ListSportsResponse_Output": {
+        "type": "object",
+        "properties": {
+          "sports": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SportResponse_Output"
+            }
+          },
+          "levels": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PlayerLevelOptionResponse_Output"
+            }
+          }
+        },
+        "required": [
+          "sports",
+          "levels"
+        ],
+        "id": "ListSportsResponse_Output",
+        "additionalProperties": false
+      },
+      "PlayerProfileResponse_Output": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "displayName": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "mainSport": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PlayerProfileMainSportResponse_Output"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "completion": {
+            "$ref": "#/components/schemas/PlayerProfileCompletionResponse_Output"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z))$"
+          }
+        },
+        "required": [
+          "id",
+          "displayName",
+          "mainSport",
+          "completion",
+          "createdAt",
+          "updatedAt"
+        ],
+        "additionalProperties": false,
+        "id": "PlayerProfileResponse_Output"
+      },
+      "PlayerProfileMainSportResponse_Output": {
+        "type": "object",
+        "properties": {
+          "sportCode": {
+            "$ref": "#/components/schemas/SportCode_Output"
+          },
+          "level": {
+            "$ref": "#/components/schemas/PlayerLevel_Output"
+          }
+        },
+        "required": [
+          "sportCode",
+          "level"
+        ],
+        "additionalProperties": false,
+        "id": "PlayerProfileMainSportResponse_Output"
+      },
+      "PlayerProfileCompletionResponse_Output": {
+        "type": "object",
+        "properties": {
+          "state": {
+            "type": "string",
+            "enum": [
+              "missing",
+              "incomplete",
+              "complete"
+            ]
+          },
+          "isComplete": {
+            "type": "boolean"
+          },
+          "missingFields": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PlayerProfileCompletionMissingField_Output"
+            }
+          }
+        },
+        "required": [
+          "state",
+          "isComplete",
+          "missingFields"
+        ],
+        "additionalProperties": false,
+        "id": "PlayerProfileCompletionResponse_Output"
+      },
+      "PlayerProfileCompletionMissingField_Output": {
+        "type": "string",
+        "enum": [
+          "displayName",
+          "mainSportCode",
+          "mainSportLevel"
+        ],
+        "id": "PlayerProfileCompletionMissingField_Output"
+      },
+      "CurrentPlayerProfileResponse_Output": {
+        "type": "object",
+        "properties": {
+          "profile": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PlayerProfileResponse_Output"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "completion": {
+            "$ref": "#/components/schemas/PlayerProfileCompletionResponse_Output"
+          }
+        },
+        "required": [
+          "profile",
+          "completion"
+        ],
+        "id": "CurrentPlayerProfileResponse_Output",
+        "additionalProperties": false
+      },
+      "SportCode": {
+        "type": "string",
+        "enum": [
+          "futevolei",
+          "beach_tennis",
+          "beach_volleyball"
+        ],
+        "id": "SportCode"
+      },
+      "PlayerLevel": {
+        "type": "string",
+        "enum": [
+          "beginner",
+          "intermediate",
+          "advanced"
+        ],
+        "id": "PlayerLevel"
+      },
+      "CreateCurrentPlayerProfileBody": {
+        "type": "object",
+        "properties": {
+          "displayName": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 80
+          },
+          "mainSportCode": {
+            "$ref": "#/components/schemas/SportCode"
+          },
+          "mainSportLevel": {
+            "$ref": "#/components/schemas/PlayerLevel"
+          }
+        },
+        "required": [
+          "displayName",
+          "mainSportCode",
+          "mainSportLevel"
+        ],
+        "id": "CreateCurrentPlayerProfileBody"
+      },
+      "UpdateCurrentPlayerProfileBody": {
+        "type": "object",
+        "properties": {
+          "displayName": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 80
+          },
+          "mainSportCode": {
+            "$ref": "#/components/schemas/SportCode"
+          },
+          "mainSportLevel": {
+            "$ref": "#/components/schemas/PlayerLevel"
+          }
+        },
+        "id": "UpdateCurrentPlayerProfileBody"
       }
     }
   }
