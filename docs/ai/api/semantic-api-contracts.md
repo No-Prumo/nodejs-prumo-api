@@ -103,15 +103,28 @@ HTTP mapping.
 
 ## Current Auth Matrix
 
-| Endpoint | Success | Expected errors |
-| --- | --- | --- |
-| `POST /auth/google/sign-in` | `200` | `400`, `401`, `403`, `409`, `429`, `500` |
-| `POST /auth/refresh` | `200` | `401`, `403`, `429`, `500` |
-| `POST /auth/magic-link/request` | `202` | `400`, `429`, `500`, `503` |
-| `POST /auth/magic-link/consume` | `200` | `400`, `401`, `403`, `409`, `410`, `429`, `500` |
-| `POST /auth/sign-out` | `204` | `401`, `429`, `500` |
-| `POST /auth/sign-out-all` | `204` | `401`, `429`, `500` |
-| `GET /auth/me` | `200` | `401`, `403`, `429`, `500` |
+| Endpoint                        | Success | Expected errors                                 |
+| ------------------------------- | ------- | ----------------------------------------------- |
+| `POST /auth/google/sign-in`     | `200`   | `400`, `401`, `403`, `409`, `429`, `500`        |
+| `POST /auth/refresh`            | `200`   | `401`, `403`, `429`, `500`                      |
+| `POST /auth/magic-link/request` | `202`   | `400`, `429`, `500`, `503`                      |
+| `POST /auth/magic-link/consume` | `200`   | `400`, `401`, `403`, `409`, `410`, `429`, `500` |
+| `POST /auth/sign-out`           | `204`   | `401`, `429`, `500`                             |
+| `POST /auth/sign-out-all`       | `204`   | `401`, `429`, `500`                             |
+| `GET /auth/me`                  | `200`   | `401`, `403`, `429`, `500`                      |
+
+## Current Player Profile Matrix
+
+The MVP current player profile supports exactly one main sport. Additional
+player sports are future paid capability and are not exposed as an active
+`sports[]` profile contract.
+
+| Endpoint            | Success | Expected errors                          |
+| ------------------- | ------- | ---------------------------------------- |
+| `GET /players/me`   | `200`   | `401`, `403`, `429`, `500`               |
+| `POST /players/me`  | `201`   | `400`, `401`, `403`, `409`, `429`, `500` |
+| `PATCH /players/me` | `200`   | `400`, `401`, `403`, `404`, `429`, `500` |
+| `GET /sports`       | `200`   | `429`, `500`                             |
 
 Exact codes are asserted by
 `src/infra/http/openapi/openapi-contract.spec.ts`.

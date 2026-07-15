@@ -4,6 +4,7 @@ import { HttpPlatformModule } from './infra/http/http-platform.module';
 import { LoggingModule } from './infra/logging/logging.module';
 import { PrismaModule } from './infra/prisma/prisma.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { PlayersModule } from './modules/players/players.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { AuthModule } from './modules/auth/auth.module';
     HttpPlatformModule,
     PrismaModule,
     AuthModule,
+    PlayersModule,
   ],
 })
 class AppModule {}
