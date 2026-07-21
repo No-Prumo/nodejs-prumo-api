@@ -1,17 +1,44 @@
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
-import type {
-  OpenAPIObject,
-  OperationObject,
-  ReferenceObject,
-  ResponseObject,
-  SchemaObject,
-} from '@nestjs/swagger/dist/interfaces/open-api-spec.interface';
+
+type ReferenceObject = {
+  $ref: string;
+};
+
+type SchemaObject = {
+  allOf?: Array<SchemaObject | ReferenceObject>;
+  enum?: unknown[];
+  properties?: Record<string, SchemaObject | ReferenceObject>;
+};
+
+type ResponseObject = {
+  content?: Record<
+    string,
+    {
+      schema?: SchemaObject | ReferenceObject;
+    }
+  >;
+};
+
+type OperationObject = {
+  responses?: Record<string, ResponseObject | ReferenceObject | undefined>;
+};
+
+type PathItemObject = Partial<
+  Record<'get' | 'post' | 'put' | 'patch' | 'delete', OperationObject>
+>;
+
+type OpenApiContractDocument = {
+  components?: {
+    schemas?: Record<string, SchemaObject | ReferenceObject>;
+  };
+  paths: Record<string, PathItemObject>;
+};
 
 const openApiArtifactPath = path.resolve('openapi', 'sandicts-api.json');
 const openApiDocument = JSON.parse(
   readFileSync(openApiArtifactPath, 'utf8'),
-) as OpenAPIObject;
+) as OpenApiContractDocument;
 
 const expectedOperations = {
   'POST /auth/google/sign-in': {
