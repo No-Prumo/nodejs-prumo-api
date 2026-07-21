@@ -1,14 +1,10 @@
-const EMAIL_GATEWAY = Symbol('EMAIL_GATEWAY');
+import type { SendMagicLinkEmailRequest } from './email-gateway.types';
 
-type SendMagicLinkEmailRequest = {
-  email: string;
-  magicLinkUrl: string;
-  expiresAt: Date;
-};
+const EMAIL_GATEWAY = Symbol('EMAIL_GATEWAY');
 
 type EmailGateway = {
   sendMagicLink(request: SendMagicLinkEmailRequest): Promise<void>;
 };
 
 export { EMAIL_GATEWAY };
-export type { EmailGateway, SendMagicLinkEmailRequest };
+export type { EmailGateway };

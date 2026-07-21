@@ -1,30 +1,10 @@
-import type { PlayerLevel } from '../../domain/player-level';
-import type { SportCode } from '../../domain/sport-code';
+import type {
+  CreatePlayerProfileData,
+  PlayerProfileRecord,
+  UpdatePlayerProfileData,
+} from './player-profiles.repository.types';
 
 const PLAYER_PROFILES_REPOSITORY = Symbol('PLAYER_PROFILES_REPOSITORY');
-
-type PlayerProfileRecord = {
-  id: string;
-  accountId: string;
-  displayName: string | null;
-  mainSportCode: SportCode | null;
-  mainSportLevel: PlayerLevel | null;
-  createdAt: Date;
-  updatedAt: Date;
-};
-
-type CreatePlayerProfileData = {
-  accountId: string;
-  displayName: string;
-  mainSportCode: SportCode;
-  mainSportLevel: PlayerLevel;
-};
-
-type UpdatePlayerProfileData = {
-  displayName?: string;
-  mainSportCode?: SportCode;
-  mainSportLevel?: PlayerLevel;
-};
 
 type PlayerProfilesRepository = {
   create(data: CreatePlayerProfileData): Promise<PlayerProfileRecord>;
@@ -36,9 +16,4 @@ type PlayerProfilesRepository = {
 };
 
 export { PLAYER_PROFILES_REPOSITORY };
-export type {
-  CreatePlayerProfileData,
-  PlayerProfileRecord,
-  PlayerProfilesRepository,
-  UpdatePlayerProfileData,
-};
+export type { PlayerProfilesRepository };

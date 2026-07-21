@@ -5,7 +5,7 @@ import {
   PLAYER_PROFILES_REPOSITORY,
   type PlayerProfilesRepository,
 } from '../../ports/player-profiles.repository';
-import { getPlayerProfileCompletion } from '../../services/player-profile-completion';
+import { getPlayerProfileCompletion } from '../../services/player-profile-completion/player-profile-completion';
 import type { CurrentPlayerProfileUseCaseResponse } from '../current-player-profile-response.types';
 import type { UpdateCurrentPlayerProfileUseCaseRequest } from './update-current-player-profile.use-case.types';
 

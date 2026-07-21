@@ -11,9 +11,9 @@ import {
 } from '../../ports/accounts.repository';
 import {
   AUTH_SESSIONS_REPOSITORY,
-  type AuthSessionRecord,
   type AuthSessionsRepository,
 } from '../../ports/auth-sessions.repository';
+import type { AuthSessionRecord } from '../../ports/auth-sessions.repository.types';
 import { TokenService } from '../../services/tokens/token.service';
 import type {
   GetCurrentAuthSessionUseCaseRequest,

@@ -1,21 +1,9 @@
-import type { PlayerProfileRecord } from '../ports/player-profiles.repository';
-
-const playerProfileCompletionMissingFields = [
-  'displayName',
-  'mainSportCode',
-  'mainSportLevel',
-] as const;
-
-type PlayerProfileCompletionMissingField =
-  (typeof playerProfileCompletionMissingFields)[number];
-
-type PlayerProfileCompletionState = 'missing' | 'incomplete' | 'complete';
-
-type PlayerProfileCompletion = {
-  state: PlayerProfileCompletionState;
-  isComplete: boolean;
-  missingFields: PlayerProfileCompletionMissingField[];
-};
+import type { PlayerProfileRecord } from '../../ports/player-profiles.repository.types';
+import { playerProfileCompletionMissingFields } from './player-profile-completion.constants';
+import type {
+  PlayerProfileCompletion,
+  PlayerProfileCompletionMissingField,
+} from './player-profile-completion.types';
 
 function getPlayerProfileCompletion(
   profile: PlayerProfileRecord | null,
@@ -49,9 +37,4 @@ function getPlayerProfileCompletion(
   };
 }
 
-export { getPlayerProfileCompletion, playerProfileCompletionMissingFields };
-export type {
-  PlayerProfileCompletion,
-  PlayerProfileCompletionMissingField,
-  PlayerProfileCompletionState,
-};
+export { getPlayerProfileCompletion };

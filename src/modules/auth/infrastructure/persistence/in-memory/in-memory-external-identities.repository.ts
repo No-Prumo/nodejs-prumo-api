@@ -1,10 +1,10 @@
+import type { ExternalIdentitiesRepository } from '../../../application/ports/external-identities.repository';
 import type {
   AccountProviderLookup,
   CreateExternalIdentityData,
-  ExternalIdentitiesRepository,
   ExternalIdentityRecord,
   ProviderSubjectLookup,
-} from '../../../application/ports/external-identities.repository';
+} from '../../../application/ports/external-identities.repository.types';
 
 class InMemoryExternalIdentitiesRepository implements ExternalIdentitiesRepository {
   readonly externalIdentities: ExternalIdentityRecord[] = [];

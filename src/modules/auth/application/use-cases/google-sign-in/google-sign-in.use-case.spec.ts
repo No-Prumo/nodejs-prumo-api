@@ -5,10 +5,8 @@ import { InMemoryAccountsRepository } from '@auth/infrastructure/persistence/in-
 import { InMemoryAuthSessionsRepository } from '@auth/infrastructure/persistence/in-memory/in-memory-auth-sessions.repository';
 import { InMemoryExternalIdentitiesRepository } from '@auth/infrastructure/persistence/in-memory/in-memory-external-identities.repository';
 import { buildTestAuthConfig } from '@test-support/auth/build-test-auth-config';
-import type {
-  GoogleIdTokenVerifier,
-  VerifiedGoogleIdentity,
-} from '../../ports/google-id-token-verifier';
+import type { GoogleIdTokenVerifier } from '../../ports/google-id-token-verifier';
+import type { VerifiedGoogleIdentity } from '../../ports/google-id-token-verifier.types';
 import { RefreshTokenHasher } from '../../services/tokens/refresh-token-hasher';
 import { TokenService } from '../../services/tokens/token.service';
 import { CreateAuthSessionUseCase } from '../create-auth-session/create-auth-session.use-case';

@@ -1,4 +1,4 @@
-import type { AccountRecord } from '@auth/application/ports/accounts.repository';
+import type { AccountRecord } from '@auth/application/ports/accounts.repository.types';
 import type { BuildAccountRecordOverrides } from './build-account-record.types';
 
 function buildAccountRecord(

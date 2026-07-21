@@ -1,5 +1,5 @@
-import type { PlayerLevel } from '../../../domain/player-level';
-import type { SportCode } from '../../../domain/sport-code';
+import type { PlayerLevel } from '../../../domain/player-level/player-level.types';
+import type { SportCode } from '../../../domain/sport-code/sport-code.types';
 
 type UpdateCurrentPlayerProfileUseCaseRequest = {
   accessToken: string;

@@ -2,10 +2,8 @@ import { Resend } from 'resend';
 import type { CreateEmailOptions } from 'resend';
 import { authErrorReasons } from '@auth/application/errors/auth-error-reasons';
 import { emailDeliveryUnavailable } from '@auth/application/errors/auth-errors';
-import type {
-  EmailGateway,
-  SendMagicLinkEmailRequest,
-} from '@auth/application/ports/email-gateway';
+import type { EmailGateway } from '@auth/application/ports/email-gateway';
+import type { SendMagicLinkEmailRequest } from '@auth/application/ports/email-gateway.types';
 import type { ResendEmailConfig } from '@config';
 import { buildMagicLinkEmailContent } from './magic-link-email-content';
 import type { ResendEmailClient } from './resend-email.gateway.types';

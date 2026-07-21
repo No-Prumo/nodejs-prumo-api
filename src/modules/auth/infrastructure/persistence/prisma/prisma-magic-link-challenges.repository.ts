@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@generated/prisma/client';
 import { PrismaService } from '@infra/prisma/prisma.service';
+import type { MagicLinkChallengesRepository } from '../../../application/ports/magic-link-challenges.repository';
 import type {
   ConsumeMagicLinkChallengeResult,
   CreateMagicLinkChallengeData,
   MagicLinkChallengeRecord,
-  MagicLinkChallengesRepository,
-} from '../../../application/ports/magic-link-challenges.repository';
+} from '../../../application/ports/magic-link-challenges.repository.types';
 import type { PrismaMagicLinkChallengeRecord } from './prisma-magic-link-challenges.repository.types';
 
 const maximumReplaceActiveAttempts = 3;

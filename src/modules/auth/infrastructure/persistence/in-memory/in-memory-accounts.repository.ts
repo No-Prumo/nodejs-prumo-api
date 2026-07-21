@@ -1,8 +1,8 @@
+import type { AccountsRepository } from '../../../application/ports/accounts.repository';
 import type {
   AccountRecord,
-  AccountsRepository,
   CreateAccountData,
-} from '../../../application/ports/accounts.repository';
+} from '../../../application/ports/accounts.repository.types';
 
 class InMemoryAccountsRepository implements AccountsRepository {
   readonly accounts: AccountRecord[] = [];

@@ -1,4 +1,10 @@
-const playerLevels = ['beginner', 'intermediate', 'advanced'] as const;
+import type { PlayerLevel } from './player-level.types';
+
+const playerLevels = [
+  'beginner',
+  'intermediate',
+  'advanced',
+] as const satisfies readonly PlayerLevel[];
 
 const playerLevelCatalog = [
   {
@@ -18,7 +24,4 @@ const playerLevelCatalog = [
   name: string;
 }[];
 
-type PlayerLevel = (typeof playerLevels)[number];
-
 export { playerLevelCatalog, playerLevels };
-export type { PlayerLevel };

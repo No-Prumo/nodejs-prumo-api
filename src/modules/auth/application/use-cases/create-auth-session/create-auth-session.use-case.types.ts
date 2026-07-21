@@ -1,4 +1,4 @@
-import type { AccountRecord } from '../../ports/accounts.repository';
+import type { AccountRecord } from '../../ports/accounts.repository.types';
 import type { AuthSessionCreationSource } from '../../../domain/auth-session-creation-source';
 
 type CreateAuthSessionUseCaseRequest = {

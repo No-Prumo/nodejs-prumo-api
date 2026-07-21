@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@infra/prisma/prisma.service';
+import type { AccountsRepository } from '../../../application/ports/accounts.repository';
 import type {
   AccountRecord,
-  AccountsRepository,
   CreateAccountData,
-} from '../../../application/ports/accounts.repository';
+} from '../../../application/ports/accounts.repository.types';
 import type { PrismaAccountRecord } from './prisma-accounts.repository.types';
 
 @Injectable()

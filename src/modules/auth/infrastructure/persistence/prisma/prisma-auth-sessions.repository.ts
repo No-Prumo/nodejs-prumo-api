@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@infra/prisma/prisma.service';
+import type { AuthSessionsRepository } from '../../../application/ports/auth-sessions.repository';
 import type {
   AuthRefreshTokenRecord,
   AuthSessionRecord,
-  AuthSessionsRepository,
   CreateAuthSessionData,
   RotateRefreshTokenData,
-} from '../../../application/ports/auth-sessions.repository';
+} from '../../../application/ports/auth-sessions.repository.types';
 import type {
   PrismaAuthRefreshTokenRecord,
   PrismaAuthSessionRecord,
