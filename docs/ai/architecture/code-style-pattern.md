@@ -50,3 +50,21 @@ Allowed inline values:
 When in doubt, name the value close to where it is used. Extract to a shared
 helper only after repetition appears or the value represents a cross-cutting
 concept such as time conversion.
+
+## Local Constants And Helpers
+
+Prefer local sibling files over broad utility buckets when a value or helper is
+specific to one module or adapter.
+
+Use:
+
+- `feature-name.constants.ts` for catalogs, allowed values, or reusable literals
+- `feature-name.types.ts` for exported structural types
+- `feature-name.helpers.ts` for small predicates, guards, or local calculations
+- `feature-name.mapper.ts` for translating between layers
+
+Avoid:
+
+- `utils.ts` or `helpers.ts` files that collect unrelated functions
+- moving domain-specific constants to `shared` only because another file imports them
+- mixing public contracts, persistence helpers, and mappers in the same file

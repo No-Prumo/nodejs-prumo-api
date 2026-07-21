@@ -1,8 +1,8 @@
 import { createZodDto } from 'nestjs-zod';
 import { z } from 'zod';
-import { playerLevels } from '../../../domain/player-level';
-import { mvpSportCodes } from '../../../domain/sport-code';
-import { playerProfileCompletionMissingFields } from '../../../application/services/player-profile-completion';
+import { playerProfileCompletionMissingFields } from '../../../application/services/player-profile-completion/player-profile-completion.constants';
+import { playerLevels } from '../../../domain/player-level/player-level.constants';
+import { mvpSportCodes } from '../../../domain/sport-code/sport-code.constants';
 
 const SportCodeSchema = z.enum(mvpSportCodes).meta({ id: 'SportCode' });
 const PlayerLevelSchema = z.enum(playerLevels).meta({ id: 'PlayerLevel' });

@@ -1,8 +1,10 @@
+import type { SportCode } from './sport-code.types';
+
 const mvpSportCodes = [
   'futevolei',
   'beach_tennis',
   'beach_volleyball',
-] as const;
+] as const satisfies readonly SportCode[];
 
 const mvpSportsCatalog = [
   {
@@ -22,7 +24,4 @@ const mvpSportsCatalog = [
   name: string;
 }[];
 
-type SportCode = (typeof mvpSportCodes)[number];
-
 export { mvpSportCodes, mvpSportsCatalog };
-export type { SportCode };

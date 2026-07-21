@@ -1,9 +1,9 @@
+import type { MagicLinkChallengesRepository } from '../../../application/ports/magic-link-challenges.repository';
 import type {
   ConsumeMagicLinkChallengeResult,
   CreateMagicLinkChallengeData,
   MagicLinkChallengeRecord,
-  MagicLinkChallengesRepository,
-} from '../../../application/ports/magic-link-challenges.repository';
+} from '../../../application/ports/magic-link-challenges.repository.types';
 
 class InMemoryMagicLinkChallengesRepository implements MagicLinkChallengesRepository {
   readonly magicLinkChallenges: MagicLinkChallengeRecord[] = [];

@@ -1,22 +1,23 @@
 import { Injectable } from '@nestjs/common';
-import { Prisma } from '@generated/prisma/client';
 import { PrismaService } from '@infra/prisma/prisma.service';
 import {
   currentPlayerProfileAlreadyExists,
   currentPlayerProfileNotFound,
 } from '../../../application/errors/player-profile-errors';
+import type { PlayerProfilesRepository } from '../../../application/ports/player-profiles.repository';
 import type {
   CreatePlayerProfileData,
   PlayerProfileRecord,
-  PlayerProfilesRepository,
   UpdatePlayerProfileData,
-} from '../../../application/ports/player-profiles.repository';
-import type { PlayerLevel } from '../../../domain/player-level';
-import type { SportCode } from '../../../domain/sport-code';
-import type {
-  PrismaPlayerLevel,
-  PrismaPlayerProfileRecord,
-} from './prisma-player-profiles.repository.types';
+} from '../../../application/ports/player-profiles.repository.types';
+import {
+  isRecordNotFoundError,
+  isUniqueConstraintError,
+} from './prisma-player-profiles.repository.helpers';
+import {
+  mapPlayerLevelToPrisma,
+  mapPlayerProfile,
+} from './prisma-player-profiles.repository.mapper';
 
 @Injectable()
 class PrismaPlayerProfilesRepository implements PlayerProfilesRepository {
@@ -89,48 +90,6 @@ class PrismaPlayerProfilesRepository implements PlayerProfilesRepository {
       throw error;
     }
   }
-}
-
-function mapPlayerProfile(
-  profile: PrismaPlayerProfileRecord,
-): PlayerProfileRecord {
-  return {
-    id: profile.id,
-    accountId: profile.accountId,
-    displayName: profile.displayName,
-    mainSportCode: profile.mainSportCode as SportCode | null,
-    mainSportLevel: profile.mainSportLevel
-      ? mapPlayerLevelFromPrisma(profile.mainSportLevel)
-      : null,
-    createdAt: profile.createdAt,
-    updatedAt: profile.updatedAt,
-  };
-}
-
-function mapPlayerLevelToPrisma(level: PlayerLevel): PrismaPlayerLevel {
-  return level.toUpperCase() as PrismaPlayerLevel;
-}
-
-function mapPlayerLevelFromPrisma(level: PrismaPlayerLevel): PlayerLevel {
-  return level.toLowerCase() as PlayerLevel;
-}
-
-function isUniqueConstraintError(
-  error: unknown,
-): error is Prisma.PrismaClientKnownRequestError {
-  return (
-    error instanceof Prisma.PrismaClientKnownRequestError &&
-    error.code === 'P2002'
-  );
-}
-
-function isRecordNotFoundError(
-  error: unknown,
-): error is Prisma.PrismaClientKnownRequestError {
-  return (
-    error instanceof Prisma.PrismaClientKnownRequestError &&
-    error.code === 'P2025'
-  );
 }
 
 export { PrismaPlayerProfilesRepository };

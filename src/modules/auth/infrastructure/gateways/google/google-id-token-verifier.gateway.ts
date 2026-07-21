@@ -4,11 +4,11 @@ import { authErrorReasons } from '@auth/application/errors/auth-error-reasons';
 import { invalidGoogleCredential } from '@auth/application/errors/auth-errors';
 import { authConfig, type AuthConfig } from '@config';
 import { unixSecondsToMilliseconds } from '@shared/time/time.helpers';
+import type { GoogleIdTokenVerifier } from '../../../application/ports/google-id-token-verifier';
 import type {
-  GoogleIdTokenVerifier,
   VerifiedGoogleIdentity,
   VerifyGoogleIdTokenRequest,
-} from '../../../application/ports/google-id-token-verifier';
+} from '../../../application/ports/google-id-token-verifier.types';
 import type {
   GoogleOAuthClient,
   GoogleTokenPayload,

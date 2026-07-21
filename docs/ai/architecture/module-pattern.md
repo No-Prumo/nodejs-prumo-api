@@ -70,24 +70,34 @@ src/modules/reservations/
       create-reservation/
         create-reservation.use-case.ts
         create-reservation.use-case.spec.ts
+        create-reservation.use-case.types.ts
       cancel-reservation/
         cancel-reservation.use-case.ts
         cancel-reservation.use-case.spec.ts
+        cancel-reservation.use-case.types.ts
     services/
       pricing/
         reservation-price-calculator.ts
+        reservation-price-calculator.types.ts
     ports/
       reservations.repository.ts
+      reservations.repository.types.ts
       payment-gateway.ts
 
   domain/
-    reservation-status.ts
+    reservation-status/
+      reservation-status.ts
+      reservation-status.constants.ts
+      reservation-status.types.ts
     errors/
     value-objects/
 
   infrastructure/
     persistence/prisma/
       prisma-reservations.repository.ts
+      prisma-reservations.repository.mapper.ts
+      prisma-reservations.repository.types.ts
+      prisma-reservations.repository.helpers.ts
 ```
 
 Use one folder per action when the module has more than one controller or use
@@ -97,6 +107,30 @@ application services by capability, such as `services/tokens/` or
 `services/pricing/`, when more than one file shares the same vocabulary.
 
 This layout can stay small. Do not create empty folders before they are needed.
+
+## File Responsibility Suffixes
+
+Use sibling files when one implementation file starts mixing more than one
+responsibility. Keep these files beside the implementation they support.
+
+Default suffixes:
+
+- `.types.ts`: exported TypeScript types for the nearby implementation
+- `.constants.ts`: reusable constants, catalogs, or validation boundaries
+- `.mapper.ts`: mapping between layers, such as Prisma records to application records
+- `.helpers.ts`: small implementation helpers or type guards
+- `.schemas.ts`: HTTP Zod DTO schemas owned by presentation
+- `.spec.ts`: tests for the nearby unit
+
+Rules:
+
+- do not create suffix files before they clarify a real responsibility split
+- group a domain concept in its own folder once it needs more than one file
+- keep module-specific helpers inside the owning module, not in `shared`
+- do not place HTTP DTO classes in application or domain folders
+- do not place Prisma-specific mappers or helpers outside infrastructure
+- prefer one small implementation file plus one or two sibling support files
+  over a wide folder with many tiny files that are only used once
 
 ## Provider Wiring
 

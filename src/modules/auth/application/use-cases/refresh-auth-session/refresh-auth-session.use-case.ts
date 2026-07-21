@@ -16,9 +16,9 @@ import {
 } from '../../ports/accounts.repository';
 import {
   AUTH_SESSIONS_REPOSITORY,
-  type AuthRefreshTokenRecord,
   type AuthSessionsRepository,
 } from '../../ports/auth-sessions.repository';
+import type { AuthRefreshTokenRecord } from '../../ports/auth-sessions.repository.types';
 import { RefreshTokenHasher } from '../../services/tokens/refresh-token-hasher';
 import { TokenService } from '../../services/tokens/token.service';
 import type {

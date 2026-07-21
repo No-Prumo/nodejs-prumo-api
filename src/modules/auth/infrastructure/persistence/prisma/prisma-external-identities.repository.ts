@@ -3,14 +3,14 @@ import { authErrorReasons } from '@auth/application/errors/auth-error-reasons';
 import { externalIdentityConflict } from '@auth/application/errors/auth-errors';
 import { Prisma } from '@generated/prisma/client';
 import { PrismaService } from '@infra/prisma/prisma.service';
-import type { AuthProvider } from '../../../domain/auth-provider';
+import type { ExternalIdentitiesRepository } from '../../../application/ports/external-identities.repository';
 import type {
   AccountProviderLookup,
   CreateExternalIdentityData,
-  ExternalIdentitiesRepository,
   ExternalIdentityRecord,
   ProviderSubjectLookup,
-} from '../../../application/ports/external-identities.repository';
+} from '../../../application/ports/external-identities.repository.types';
+import type { AuthProvider } from '../../../domain/auth-provider';
 import type { PrismaExternalIdentityRecord } from './prisma-external-identities.repository.types';
 
 @Injectable()

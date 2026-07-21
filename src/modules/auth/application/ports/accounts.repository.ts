@@ -1,22 +1,9 @@
-import type { AccountStatus } from '../../domain/account-status';
+import type {
+  AccountRecord,
+  CreateAccountData,
+} from './accounts.repository.types';
 
 const ACCOUNTS_REPOSITORY = Symbol('ACCOUNTS_REPOSITORY');
-
-type AccountRecord = {
-  id: string;
-  email: string;
-  normalizedEmail: string;
-  displayName: string | null;
-  status: AccountStatus;
-  createdAt: Date;
-  updatedAt: Date;
-};
-
-type CreateAccountData = {
-  email: string;
-  normalizedEmail: string;
-  displayName?: string | null;
-};
 
 type AccountsRepository = {
   create(data: CreateAccountData): Promise<AccountRecord>;
@@ -26,4 +13,4 @@ type AccountsRepository = {
 };
 
 export { ACCOUNTS_REPOSITORY };
-export type { AccountRecord, AccountsRepository, CreateAccountData };
+export type { AccountsRepository };

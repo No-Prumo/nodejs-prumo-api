@@ -33,12 +33,19 @@ The application layer defines what it needs. Infrastructure decides how that nee
 Place repository ports in the application layer:
 
 ```txt
-modules/reservations/application/ports/reservations.repository.ts
+modules/reservations/application/ports/
+  reservations.repository.ts
+  reservations.repository.types.ts
 ```
 
 Pattern:
 
 ```ts
+import type {
+  CreateReservationData,
+  ReservationRecord,
+} from './reservations.repository.types';
+
 const RESERVATIONS_REPOSITORY = Symbol('RESERVATIONS_REPOSITORY');
 
 type ReservationsRepository = {
@@ -51,12 +58,33 @@ export { RESERVATIONS_REPOSITORY };
 export type { ReservationsRepository };
 ```
 
+```ts
+// reservations.repository.types.ts
+type ReservationRecord = {
+  id: string;
+  startsAt: Date;
+  endsAt: Date;
+};
+
+type CreateReservationData = {
+  courtId: string;
+  startsAt: Date;
+  endsAt: Date;
+};
+
+export type { CreateReservationData, ReservationRecord };
+```
+
 Rules:
 
 - the port name uses domain language
 - methods describe use case needs
 - methods should not expose Prisma model types
 - methods should not accept raw controller DTOs
+- keep the injection token and repository contract in `.repository.ts`
+- keep record, lookup, and write data shapes in `.repository.types.ts`
+- prefer `type` for repository contracts unless the project intentionally
+  changes the convention for every port
 
 ## Adapter Location
 
@@ -75,6 +103,9 @@ Place Prisma implementation in infrastructure:
 ```txt
 modules/reservations/infrastructure/persistence/prisma/
   prisma-reservations.repository.ts
+  prisma-reservations.repository.mapper.ts
+  prisma-reservations.repository.types.ts
+  prisma-reservations.repository.helpers.ts
 ```
 
 Pattern:
@@ -93,6 +124,14 @@ class PrismaReservationsRepository implements ReservationsRepository {
 
 export { PrismaReservationsRepository };
 ```
+
+Rules:
+
+- keep query orchestration in the repository implementation
+- keep database-to-application mapping in `.mapper.ts` once it is reused or non-trivial
+- keep Prisma record aliases in `.types.ts`
+- keep Prisma error type guards or low-level predicates in `.helpers.ts`
+- do not import Prisma-specific mapper or helper files outside infrastructure
 
 ## Method Semantics
 

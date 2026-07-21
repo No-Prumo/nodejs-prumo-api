@@ -1,10 +1,10 @@
+import type { AuthSessionsRepository } from '../../../application/ports/auth-sessions.repository';
 import type {
   AuthRefreshTokenRecord,
   AuthSessionRecord,
-  AuthSessionsRepository,
   CreateAuthSessionData,
   RotateRefreshTokenData,
-} from '../../../application/ports/auth-sessions.repository';
+} from '../../../application/ports/auth-sessions.repository.types';
 
 class InMemoryAuthSessionsRepository implements AuthSessionsRepository {
   readonly authSessions: AuthSessionRecord[] = [];

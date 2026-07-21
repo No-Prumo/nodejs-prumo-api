@@ -1,4 +1,4 @@
-import type { AccountRecord } from '../../ports/accounts.repository';
+import type { AccountRecord } from '../../ports/accounts.repository.types';
 
 type GetCurrentAuthSessionUseCaseRequest = {
   accessToken: string;

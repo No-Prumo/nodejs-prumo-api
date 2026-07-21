@@ -7,7 +7,7 @@ import {
   invalidGoogleCredential,
 } from '@auth/application/errors/auth-errors';
 import { authProviderCodes } from '@auth/domain/auth-provider';
-import type { AccountRecord } from '../../ports/accounts.repository';
+import type { AccountRecord } from '../../ports/accounts.repository.types';
 import {
   ACCOUNTS_REPOSITORY,
   type AccountsRepository,
@@ -18,9 +18,9 @@ import {
 } from '../../ports/external-identities.repository';
 import {
   GOOGLE_ID_TOKEN_VERIFIER,
-  type VerifiedGoogleIdentity,
   type GoogleIdTokenVerifier,
 } from '../../ports/google-id-token-verifier';
+import type { VerifiedGoogleIdentity } from '../../ports/google-id-token-verifier.types';
 import { normalizeEmail } from '../../services/email/normalize-email';
 import { CreateAuthSessionUseCase } from '../create-auth-session/create-auth-session.use-case';
 import type {

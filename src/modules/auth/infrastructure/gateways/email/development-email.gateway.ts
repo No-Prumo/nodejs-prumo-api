@@ -1,8 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import type {
-  EmailGateway,
-  SendMagicLinkEmailRequest,
-} from '../../../application/ports/email-gateway';
+import type { EmailGateway } from '../../../application/ports/email-gateway';
+import type { SendMagicLinkEmailRequest } from '../../../application/ports/email-gateway.types';
 
 @Injectable()
 class DevelopmentEmailGateway implements EmailGateway {

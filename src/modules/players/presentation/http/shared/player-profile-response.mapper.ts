@@ -1,6 +1,6 @@
-import { getPlayerProfileCompletion } from '../../../application/services/player-profile-completion';
+import { getPlayerProfileCompletion } from '../../../application/services/player-profile-completion/player-profile-completion';
 import type { CurrentPlayerProfileUseCaseResponse } from '../../../application/use-cases/current-player-profile-response.types';
-import type { PlayerProfileRecord } from '../../../application/ports/player-profiles.repository';
+import type { PlayerProfileRecord } from '../../../application/ports/player-profiles.repository.types';
 import type {
   CurrentPlayerProfileResponseDto,
   PlayerProfileResponseDto,

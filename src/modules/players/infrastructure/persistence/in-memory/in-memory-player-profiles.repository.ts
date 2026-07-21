@@ -1,10 +1,10 @@
 import { currentPlayerProfileAlreadyExists } from '../../../application/errors/player-profile-errors';
+import type { PlayerProfilesRepository } from '../../../application/ports/player-profiles.repository';
 import type {
   CreatePlayerProfileData,
   PlayerProfileRecord,
-  PlayerProfilesRepository,
   UpdatePlayerProfileData,
-} from '../../../application/ports/player-profiles.repository';
+} from '../../../application/ports/player-profiles.repository.types';
 
 class InMemoryPlayerProfilesRepository implements PlayerProfilesRepository {
   readonly profiles: PlayerProfileRecord[] = [];

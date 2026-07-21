@@ -2,10 +2,8 @@ import { buildTestAuthConfig } from '@test-support/auth/build-test-auth-config';
 import { buildTestEmailConfig } from '@test-support/email/build-test-email-config';
 import { InMemoryMagicLinkChallengesRepository } from '@auth/infrastructure/persistence/in-memory/in-memory-magic-link-challenges.repository';
 import { secondsToMilliseconds } from '@shared/time/time.helpers';
-import type {
-  EmailGateway,
-  SendMagicLinkEmailRequest,
-} from '../../ports/email-gateway';
+import type { EmailGateway } from '../../ports/email-gateway';
+import type { SendMagicLinkEmailRequest } from '../../ports/email-gateway.types';
 import { MagicLinkUrlBuilder } from '../../services/email/magic-link-url.builder';
 import { MagicLinkTokenService } from '../../services/tokens/magic-link-token.service';
 import {

@@ -1,6 +1,9 @@
 import { Injectable } from '@nestjs/common';
-import { playerLevelCatalog, playerLevels } from '../../../domain/player-level';
-import { mvpSportsCatalog } from '../../../domain/sport-code';
+import {
+  playerLevelCatalog,
+  playerLevels,
+} from '../../../domain/player-level/player-level.constants';
+import { mvpSportsCatalog } from '../../../domain/sport-code/sport-code.constants';
 
 @Injectable()
 class ListSportsUseCase {
