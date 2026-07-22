@@ -5,6 +5,7 @@ role: source-of-truth
 priority: high
 canonical: docs/ai/task-finalization-workflow.md
 related:
+  - sandicts/sandicts-docs:docs/ai/dependency-security-remediation.md
   - sandicts/sandicts-docs:docs/ai/pull-request-standard.md
   - .codex/skills/jira-pr-commit-writer/SKILL.md
   - .github/pull_request_template.md
@@ -218,6 +219,8 @@ Do not mark a validation as complete in the PR unless it actually ran.
 ## Security Remediation Rule
 
 When a task fixes dependency vulnerabilities, follow
+`sandicts/sandicts-docs:docs/ai/dependency-security-remediation.md` and the
+backend-specific workflow in
 `docs/ai/ci-cd/security-audit-remediation.md`.
 
 Rules:
@@ -229,6 +232,9 @@ Rules:
 - prefer targeted non-breaking updates or overrides before broad forced audit
   fixes
 - do not weaken the audit threshold or remove the dependency audit job
+- when the audit failure predates an unrelated PR, deliver the remediation in a
+  dedicated Jira task, branch, commit, and PR; merge it first, then update the
+  blocked branch from `developer`
 
 ## Jira Status Rule
 
