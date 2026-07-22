@@ -138,7 +138,8 @@ For finishing a Jira task, committing, or opening a PR, read:
 
 For dependency audit failures or vulnerability remediation, read:
 
-1. `docs/ai/ci-cd/security-audit-remediation.md`
-2. `docs/ai/ci-cd/ci-governance.md`
-3. `docs/ai/ci-cd/ci-operational-rules.md`
-4. `docs/ai/task-finalization-workflow.md`
+1. `sandicts/sandicts-docs:docs/ai/dependency-security-remediation.md`
+2. `docs/ai/ci-cd/security-audit-remediation.md`
+3. `docs/ai/ci-cd/ci-governance.md`
+4. `docs/ai/ci-cd/ci-operational-rules.md`
+5. `docs/ai/task-finalization-workflow.md`
