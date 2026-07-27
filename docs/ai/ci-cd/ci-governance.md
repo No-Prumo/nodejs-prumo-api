@@ -52,8 +52,8 @@ Protected branches:
 
 Technical baseline:
 
-- Node.js 22
-- npm
+- Node.js 24
+- npm 11
 - single repository
 
 ---
