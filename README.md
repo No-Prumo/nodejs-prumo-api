@@ -102,8 +102,8 @@ sign-out, sign-out-all, and current-session inspection.
 
 Runtime and framework:
 
-- Node.js 22
-- npm
+- Node.js 24
+- npm 11
 - NestJS 11
 - TypeScript
 - Express platform adapter through NestJS
@@ -146,8 +146,8 @@ Local infrastructure:
 
 Install:
 
-- Node.js 22
-- npm
+- Node.js 24
+- npm 11
 - Docker and Docker Compose
 
 Recommended checks:
@@ -159,7 +159,8 @@ docker --version
 docker compose version
 ```
 
-CI uses Node.js 22, so local development should use the same major version.
+CI uses Node.js 24 and npm 11, so local development should use the same major
+versions.
 
 ## Quick Start
 
@@ -1219,7 +1220,7 @@ master
 CI uses:
 
 - Ubuntu latest runners
-- Node.js 22
+- Node.js 24
 - npm cache
 - `npm ci`
 
