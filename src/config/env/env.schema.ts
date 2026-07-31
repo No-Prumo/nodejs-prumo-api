@@ -11,6 +11,10 @@ import {
 } from '../email/email-delivery-provider';
 import { getPackageMetadata } from '../app/package-metadata';
 import { loggerLevelInputValues } from '../logger/logger-level';
+import {
+  isLocalCorsHostname,
+  parseCorsAllowedOrigins,
+} from '../cors/cors-origin';
 
 const packageMetadata = getPackageMetadata();
 const minimumNonEmptyStringLength = 1;
@@ -18,6 +22,7 @@ const minimumAccessTokenSecretLength = 32;
 const minimumPortNumber = 1;
 const maximumPortNumber = 65535;
 const defaultApiPort = 3000;
+const defaultCorsAllowedOrigins = 'http://localhost:3001';
 const defaultPostgresPort = 5432;
 const defaultSmtpPort = 1025;
 const defaultAccessTokenTtlSeconds = 900;
@@ -28,6 +33,7 @@ const defaultRefreshTokenIdleTtlSeconds =
   secondsPerDay * refreshTokenIdleTtlDays;
 const defaultRefreshTokenAbsoluteTtlSeconds =
   secondsPerDay * refreshTokenAbsoluteTtlDays;
+const deploymentSlugPattern = /^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/;
 
 const booleanFromEnv = z.preprocess((value) => {
   if (typeof value === 'boolean') {
@@ -80,6 +86,17 @@ const envSchema = z
       .min(minimumNonEmptyStringLength)
       .default('0.0.0.0'),
     APP_GLOBAL_PREFIX: z.string().trim().default(''),
+    CORS_ALLOWED_ORIGINS: z
+      .string()
+      .trim()
+      .min(minimumNonEmptyStringLength)
+      .default(defaultCorsAllowedOrigins),
+    CORS_VERCEL_PREVIEW_PROJECT_SLUG: optionalStringFromEnv.pipe(
+      z.string().regex(deploymentSlugPattern).optional(),
+    ),
+    CORS_VERCEL_PREVIEW_TEAM_SLUG: optionalStringFromEnv.pipe(
+      z.string().regex(deploymentSlugPattern).optional(),
+    ),
     DATABASE_URL: z.string().url(),
     POSTGRES_HOST: z.string().trim().min(minimumNonEmptyStringLength),
     POSTGRES_PORT: portFromEnv.default(defaultPostgresPort),
@@ -172,9 +189,90 @@ const envSchema = z
     }
 
     const environment = resolveAppEnvironment(env);
+    const secureEnvironment =
+      environment === 'staging' || environment === 'production';
+    const cookieSecure = env.AUTH_COOKIE_SECURE ?? secureEnvironment;
     const emailProvider =
       env.EMAIL_DELIVERY_PROVIDER ??
       getDefaultEmailDeliveryProvider(environment);
+
+    try {
+      const allowedOrigins = parseCorsAllowedOrigins(env.CORS_ALLOWED_ORIGINS);
+
+      if (
+        secureEnvironment &&
+        allowedOrigins.some((origin) => {
+          const url = new URL(origin);
+
+          return url.protocol !== 'https:' || isLocalCorsHostname(url.hostname);
+        })
+      ) {
+        context.addIssue({
+          code: 'custom',
+          path: ['CORS_ALLOWED_ORIGINS'],
+          message:
+            'All origins must use https and a non-local hostname in staging and production',
+        });
+      }
+
+      if (
+        secureEnvironment &&
+        env.WEB_APP_BASE_URL !== undefined &&
+        !allowedOrigins.includes(new URL(env.WEB_APP_BASE_URL).origin)
+      ) {
+        context.addIssue({
+          code: 'custom',
+          path: ['CORS_ALLOWED_ORIGINS'],
+          message: 'Must include WEB_APP_BASE_URL in staging and production',
+        });
+      }
+    } catch (error) {
+      context.addIssue({
+        code: 'custom',
+        path: ['CORS_ALLOWED_ORIGINS'],
+        message:
+          error instanceof Error ? error.message : 'Invalid CORS origin list',
+      });
+    }
+
+    if (
+      (env.CORS_VERCEL_PREVIEW_PROJECT_SLUG === undefined) !==
+      (env.CORS_VERCEL_PREVIEW_TEAM_SLUG === undefined)
+    ) {
+      context.addIssue({
+        code: 'custom',
+        path: ['CORS_VERCEL_PREVIEW_PROJECT_SLUG'],
+        message:
+          'Vercel preview project and team slugs must be configured together',
+      });
+    }
+
+    if (
+      environment === 'production' &&
+      env.CORS_VERCEL_PREVIEW_PROJECT_SLUG !== undefined
+    ) {
+      context.addIssue({
+        code: 'custom',
+        path: ['CORS_VERCEL_PREVIEW_PROJECT_SLUG'],
+        message: 'Vercel pull request origins are not allowed in production',
+      });
+    }
+
+    if (secureEnvironment && !cookieSecure) {
+      context.addIssue({
+        code: 'custom',
+        path: ['AUTH_COOKIE_SECURE'],
+        message: 'Must be true in staging and production',
+      });
+    }
+
+    if (env.AUTH_COOKIE_SAME_SITE === 'none' && !cookieSecure) {
+      context.addIssue({
+        code: 'custom',
+        path: ['AUTH_COOKIE_SECURE'],
+        message: 'Must be true when AUTH_COOKIE_SAME_SITE is none',
+      });
+    }
 
     if (environment === 'local' && emailProvider !== 'smtp') {
       context.addIssue({

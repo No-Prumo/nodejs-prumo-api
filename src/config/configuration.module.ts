@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { appConfig } from './app/app.config';
 import { authConfig } from './auth/auth.config';
+import { corsConfig } from './cors/cors.config';
 import { databaseConfig } from './database/database.config';
 import { docsConfig } from './docs/docs.config';
 import { emailConfig } from './email/email.config';
@@ -19,6 +20,7 @@ import { observabilityConfig } from './observability/observability.config';
       load: [
         appConfig,
         authConfig,
+        corsConfig,
         databaseConfig,
         loggerConfig,
         docsConfig,

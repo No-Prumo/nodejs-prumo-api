@@ -12,6 +12,11 @@ export {
   type AuthConfig,
 } from './auth/auth.config';
 export {
+  buildCorsConfig,
+  corsConfig,
+  type CorsConfig,
+} from './cors/cors.config';
+export {
   databaseConfig,
   type DatabaseConfig,
 } from './database/database.config';
