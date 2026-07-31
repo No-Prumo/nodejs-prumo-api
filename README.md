@@ -77,6 +77,8 @@ Implemented:
 - global HTTP rate limiting with stricter magic link endpoint throttles
 - Swagger/OpenAPI generated from Zod-backed DTOs
 - global exception filter with normalized public error responses
+- typed credentialed CORS with exact environment origins and scoped Sandicts
+  Vercel pull request previews
 - structured logging with request correlation
 - authentication/session domain foundation
 - public email magic link request and consume controllers
@@ -174,52 +176,8 @@ npm ci
 
 Create a local `.env` file in the repository root:
 
-```env
-NODE_ENV=development
-APP_ENV=local
-APP_VERSION=0.0.1
-PORT=3000
-APP_HOST=0.0.0.0
-APP_GLOBAL_PREFIX=
-
-POSTGRES_USER=postgres
-POSTGRES_PASSWORD=sandicts
-POSTGRES_DB=sandicts
-POSTGRES_HOST=localhost
-POSTGRES_PORT=5432
-DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
-
-LOG_LEVEL=debug
-LOG_PRETTY=true
-
-DOCS_ENABLED=true
-DOCS_PATH=docs
-
-OBSERVABILITY_ENABLED=false
-OBSERVABILITY_SERVICE_NAME=sandicts-api
-
-AUTH_ACCESS_TOKEN_SECRET=dev-only-auth-secret-minimum-32-chars-change-me
-AUTH_ACCESS_TOKEN_TTL_SECONDS=900
-AUTH_GOOGLE_CLIENT_ID=your-google-web-client-id.apps.googleusercontent.com
-AUTH_MAGIC_LINK_TTL_SECONDS=900
-AUTH_REFRESH_TOKEN_IDLE_TTL_SECONDS=1209600
-AUTH_REFRESH_TOKEN_ABSOLUTE_TTL_SECONDS=2592000
-AUTH_REFRESH_TOKEN_COOKIE_NAME=sandicts_refresh_token
-AUTH_REFRESH_TOKEN_COOKIE_PATH=/auth/refresh
-AUTH_COOKIE_SAME_SITE=lax
-AUTH_COOKIE_SECURE=false
-
-EMAIL_DELIVERY_PROVIDER=smtp
-EMAIL_FROM_ADDRESS=auth@sandicts.test
-EMAIL_FROM_NAME=Sandicts
-EMAIL_REPLY_TO_ADDRESS=
-WEB_APP_BASE_URL=http://localhost:3001
-RESEND_API_KEY=
-SMTP_HOST=localhost
-SMTP_PORT=1025
-SMTP_SECURE=false
-SMTP_USER=
-SMTP_PASSWORD=
+```bash
+cp .env.example .env
 ```
 
 Notes:
@@ -320,6 +278,25 @@ Rules:
 | `APP_HOST` | No | `0.0.0.0` | Host passed to `app.listen`. |
 | `APP_GLOBAL_PREFIX` | No | empty string | Optional global route prefix. |
 
+### Browser CORS
+
+| Variable | Required | Default | Description |
+| --- | --- | --- | --- |
+| `CORS_ALLOWED_ORIGINS` | Yes in deployed environments | `http://localhost:3001` | Comma-separated exact frontend origins. |
+| `CORS_VERCEL_PREVIEW_PROJECT_SLUG` | With team slug in staging | none | Vercel project slug accepted for ephemeral Sandicts previews. |
+| `CORS_VERCEL_PREVIEW_TEAM_SLUG` | With project slug in staging | none | Vercel team slug that owns accepted preview URLs. |
+
+Rules:
+
+- browser requests without an allowed origin do not receive CORS access
+- credentialed responses never use `Access-Control-Allow-Origin: *`
+- staging and production exact origins must use HTTPS
+- Vercel project/team slugs must be configured together
+- ephemeral Vercel origins can be enabled in staging but are rejected by
+  configuration validation in production
+- allowed methods are currently `GET`, `POST`, `PATCH`, and `OPTIONS`
+- allowed request headers are `Accept`, `Authorization`, and `Content-Type`
+
 `APP_ENV` fallback behavior:
 
 - `NODE_ENV=development` -> `APP_ENV=local`
@@ -373,7 +350,16 @@ Default log levels:
 | `AUTH_REFRESH_TOKEN_COOKIE_NAME` | No | `sandicts_refresh_token` | Refresh token cookie name. |
 | `AUTH_REFRESH_TOKEN_COOKIE_PATH` | No | `/auth/refresh` | Refresh token cookie path. |
 | `AUTH_COOKIE_SAME_SITE` | No | `lax` | Cookie SameSite policy: `lax`, `strict`, or `none`. |
-| `AUTH_COOKIE_SECURE` | No | `true` when `NODE_ENV=production` | Cookie `Secure` attribute. |
+| `AUTH_COOKIE_SECURE` | No | `true` in staging/production | Cookie `Secure` attribute. |
+
+`AUTH_COOKIE_SECURE` defaults from `APP_ENV`: it is `true` in staging and
+production and `false` locally. Explicitly disabling it in staging or production
+is rejected. `SameSite=None` also requires `Secure=true`.
+
+The refresh cookie deliberately has no `Domain` attribute. It remains host-only
+to the API and uses `Path=/auth/refresh`. Frontend and API deployment origins
+should remain HTTPS subdomains of the same registrable domain so
+`SameSite=Lax` continues to work without third-party cookies.
 
 ### Transactional Email
 
@@ -996,9 +982,9 @@ Security rules:
   login for the passwordless web MVP unless product direction changes.
 - If cookies become cross-site with `SameSite=None`, revisit CSRF protection
   before public launch.
-- Frontend integration still needs an explicit CORS/credentials follow-up so
-  the browser can send backend-owned refresh cookies safely between the local
-  web app and API origins.
+- Browser CORS accepts exact configured origins with credentials. Sandicts
+  Vercel pull request origins are scoped by both project and team and are
+  staging-only.
 - Move rate-limit storage to a distributed backend and add normalized-email
   tracking before running multiple API instances in production.
 

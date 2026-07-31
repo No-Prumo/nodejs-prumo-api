@@ -41,6 +41,7 @@ describe('buildEmailConfig', () => {
       validateEnv({
         ...baseEnv,
         APP_ENV: 'staging',
+        CORS_ALLOWED_ORIGINS: 'https://app.sandicts.com',
         EMAIL_DELIVERY_PROVIDER: 'resend',
         EMAIL_FROM_ADDRESS: 'auth@sandicts.com',
         EMAIL_REPLY_TO_ADDRESS: 'support@sandicts.com',

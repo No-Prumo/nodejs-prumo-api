@@ -173,9 +173,20 @@ Recommended cookie attributes:
 - `Secure` outside local development
 - `SameSite=Lax` for normal same-site frontend/API usage
 - narrow `Path`, such as `/auth/refresh` for refresh token when possible
-- no broad `Domain` unless cross-subdomain behavior is intentionally needed
+- no `Domain` attribute; the refresh cookie remains host-only to the API
 
 If the frontend and API must be cross-site, revisit CSRF protections before changing `SameSite=None`.
+
+Deployment contract:
+
+- local web `http://localhost:3001` and API `http://localhost:3000` use
+  credentialed exact-origin CORS and `Secure=false`
+- stable preview and production keep frontend and API on HTTPS subdomains of
+  the same registrable Sandicts domain
+- pull request preview URLs do not support a complete refresh-cookie session
+- Vercel preview origins may access staging only when both the configured
+  Sandicts project and team slugs match
+- production never accepts generated Vercel pull request origins
 
 ## CSRF Policy
 

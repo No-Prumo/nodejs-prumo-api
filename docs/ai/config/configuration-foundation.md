@@ -50,6 +50,7 @@ If future code conflicts with this document, prefer this document unless the use
 src/
   bootstrap/
     bootstrap.ts
+    setup-cors.ts
     setup-docs.ts
     setup-global-prefix.ts
     setup-logger.ts
@@ -64,6 +65,9 @@ src/
       package-metadata.ts
     auth/
       auth.config.ts
+    cors/
+      cors-origin.ts
+      cors.config.ts
     database/
       database.config.ts
     docs/
@@ -135,6 +139,7 @@ Current domain folders:
 
 - `app`: runtime app settings, app environment resolution, package metadata
 - `auth`: token lifetimes, magic link lifetime, and refresh cookie settings
+- `cors`: exact browser origins and scoped Vercel preview origin settings
 - `database`: database connection metadata without ORM coupling
 - `docs`: OpenAPI/docs toggles and pathing
 - `email`: transactional email provider, sender identity, trusted frontend
@@ -281,6 +286,33 @@ Current shape:
 - `refreshTokenCookie.secure`
 - `refreshTokenCookie.httpOnly`
 
+### `cors`
+
+Purpose:
+
+- allow credentialed browser requests only from approved frontend origins
+- keep local, staging, and production origins explicit
+- optionally accept ephemeral preview URLs owned by one Sandicts Vercel project
+  and team in staging
+
+Current shape:
+
+- `allowedOrigins`
+- `allowedHeaders`
+- `allowedMethods`
+- `credentials`
+- `vercelPreview.projectSlug`
+- `vercelPreview.teamSlug`
+
+Rules:
+
+- never combine credentialed CORS with a wildcard origin
+- require HTTPS non-local exact origins in staging and production
+- require `WEB_APP_BASE_URL` to be included in the deployed allowlist
+- require Vercel project and team slugs together
+- reject Vercel pull request origins in production
+- keep the browser-origin callback in `src/bootstrap/setup-cors.ts`
+
 ### `email`
 
 Purpose:
@@ -345,6 +377,10 @@ PORT=3000
 APP_HOST=0.0.0.0
 APP_GLOBAL_PREFIX=
 
+CORS_ALLOWED_ORIGINS=http://localhost:3001
+CORS_VERCEL_PREVIEW_PROJECT_SLUG=
+CORS_VERCEL_PREVIEW_TEAM_SLUG=
+
 POSTGRES_USER=postgres
 POSTGRES_PASSWORD=sandicts
 POSTGRES_DB=sandicts
@@ -390,6 +426,10 @@ Notes:
 - `expandVariables: true` allows composed values in `.env`
 - `APP_ENV` separates local/staging/production intent from `NODE_ENV`
 - `APP_VERSION` may be omitted and falls back to `package.json`
+- `CORS_ALLOWED_ORIGINS` is a comma-separated list of exact HTTP(S) origins
+- staging and production CORS origins require HTTPS
+- Vercel preview project/team slugs are paired and allowed only outside
+  production
 - `DATABASE_URL` is validated as URL text
 - booleans accept `true/false`, `1/0`, `yes/no`, `on/off`
 - ports are coerced to integers and validated in range `1..65535`
@@ -398,8 +438,9 @@ Notes:
 - `AUTH_GOOGLE_CLIENT_ID` is required in production and is used to validate
   Google Sign-In and Google One Tap ID token audiences
 - auth lifetimes are positive integer seconds
-- `AUTH_COOKIE_SECURE` defaults to `true` in production and otherwise follows
-  the explicit env value or local default
+- `AUTH_COOKIE_SECURE` defaults to `true` for staging/production `APP_ENV` and
+  otherwise follows the explicit env value or local default
+- `AUTH_COOKIE_SAME_SITE=none` requires `AUTH_COOKIE_SECURE=true`
 - `EMAIL_DELIVERY_PROVIDER=resend` is required for staging/production Resend
   delivery
 - local defaults use `EMAIL_DELIVERY_PROVIDER=smtp` with Mailpit on port `1025`
