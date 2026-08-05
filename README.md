@@ -231,8 +231,14 @@ Default local URLs:
 
 - API: `http://localhost:3000`
 - Swagger UI: `http://localhost:3000/docs`
+- liveness: `http://localhost:3000/health/live`
+- readiness: `http://localhost:3000/health/ready`
 
 If `APP_GLOBAL_PREFIX` is set, API routes use that prefix.
+
+The liveness endpoint only verifies that the HTTP process is responsive. The
+readiness endpoint also runs a lightweight PostgreSQL query and returns `503`
+with `{ "status": "unavailable" }` while the database cannot accept traffic.
 
 ### 7. Smoke Test The API
 
@@ -308,11 +314,11 @@ Rules:
 | Variable | Required | Default | Description |
 | --- | --- | --- | --- |
 | `DATABASE_URL` | Yes | - | PostgreSQL URL used by Prisma runtime and Prisma CLI. |
-| `POSTGRES_HOST` | Yes | - | PostgreSQL host. |
-| `POSTGRES_PORT` | No | `5432` | PostgreSQL port. |
-| `POSTGRES_USER` | Yes | - | PostgreSQL user. |
-| `POSTGRES_PASSWORD` | Yes | - | PostgreSQL password. |
-| `POSTGRES_DB` | Yes | - | PostgreSQL database name. |
+
+`POSTGRES_HOST`, `POSTGRES_PORT`, `POSTGRES_USER`, `POSTGRES_PASSWORD`, and
+`POSTGRES_DB` remain useful to interpolate the local `.env` and configure
+Docker Compose, but the application runtime deliberately depends only on the
+provider-neutral `DATABASE_URL`.
 
 ### Logging And Docs
 

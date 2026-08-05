@@ -1,0 +1,18 @@
+import { Injectable } from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
+
+@Injectable()
+class HealthService {
+  constructor(private readonly prisma: PrismaService) {}
+
+  async isReady(): Promise<boolean> {
+    try {
+      await this.prisma.$queryRaw`SELECT 1`;
+      return true;
+    } catch {
+      return false;
+    }
+  }
+}
+
+export { HealthService };
