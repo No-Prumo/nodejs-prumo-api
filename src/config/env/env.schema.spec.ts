@@ -3,7 +3,6 @@ import { validateEnv } from './env.schema';
 const inputApiPort = '4000';
 const expectedApiPort = 4000;
 const inputPostgresPort = '5432';
-const expectedPostgresPort = 5432;
 const defaultAccessTokenTtlSeconds = 900;
 const defaultMagicLinkTtlSeconds = 900;
 
@@ -32,7 +31,6 @@ describe('validateEnv', () => {
     expect(env.APP_ENV).toBe('staging');
     expect(env.APP_VERSION).toBe('1.2.3');
     expect(env.PORT).toBe(expectedApiPort);
-    expect(env.POSTGRES_PORT).toBe(expectedPostgresPort);
     expect(env.LOG_PRETTY).toBe(false);
     expect(env.DOCS_ENABLED).toBe(true);
     expect(env.APP_HOST).toBe('0.0.0.0');

@@ -23,7 +23,6 @@ const minimumPortNumber = 1;
 const maximumPortNumber = 65535;
 const defaultApiPort = 3000;
 const defaultCorsAllowedOrigins = 'http://localhost:3001';
-const defaultPostgresPort = 5432;
 const defaultSmtpPort = 1025;
 const defaultAccessTokenTtlSeconds = 900;
 const defaultMagicLinkTtlSeconds = 900;
@@ -98,11 +97,6 @@ const envSchema = z
       z.string().regex(deploymentSlugPattern).optional(),
     ),
     DATABASE_URL: z.string().url(),
-    POSTGRES_HOST: z.string().trim().min(minimumNonEmptyStringLength),
-    POSTGRES_PORT: portFromEnv.default(defaultPostgresPort),
-    POSTGRES_USER: z.string().trim().min(minimumNonEmptyStringLength),
-    POSTGRES_PASSWORD: z.string().min(minimumNonEmptyStringLength),
-    POSTGRES_DB: z.string().trim().min(minimumNonEmptyStringLength),
     LOG_LEVEL: z.enum(loggerLevelInputValues).optional(),
     LOG_PRETTY: booleanFromEnv.optional(),
     DOCS_ENABLED: booleanFromEnv.default(true),

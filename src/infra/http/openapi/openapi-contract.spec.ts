@@ -41,6 +41,14 @@ const openApiDocument = JSON.parse(
 ) as OpenApiContractDocument;
 
 const expectedOperations = {
+  'GET /health/live': {
+    success: ['200'],
+    errors: {},
+  },
+  'GET /health/ready': {
+    success: ['200', '503'],
+    errors: {},
+  },
   'POST /auth/google/sign-in': {
     success: ['200'],
     errors: {

@@ -431,6 +431,8 @@ Notes:
 - Vercel preview project/team slugs are paired and allowed only outside
   production
 - `DATABASE_URL` is validated as URL text
+- the application runtime depends only on `DATABASE_URL`; the `POSTGRES_*`
+  values in the local example exist for Docker Compose interpolation
 - booleans accept `true/false`, `1/0`, `yes/no`, `on/off`
 - ports are coerced to integers and validated in range `1..65535`
 - `AUTH_ACCESS_TOKEN_SECRET` is required in production and falls back only for
