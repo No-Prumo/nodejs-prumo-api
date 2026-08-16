@@ -71,7 +71,8 @@ Rules:
 - direct push is forbidden
 - changes must arrive only through pull requests
 - required status checks must pass before merge
-- squash merge only
+- task branches merge into `developer` with squash merge
+- `developer -> staging` and `staging -> master` promotions use merge commits
 
 CI does not replace branch protection / rulesets.
 GitHub rulesets must enforce push and merge restrictions.
@@ -123,7 +124,7 @@ Allowed PR targets:
 - `staging`
 - `master`
 
-Allowed PR sources:
+Recognized PR sources (subject to the direction matrix below):
 
 - `feature/*`
 - `fix/*`
@@ -145,10 +146,14 @@ Rules:
 - target branch must be one of the protected branches
 - title must follow the Sandicts Jira-prefixed Conventional Commit format
 - description must use the repository PR template, keep required headings, replace raw placeholders, and include the matching primary Jira key
-- the same source rules apply to every protected target (`developer`, `staging`, and `master`); there is no separate “promotion-only” path exclusive to `master`
+- temporary work branches target only `developer`
+- `staging` accepts promotion PRs only from `developer`
+- `master` accepts promotion PRs only from `staging`
+- protected branches cannot merge back into `developer`
 - pull requests from invalid branch names must fail
 - pull requests with invalid titles or descriptions must fail
-- squash merge only
+- task PRs into `developer` use squash merge
+- protected-branch promotions use merge commits to preserve the exact source SHA
 
 Required PR title format:
 
@@ -157,6 +162,16 @@ Required PR title format:
 
 The Jira key must be the first visible token in the title. Detailed delivery
 rules live in `docs/ai/task-finalization-workflow.md`.
+
+Required promotion titles:
+
+- `[KAN-123] chore(release): Promote developer to staging`
+- `[KAN-123] chore(release): Promote staging to master`
+
+Promotion descriptions use
+`.github/PULL_REQUEST_TEMPLATE/release-promotion.md` and must record the source
+commit, target environment, promotion path, and rollback plan. Production
+promotions must also record Preview deployment and validation evidence.
 
 ---
 
@@ -167,7 +182,9 @@ Every pull request targeting a protected branch must run, at minimum:
 - lint
 - typecheck
 - tests
+- API contract
 - build
+- Docker image build and non-root liveness check
 - dependency audit
 
 The dependency audit blocking threshold must be explicit in workflow code.
@@ -199,8 +216,15 @@ CI must enforce:
    - lint
    - typecheck
    - tests
+   - API contract
    - build
+   - Docker runtime liveness and non-root user
    - dependency audit
+
+6. Promotion direction
+   - fail temporary or unrelated branches targeting `staging` or `master`
+   - fail protected branches targeting `developer`
+   - preserve exact source commits with merge commits on promotions
 
 ---
 
@@ -236,7 +260,8 @@ These rules must not be relaxed unless explicitly requested:
 
 - `developer`, `staging`, and `master` do not allow direct push
 - pull requests to protected branches require valid source branch names
-- required validation includes lint, typecheck, tests, and build
+- required validation includes governance, lint, typecheck, tests, API contract,
+  build, Docker runtime validation, and dependency audit
 - CI changes must not silently weaken governance
 - `npm` remains the package manager
 - Node.js version remains aligned with project baseline

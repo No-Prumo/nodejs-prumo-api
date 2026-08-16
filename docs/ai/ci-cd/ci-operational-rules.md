@@ -7,116 +7,129 @@ canonical: docs/ai/ci-cd/ci-governance.md
 use-together-with:
   - docs/ai/ci-cd/ci-governance.md
 related:
-  - docs/ai/ci-cd/ci-governance.md
-scope: github-actions, branch-validation, pr-validation
+  - docs/ai/ci-cd/render-free-deployment.md
+scope: github-actions, branch-validation, pr-validation, preview-deployment
 read-when:
   - implementing or editing GitHub Actions workflows
-  - writing branch validation scripts
-  - writing pull request validation scripts
-  - looking up job display names, regex, or audit thresholds as implemented in YAML
+  - writing branch or pull request validation scripts
+  - changing Preview migration, deployment, health, or rollback automation
 do-not-read-when:
-  - deciding policy (branch naming rules, merge policy, non-negotiables)
+  - deciding policy
   - changing only application business logic
-  - changing only UI or backend features unrelated to CI
 ---
 
-# CI Operational Rules
+# CI/CD Operational Rules
 
-Mechanical facts from repository workflows. Normative policy lives in `ci-governance.md`. If YAML and policy diverge, follow the conflict order in governance.
+Mechanical facts from repository workflows. Normative policy lives in
+`ci-governance.md`.
 
-## Active PR workflow
+## Reusable CI workflow
 
-| Item            | Value                         |
-| --------------- | ----------------------------- |
-| File            | `.github/workflows/ci-pr.yml` |
-| Workflow name   | `CI PR`                       |
-| Node (jobs)     | `22`                          |
-| Package manager | `npm` (`npm ci`)              |
+| Item               | Value                                              |
+| ------------------ | -------------------------------------------------- |
+| File               | `.github/workflows/ci-pr.yml`                      |
+| Workflow name      | `CI PR`                                            |
+| Triggers           | PR to protected branches; reusable `workflow_call` |
+| Node               | `.nvmrc` (`24`)                                    |
+| npm                | major version `11`                                 |
+| Database during CI | non-secret placeholder URL; no connection required |
 
-### Workflow environment
+Reusable calls are accepted only when the caller event is a push to `staging`
+or `master`. PR-only governance is skipped for reusable post-merge calls.
 
-The workflow defines `DATABASE_URL` with a non-secret local PostgreSQL URL so Prisma client generation can run during typecheck, tests, and build without connecting to a database.
+### Job IDs and stable display names
 
-### PR event branches (`on.pull_request.branches`)
+| Job ID       | Display name     |
+| ------------ | ---------------- |
+| `governance` | Governance       |
+| `quality`    | Quality          |
+| `test`       | Test             |
+| `contract`   | Contract         |
+| `build`      | Build            |
+| `security`   | Dependency audit |
 
-- `developer`
-- `staging`
-- `master`
+Do not rename display names without updating GitHub required status checks.
 
-### Job IDs and display names (required check labels)
+### Commands
 
-| Job ID       | `name:` (GitHub UI / branch protection) |
-| ------------ | --------------------------------------- |
-| `governance` | Governance                              |
-| `quality`    | Quality                                 |
-| `test`       | Test                                    |
-| `contract`   | Contract                                |
-| `build`      | Build                                   |
-| `security`   | Dependency audit                        |
+| Job              | Command / validation                                                                           |
+| ---------------- | ---------------------------------------------------------------------------------------------- |
+| Quality          | `npm run lint:ci`; `npm run typecheck`                                                         |
+| Test             | `npm run test:ci`                                                                              |
+| Contract         | `npm run openapi:check`                                                                        |
+| Build            | `npm run build`; build Docker image; start it; check `/health/live`; assert Docker user `node` |
+| Dependency audit | `npm audit --audit-level=moderate`                                                             |
 
-Dependency order: `quality`, `test`, `contract`, `build`, and `security` each `needs: governance`.
+All Node jobs verify Node 24 and npm 11 before installing dependencies.
 
-### Commands run
+## Governance mechanics
 
-| Job      | Step      | Command                            |
-| -------- | --------- | ---------------------------------- |
-| Quality  | Lint      | `npm run lint:ci`                  |
-| Quality  | Typecheck | `npm run typecheck`                |
-| Test     | Tests     | `npm run test:ci`                  |
-| Contract | OpenAPI   | `npm run openapi:check`            |
-| Build    | Build     | `npm run build`                    |
-| Security | Audit     | `npm audit --audit-level=moderate` |
-
-Notes:
-
-- `npm run lint:ci`, `npm run typecheck`, `npm run test:ci`, and `npm run build` each run `npm run prisma:generate` first.
-
-## Regex and branch logic (Governance job)
-
-Source branch pattern for temporary branches (inline in `ci-pr.yml`):
+Temporary branch regex:
 
 ```regex
 ^(feature|fix|hotfix|docs|refactor|test|ci|chore|rc|codex)/KAN-[0-9]+-[a-z0-9]+(-[a-z0-9]+)*$
 ```
 
-Allowed source branches that skip the temp-branch regex (exact match):
-
-- `developer`
-- `staging`
-- `master`
-
-Target validation: `BASE` must be one of `developer`, `staging`, `master`. There is no per-target promotion `case`; the same source rules apply to all targets.
-
-Pull request title pattern (inline in `ci-pr.yml`):
+PR title regex:
 
 ```regex
 ^\[KAN-[0-9]+\] (feat|fix|hotfix|docs|refactor|test|ci|chore|build|perf|style|revert)\([a-z0-9-]+\): .+$
 ```
 
-Pull request description validation requires:
+Direction matrix:
 
-- non-empty PR body
-- required template sections in order: `Summary`, `Problem`, `Root cause`, `Changes`, `Files added or updated`, `Impact`, `Validation`, and `Notes`
-- no raw template placeholders such as `Describe clearly...`, `- item`, `path/to/file`, or `relevant note`
-- `Primary Jira` in `Notes` matching the Jira key from the PR title
+| Target      | Accepted source        | Merge method |
+| ----------- | ---------------------- | ------------ |
+| `developer` | valid temporary branch | squash       |
+| `staging`   | `developer` only       | merge commit |
+| `master`    | `staging` only         | merge commit |
 
-## GitHub branch protection (manual)
+Promotion titles are exact and descriptions must contain `Release type`,
+`Promotion path`, `Source commit`, `Target environment`, and `Rollback`.
+Production additionally requires `Preview deployment` and `Preview validation`.
 
-Set the repository default branch to `master` (GitHub: Settings → General → Default branch) so clones and PR defaults align with policy.
+## Preview CD workflow
 
-Configure rulesets or branch protection on `developer`, `staging`, and `master` to match policy in `ci-governance.md`. Required status checks should include the job display names above (`Governance`, `Quality`, `Test`, `Contract`, `Build`, `Dependency audit`) so merges are blocked until CI passes.
+| Item        | Value                                                       |
+| ----------- | ----------------------------------------------------------- |
+| File        | `.github/workflows/cd-preview.yml`                          |
+| Trigger     | push to `staging`                                           |
+| Concurrency | one `cd-preview-api` execution, queued rather than canceled |
+| Environment | GitHub `preview`                                            |
 
-## Other workflow files
+Order:
 
-| File                                                  | Status                                                            |
-| ----------------------------------------------------- | ----------------------------------------------------------------- |
-| `.github/workflows/validate-branch-name.yml`          | Commented out (inactive)                                          |
-| `.github/workflows/validate-production-pr-source.yml` | Commented out (inactive)                                          |
-| `.github/workflows/ci-push-guard.yml`                 | Commented out (inactive)                                          |
-| `.github/workflows/security.yml`                      | Commented out (inactive); duplicate of audit logic in `ci-pr.yml` |
+1. call the complete reusable CI for the pushed SHA
+2. check out and verify the immutable SHA
+3. run `prisma migrate deploy` with `PREVIEW_DATABASE_DIRECT_URL`
+4. call the Render deploy hook with the exact SHA
+5. poll the Render API until that deploy is `live`
+6. verify Render reports the same commit SHA
+7. check `/health/ready` and `/health/live`
 
-## Thresholds
+Required GitHub environment secrets:
 
-| Check            | Active in repo | Notes                                                                                                |
-| ---------------- | -------------- | ---------------------------------------------------------------------------------------------------- |
-| Dependency audit | Yes            | `npm audit --audit-level=moderate` — job fails on moderate or higher (see `ci-pr.yml` security job). |
+- `PREVIEW_DATABASE_DIRECT_URL`
+- `RENDER_PREVIEW_DEPLOY_HOOK_URL`
+- `RENDER_API_KEY`
+
+Required GitHub environment variables:
+
+- `RENDER_PREVIEW_SERVICE_ID`
+- `PREVIEW_API_BASE_URL`
+
+## Preview rollback workflow
+
+`.github/workflows/rollback-preview.yml` is manual and must be dispatched from
+`staging`. It requires a full 40-character healthy commit SHA and a reason. It
+uses the same deployment concurrency group and post-deploy checks as normal CD.
+
+Rollback never reverses Prisma migrations. Database changes must remain
+backward compatible or be repaired with a forward migration first.
+
+## GitHub rulesets
+
+The repository default branch is `master`. Configure rulesets for `developer`,
+`staging`, and `master` with the stable check names listed above. CI validates
+policy but does not replace ruleset enforcement for direct pushes and merge
+methods.
