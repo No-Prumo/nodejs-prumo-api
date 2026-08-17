@@ -1,0 +1,69 @@
+name: Rollback Preview
+
+on:
+  workflow_dispatch:
+    inputs:
+      commit_sha:
+        description: Full 40-character SHA of a previously healthy Preview release
+        required: true
+        type: string
+      reason:
+        description: Reason for the rollback
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cd-preview-api
+  cancel-in-progress: false
+
+jobs:
+  rollback:
+    name: Roll back and verify Preview
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    environment: preview
+    env:
+      TARGET_SHA: ${{ inputs.commit_sha }}
+      RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_PREVIEW_DEPLOY_HOOK_URL }}
+      RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+      RENDER_SERVICE_ID: ${{ vars.RENDER_PREVIEW_SERVICE_ID }}
+      PREVIEW_API_BASE_URL: ${{ vars.PREVIEW_API_BASE_URL }}
+
+    steps:
+      - name: Checkout workflow branch
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate rollback request
+        env:
+          ROLLBACK_REASON: ${{ inputs.reason }}
+        run: |
+          if [[ "${{ github.ref }}" != "refs/heads/staging" ]]; then
+            echo "Rollback Preview must be dispatched from the staging branch."
+            exit 1
+          fi
+
+          if [[ ! "$TARGET_SHA" =~ ^[0-9a-fA-F]{40}$ ]]; then
+            echo "commit_sha must be a full 40-character Git commit SHA."
+            exit 1
+          fi
+
+          if ! git cat-file -e "${TARGET_SHA}^{commit}"; then
+            echo "Commit $TARGET_SHA is not available in this repository."
+            exit 1
+          fi
+
+          if [[ -z "${ROLLBACK_REASON//[[:space:]]/}" ]]; then
+            echo "A rollback reason is required."
+            exit 1
+          fi
+
+          echo "Rolling Preview back to $TARGET_SHA."
+          echo "Prisma migrations are not reversed automatically."
+
+      - name: Deploy exact SHA and run smoke tests
+        run: node .github/scripts/render-deploy.mjs

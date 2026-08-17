@@ -25,32 +25,33 @@ Short catalog. Routing hints (`read-when`, `do-not-read-when`, `related`, `canon
 - Read long page, screen, roadmap, or Jira specs only when the task depends on their detailed sections.
 - Do not load every related document just because it is listed in frontmatter.
 
-| Document                                                                                                   | Role                                                        |
-| ---------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------- |
-| [`docs/ai/api/error-handling-foundation.md`](api/error-handling-foundation.md)                             | Global HTTP error handling baseline                         |
-| [`docs/ai/api/semantic-api-contracts.md`](api/semantic-api-contracts.md)                                   | Semantic statuses, public errors, and OpenAPI drift rules   |
-| [`docs/ai/api/zod-swagger-foundation.md`](api/zod-swagger-foundation.md)                                   | API validation and Swagger baseline                         |
-| [`docs/ai/architecture/authentication-session-pattern.md`](architecture/authentication-session-pattern.md) | Auth methods, sessions, and refresh tokens                  |
-| [`docs/ai/architecture/backend-architecture-overview.md`](architecture/backend-architecture-overview.md)   | Backend architecture source of truth                        |
-| [`docs/ai/architecture/code-style-pattern.md`](architecture/code-style-pattern.md)                         | Code style, semantic constants, and magic number rules      |
-| [`docs/ai/architecture/controller-pattern.md`](architecture/controller-pattern.md)                         | Controller and HTTP boundary pattern                        |
-| [`docs/ai/architecture/external-integrations-pattern.md`](architecture/external-integrations-pattern.md)   | External gateway and webhook pattern                        |
-| [`docs/ai/architecture/module-pattern.md`](architecture/module-pattern.md)                                 | Nest feature module pattern                                 |
-| [`docs/ai/architecture/repository-pattern.md`](architecture/repository-pattern.md)                         | Repository port and Prisma adapter pattern                  |
+| Document                                                                                                                 | Role                                                        |
+| ------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------- |
+| [`docs/ai/api/error-handling-foundation.md`](api/error-handling-foundation.md)                                           | Global HTTP error handling baseline                         |
+| [`docs/ai/api/semantic-api-contracts.md`](api/semantic-api-contracts.md)                                                 | Semantic statuses, public errors, and OpenAPI drift rules   |
+| [`docs/ai/api/zod-swagger-foundation.md`](api/zod-swagger-foundation.md)                                                 | API validation and Swagger baseline                         |
+| [`docs/ai/architecture/authentication-session-pattern.md`](architecture/authentication-session-pattern.md)               | Auth methods, sessions, and refresh tokens                  |
+| [`docs/ai/architecture/backend-architecture-overview.md`](architecture/backend-architecture-overview.md)                 | Backend architecture source of truth                        |
+| [`docs/ai/architecture/code-style-pattern.md`](architecture/code-style-pattern.md)                                       | Code style, semantic constants, and magic number rules      |
+| [`docs/ai/architecture/controller-pattern.md`](architecture/controller-pattern.md)                                       | Controller and HTTP boundary pattern                        |
+| [`docs/ai/architecture/external-integrations-pattern.md`](architecture/external-integrations-pattern.md)                 | External gateway and webhook pattern                        |
+| [`docs/ai/architecture/module-pattern.md`](architecture/module-pattern.md)                                               | Nest feature module pattern                                 |
+| [`docs/ai/architecture/repository-pattern.md`](architecture/repository-pattern.md)                                       | Repository port and Prisma adapter pattern                  |
 | [`docs/ai/architecture/transactional-email-provider-decision.md`](architecture/transactional-email-provider-decision.md) | Resend/Mailpit decision for magic link email delivery       |
-| [`docs/ai/architecture/use-case-pattern.md`](architecture/use-case-pattern.md)                             | Application use case pattern                                |
-| [`docs/ai/business/README.md`](business/README.md)                                               | Pointer to shared Sandicts business rules                   |
-| [`docs/ai/config/configuration-foundation.md`](config/configuration-foundation.md)                         | Backend config baseline, source of truth                    |
-| [`docs/ai/config/typescript-module-resolution.md`](config/typescript-module-resolution.md)                 | TypeScript/Nest module resolution decision                  |
-| [`docs/ai/testing/test-organization.md`](testing/test-organization.md)                                     | Test fixtures, builders, and helper placement               |
-| [`docs/ai/ci-cd/ci-governance.md`](ci-cd/ci-governance.md)                                                 | Policy, source of truth                                     |
-| [`docs/ai/ci-cd/ci-operational-rules.md`](ci-cd/ci-operational-rules.md)                                   | Mechanical: regex, jobs, thresholds as in YAML              |
-| [`docs/ai/ci-cd/security-audit-remediation.md`](ci-cd/security-audit-remediation.md)                       | Dependency vulnerability remediation workflow               |
-| [`docs/ai/codex-skills-strategy.md`](codex-skills-strategy.md)                                             | Codex skills ownership and repository strategy              |
-| [`docs/ai/task-finalization-workflow.md`](task-finalization-workflow.md)                                   | Task finish, commit, and PR title workflow                  |
-| [`docs/ai/logging/logging-foundation.md`](logging/logging-foundation.md)                                   | Logging baseline with nestjs-pino                           |
-| [`docs/ai/product/README.md`](product/README.md)                                                 | Pointer to shared product, scope, glossary, and Jira docs   |
-| [`docs/frontend/README.md`](../frontend/README.md)                                                         | Pointer to frontend docs in `sandicts/reactjs-sandicts-web` |
+| [`docs/ai/architecture/use-case-pattern.md`](architecture/use-case-pattern.md)                                           | Application use case pattern                                |
+| [`docs/ai/business/README.md`](business/README.md)                                                                       | Pointer to shared Sandicts business rules                   |
+| [`docs/ai/config/configuration-foundation.md`](config/configuration-foundation.md)                                       | Backend config baseline, source of truth                    |
+| [`docs/ai/config/typescript-module-resolution.md`](config/typescript-module-resolution.md)                               | TypeScript/Nest module resolution decision                  |
+| [`docs/ai/testing/test-organization.md`](testing/test-organization.md)                                                   | Test fixtures, builders, and helper placement               |
+| [`docs/ai/ci-cd/ci-governance.md`](ci-cd/ci-governance.md)                                                               | Policy, source of truth                                     |
+| [`docs/ai/ci-cd/ci-operational-rules.md`](ci-cd/ci-operational-rules.md)                                                 | Mechanical: regex, jobs, thresholds as in YAML              |
+| [`docs/ai/ci-cd/render-free-deployment.md`](ci-cd/render-free-deployment.md)                                             | Preview topology, Render/Neon config, deploy, and rollback  |
+| [`docs/ai/ci-cd/security-audit-remediation.md`](ci-cd/security-audit-remediation.md)                                     | Dependency vulnerability remediation workflow               |
+| [`docs/ai/codex-skills-strategy.md`](codex-skills-strategy.md)                                                           | Codex skills ownership and repository strategy              |
+| [`docs/ai/task-finalization-workflow.md`](task-finalization-workflow.md)                                                 | Task finish, commit, and PR title workflow                  |
+| [`docs/ai/logging/logging-foundation.md`](logging/logging-foundation.md)                                                 | Logging baseline with nestjs-pino                           |
+| [`docs/ai/product/README.md`](product/README.md)                                                                         | Pointer to shared product, scope, glossary, and Jira docs   |
+| [`docs/frontend/README.md`](../frontend/README.md)                                                                       | Pointer to frontend docs in `sandicts/reactjs-sandicts-web` |
 
 ## Common AI Reading Paths
 
@@ -143,3 +144,9 @@ For dependency audit failures or vulnerability remediation, read:
 3. `docs/ai/ci-cd/ci-governance.md`
 4. `docs/ai/ci-cd/ci-operational-rules.md`
 5. `docs/ai/task-finalization-workflow.md`
+
+For Preview infrastructure or CI/CD changes, read:
+
+1. `docs/ai/ci-cd/ci-governance.md`
+2. `docs/ai/ci-cd/ci-operational-rules.md`
+3. `docs/ai/ci-cd/render-free-deployment.md`

@@ -1,0 +1,84 @@
+name: CD Preview
+
+on:
+  push:
+    branches:
+      - staging
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cd-preview-api
+  cancel-in-progress: false
+
+jobs:
+  ci:
+    name: Validate release SHA
+    uses: ./.github/workflows/ci-pr.yml
+
+  migrate:
+    name: Apply Preview migrations
+    needs: ci
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: preview
+    env:
+      DATABASE_URL: ${{ secrets.PREVIEW_DATABASE_DIRECT_URL }}
+
+    steps:
+      - name: Checkout release SHA
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+
+      - name: Verify immutable release SHA
+        run: |
+          checked_out_sha="$(git rev-parse HEAD)"
+          if [[ "$checked_out_sha" != "${{ github.sha }}" ]]; then
+            echo "Expected ${{ github.sha }}, received $checked_out_sha."
+            exit 1
+          fi
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Apply Prisma migrations
+        run: npm run prisma:migrate:deploy
+
+  deploy:
+    name: Deploy and verify Preview
+    needs: migrate
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    environment: preview
+    env:
+      TARGET_SHA: ${{ github.sha }}
+      RENDER_DEPLOY_HOOK_URL: ${{ secrets.RENDER_PREVIEW_DEPLOY_HOOK_URL }}
+      RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+      RENDER_SERVICE_ID: ${{ vars.RENDER_PREVIEW_SERVICE_ID }}
+      PREVIEW_API_BASE_URL: ${{ vars.PREVIEW_API_BASE_URL }}
+
+    steps:
+      - name: Checkout release SHA
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+
+      - name: Verify immutable release SHA
+        run: |
+          checked_out_sha="$(git rev-parse HEAD)"
+          if [[ "$checked_out_sha" != "$TARGET_SHA" ]]; then
+            echo "Expected $TARGET_SHA, received $checked_out_sha."
+            exit 1
+          fi
+
+      - name: Deploy exact SHA and run smoke tests
+        run: node .github/scripts/render-deploy.mjs
