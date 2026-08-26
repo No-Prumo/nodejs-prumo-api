@@ -13,7 +13,7 @@
     "target": "ES2023",
     "paths": {
       "@auth/*": ["./src/modules/auth/*"],
-      "@config": ["./src/config/index.ts"],
+      "@config": ["./src/config"],
       "@generated/*": ["./src/generated/*"],
       "@infra/*": ["./src/infra/*"],
       "@shared/*": ["./src/shared/*"],
