@@ -1,11 +1,13 @@
 import { buildTestAuthConfig } from '@test-support/auth/build-test-auth-config';
 import { buildTestEmailConfig } from '@test-support/email/build-test-email-config';
 import { InMemoryMagicLinkChallengesRepository } from '@auth/infrastructure/persistence/in-memory/in-memory-magic-link-challenges.repository';
+import { InMemoryBetaInvitationsRepository } from '@auth/infrastructure/persistence/in-memory/in-memory-beta-invitations.repository';
 import { secondsToMilliseconds } from '@shared/time/time.helpers';
 import type { EmailGateway } from '../../ports/email-gateway';
 import type { SendMagicLinkEmailRequest } from '../../ports/email-gateway.types';
 import { MagicLinkUrlBuilder } from '../../services/email/magic-link-url.builder';
 import { MagicLinkTokenService } from '../../services/tokens/magic-link-token.service';
+import { BetaAccessPolicy } from '../../services/beta-access/beta-access-policy';
 import {
   magicLinkRequestStatus,
   RequestMagicLinkUseCase,
@@ -32,18 +34,22 @@ describe('RequestMagicLinkUseCase', () => {
   function makeSut() {
     const challengesRepository = new InMemoryMagicLinkChallengesRepository();
     const emailGateway = new FakeEmailGateway();
+    const betaInvitationsRepository = new InMemoryBetaInvitationsRepository();
+    betaInvitationsRepository.invite('user@example.com');
     const tokenService = new MagicLinkTokenService();
     const useCase = new RequestMagicLinkUseCase(
       challengesRepository,
       emailGateway,
       new MagicLinkUrlBuilder(emailSettings),
       tokenService,
+      new BetaAccessPolicy(betaInvitationsRepository),
       authSettings,
     );
 
     return {
       challengesRepository,
       emailGateway,
+      betaInvitationsRepository,
       tokenService,
       useCase,
     };
@@ -90,6 +96,18 @@ describe('RequestMagicLinkUseCase', () => {
     expect(challenge?.expiresAt.getTime()).toBeLessThanOrEqual(
       Date.now() + magicLinkTtlMilliseconds,
     );
+  });
+
+  it('returns the same response without creating a challenge for a non-invited email', async () => {
+    const { challengesRepository, emailGateway, useCase } = makeSut();
+
+    const result = await useCase.execute({
+      email: 'not-invited@example.com',
+    });
+
+    expect(result).toEqual({ status: magicLinkRequestStatus });
+    expect(challengesRepository.magicLinkChallenges).toHaveLength(0);
+    expect(emailGateway.sentMagicLinks).toHaveLength(0);
   });
 
   it('supersedes an active challenge when the email requests another link', async () => {

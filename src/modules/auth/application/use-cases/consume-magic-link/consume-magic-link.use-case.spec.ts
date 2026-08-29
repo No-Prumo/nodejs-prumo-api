@@ -2,6 +2,7 @@ import { buildTestAuthConfig } from '@test-support/auth/build-test-auth-config';
 import { InMemoryAccountsRepository } from '@auth/infrastructure/persistence/in-memory/in-memory-accounts.repository';
 import { InMemoryAuthSessionsRepository } from '@auth/infrastructure/persistence/in-memory/in-memory-auth-sessions.repository';
 import { InMemoryMagicLinkChallengesRepository } from '@auth/infrastructure/persistence/in-memory/in-memory-magic-link-challenges.repository';
+import { InMemoryBetaInvitationsRepository } from '@auth/infrastructure/persistence/in-memory/in-memory-beta-invitations.repository';
 import {
   minutesToMilliseconds,
   secondsToMilliseconds,
@@ -9,6 +10,7 @@ import {
 import { MagicLinkTokenService } from '../../services/tokens/magic-link-token.service';
 import { RefreshTokenHasher } from '../../services/tokens/refresh-token-hasher';
 import { TokenService } from '../../services/tokens/token.service';
+import { BetaAccessPolicy } from '../../services/beta-access/beta-access-policy';
 import { ConsumeMagicLinkUseCase } from './consume-magic-link.use-case';
 import { CreateAuthSessionUseCase } from '../create-auth-session/create-auth-session.use-case';
 
@@ -24,6 +26,8 @@ describe('ConsumeMagicLinkUseCase', () => {
     const accountsRepository = new InMemoryAccountsRepository();
     const authSessionsRepository = new InMemoryAuthSessionsRepository();
     const challengesRepository = new InMemoryMagicLinkChallengesRepository();
+    const betaInvitationsRepository = new InMemoryBetaInvitationsRepository();
+    betaInvitationsRepository.invite('user@example.com');
     const magicLinkTokenService = new MagicLinkTokenService();
     const createAuthSession = new CreateAuthSessionUseCase(
       accountsRepository,
@@ -36,12 +40,14 @@ describe('ConsumeMagicLinkUseCase', () => {
       challengesRepository,
       accountsRepository,
       magicLinkTokenService,
+      new BetaAccessPolicy(betaInvitationsRepository),
       createAuthSession,
     );
 
     return {
       accountsRepository,
       authSessionsRepository,
+      betaInvitationsRepository,
       challengesRepository,
       magicLinkTokenService,
       useCase,
@@ -108,6 +114,27 @@ describe('ConsumeMagicLinkUseCase', () => {
 
     expect(accountsRepository.accounts).toHaveLength(1);
     expect(result.account.id).toBe(existingAccount.id);
+  });
+
+  it('rejects a token when the invitation was removed before consumption', async () => {
+    const {
+      accountsRepository,
+      authSessionsRepository,
+      betaInvitationsRepository,
+      challengesRepository,
+      magicLinkTokenService,
+      useCase,
+    } = makeSut();
+    const token = magicLinkTokenService.generateToken();
+    await createChallenge(challengesRepository, magicLinkTokenService, token);
+    betaInvitationsRepository.revoke('user@example.com');
+
+    await expect(useCase.execute({ token })).rejects.toMatchObject({
+      code: 'invalid_magic_link_token',
+      message: 'Magic link is invalid or expired',
+    });
+    expect(accountsRepository.accounts).toHaveLength(0);
+    expect(authSessionsRepository.authSessions).toHaveLength(0);
   });
 
   it('returns semantic errors for invalid, expired, and already used tokens', async () => {

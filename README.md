@@ -415,6 +415,7 @@ payloads must not be logged.
 | `npm run prisma:migrate:dev` | Creates/applies development migrations. |
 | `npm run prisma:migrate:deploy` | Applies migrations in deploy environments. |
 | `npm run prisma:studio` | Opens Prisma Studio. |
+| `npm run beta:testers -- <action>` | Manages Beta invitations, access revocation, and privacy operations. |
 
 ## Project Structure
 
@@ -876,6 +877,7 @@ Current models:
 - `AuthSession`
 - `AuthRefreshToken`
 - `MagicLinkChallenge`
+- `BetaInvitation`
 
 Current enums:
 
@@ -933,6 +935,8 @@ Current capabilities:
 - access token issuing
 - public magic link request and consume endpoints
 - Google sign-in endpoint
+- invite-only Beta eligibility for Google and magic link authentication
+- operational invite, access revocation, data location, and data deletion command
 - refresh token rotation endpoint
 - current-session and sign-out endpoints
 - refresh token cookie option helpers
@@ -978,11 +982,15 @@ The source-of-truth design is
 `docs/ai/architecture/authentication-session-pattern.md`.
 The source-of-truth provider decision is
 `docs/ai/architecture/transactional-email-provider-decision.md`.
+The Beta tester operating procedure is
+`docs/ai/operations/beta-tester-access.md`.
 
 Security rules:
 
 - Do not log raw passwords, refresh tokens, magic link tokens, Google ID tokens,
   or authorization codes.
+- Do not store invited tester lists in Git or public environment variables, and
+  do not print tester emails from operational commands.
 - Do not store refresh tokens in localStorage.
 - Do not add password login, SMS login, passkeys, MFA, Facebook login, or Apple
   login for the passwordless web MVP unless product direction changes.
@@ -1318,6 +1326,7 @@ Current source-of-truth docs:
 - `docs/ai/ci-cd/ci-operational-rules.md`
 - `docs/ai/codex-skills-strategy.md`
 - `docs/ai/logging/logging-foundation.md`
+- `docs/ai/operations/beta-tester-access.md`
 - `sandicts/sandicts-docs:docs/product/sandicts-product-context.md`
 
 Repository-owned Codex skills live under `.codex/skills`:

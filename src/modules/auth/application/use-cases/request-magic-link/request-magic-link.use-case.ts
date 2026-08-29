@@ -8,6 +8,7 @@ import {
 } from '../../ports/magic-link-challenges.repository';
 import { MagicLinkUrlBuilder } from '../../services/email/magic-link-url.builder';
 import { normalizeEmail } from '../../services/email/normalize-email';
+import { BetaAccessPolicy } from '../../services/beta-access/beta-access-policy';
 import { MagicLinkTokenService } from '../../services/tokens/magic-link-token.service';
 import type {
   RequestMagicLinkUseCaseRequest,
@@ -25,6 +26,7 @@ class RequestMagicLinkUseCase {
     private readonly emailGateway: EmailGateway,
     private readonly magicLinkUrlBuilder: MagicLinkUrlBuilder,
     private readonly magicLinkTokenService: MagicLinkTokenService,
+    private readonly betaAccessPolicy: BetaAccessPolicy,
     @Inject(authConfig.KEY)
     private readonly authSettings: AuthConfig,
   ) {}
@@ -33,6 +35,11 @@ class RequestMagicLinkUseCase {
     request: RequestMagicLinkUseCaseRequest,
   ): Promise<RequestMagicLinkUseCaseResponse> {
     const normalizedEmail = normalizeEmail(request.email);
+
+    if (!(await this.betaAccessPolicy.isEligible(normalizedEmail))) {
+      return { status: magicLinkRequestStatus };
+    }
+
     const token = this.magicLinkTokenService.generateToken();
     const requestedAt = new Date();
     const expiresAt = addSeconds(

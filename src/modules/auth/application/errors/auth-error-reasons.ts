@@ -2,6 +2,7 @@ const authErrorReasons = {
   accountNotFound: 'account_not_found',
   accountProviderAlreadyLinked: 'account_provider_already_linked',
   accountStatusNotActive: 'account_status_not_active',
+  betaInvitationRequired: 'beta_invitation_required',
   challengeAlreadyUsed: 'challenge_already_used',
   challengeExpired: 'challenge_expired',
   challengeNotFoundExpiredOrConsumed: 'challenge_not_found_expired_or_consumed',

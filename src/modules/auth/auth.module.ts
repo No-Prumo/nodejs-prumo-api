@@ -2,11 +2,13 @@ import { Module } from '@nestjs/common';
 import { emailConfig, type EmailConfig } from '@config';
 import { ACCOUNTS_REPOSITORY } from './application/ports/accounts.repository';
 import { AUTH_SESSIONS_REPOSITORY } from './application/ports/auth-sessions.repository';
+import { BETA_INVITATIONS_REPOSITORY } from './application/ports/beta-invitations.repository';
 import { EMAIL_GATEWAY } from './application/ports/email-gateway';
 import { EXTERNAL_IDENTITIES_REPOSITORY } from './application/ports/external-identities.repository';
 import { GOOGLE_ID_TOKEN_VERIFIER } from './application/ports/google-id-token-verifier';
 import { MAGIC_LINK_CHALLENGES_REPOSITORY } from './application/ports/magic-link-challenges.repository';
 import { MagicLinkUrlBuilder } from './application/services/email/magic-link-url.builder';
+import { BetaAccessPolicy } from './application/services/beta-access/beta-access-policy';
 import { MagicLinkTokenService } from './application/services/tokens/magic-link-token.service';
 import { RefreshTokenHasher } from './application/services/tokens/refresh-token-hasher';
 import { TokenService } from './application/services/tokens/token.service';
@@ -22,6 +24,7 @@ import { createEmailGateway } from './infrastructure/gateways/email/email-gatewa
 import { GoogleIdTokenVerifierGateway } from './infrastructure/gateways/google/google-id-token-verifier.gateway';
 import { PrismaAccountsRepository } from './infrastructure/persistence/prisma/prisma-accounts.repository';
 import { PrismaAuthSessionsRepository } from './infrastructure/persistence/prisma/prisma-auth-sessions.repository';
+import { PrismaBetaInvitationsRepository } from './infrastructure/persistence/prisma/prisma-beta-invitations.repository';
 import { PrismaExternalIdentitiesRepository } from './infrastructure/persistence/prisma/prisma-external-identities.repository';
 import { PrismaMagicLinkChallengesRepository } from './infrastructure/persistence/prisma/prisma-magic-link-challenges.repository';
 import { ConsumeMagicLinkController } from './presentation/http/consume-magic-link/consume-magic-link.controller';
@@ -44,6 +47,7 @@ import { SignOutController } from './presentation/http/sign-out/sign-out.control
   ],
   providers: [
     ConsumeMagicLinkUseCase,
+    BetaAccessPolicy,
     CreateAuthSessionUseCase,
     GetCurrentAuthSessionUseCase,
     GoogleSignInUseCase,
@@ -62,6 +66,10 @@ import { SignOutController } from './presentation/http/sign-out/sign-out.control
     {
       provide: AUTH_SESSIONS_REPOSITORY,
       useClass: PrismaAuthSessionsRepository,
+    },
+    {
+      provide: BETA_INVITATIONS_REPOSITORY,
+      useClass: PrismaBetaInvitationsRepository,
     },
     {
       provide: EXTERNAL_IDENTITIES_REPOSITORY,
