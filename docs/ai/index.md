@@ -50,6 +50,7 @@ Short catalog. Routing hints (`read-when`, `do-not-read-when`, `related`, `canon
 | [`docs/ai/codex-skills-strategy.md`](codex-skills-strategy.md)                                                           | Codex skills ownership and repository strategy              |
 | [`docs/ai/task-finalization-workflow.md`](task-finalization-workflow.md)                                                 | Task finish, commit, and PR title workflow                  |
 | [`docs/ai/logging/logging-foundation.md`](logging/logging-foundation.md)                                                 | Logging baseline with nestjs-pino                           |
+| [`docs/ai/operations/beta-tester-access.md`](operations/beta-tester-access.md)                                           | Closed Beta access and privacy operations                   |
 | [`docs/ai/product/README.md`](product/README.md)                                                                         | Pointer to shared product, scope, glossary, and Jira docs   |
 | [`docs/frontend/README.md`](../frontend/README.md)                                                                       | Pointer to frontend docs in `sandicts/reactjs-sandicts-web` |
 

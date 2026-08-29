@@ -21,6 +21,7 @@ import {
   type GoogleIdTokenVerifier,
 } from '../../ports/google-id-token-verifier';
 import type { VerifiedGoogleIdentity } from '../../ports/google-id-token-verifier.types';
+import { BetaAccessPolicy } from '../../services/beta-access/beta-access-policy';
 import { normalizeEmail } from '../../services/email/normalize-email';
 import { CreateAuthSessionUseCase } from '../create-auth-session/create-auth-session.use-case';
 import type {
@@ -37,6 +38,7 @@ class GoogleSignInUseCase {
     private readonly externalIdentitiesRepository: ExternalIdentitiesRepository,
     @Inject(ACCOUNTS_REPOSITORY)
     private readonly accountsRepository: AccountsRepository,
+    private readonly betaAccessPolicy: BetaAccessPolicy,
     private readonly createAuthSession: CreateAuthSessionUseCase,
   ) {}
 
@@ -51,6 +53,13 @@ class GoogleSignInUseCase {
       throw invalidGoogleCredential({
         action: 'google_sign_in',
         reason: authErrorReasons.unverifiedEmail,
+      });
+    }
+
+    if (!(await this.betaAccessPolicy.isEligible(googleIdentity.email))) {
+      throw invalidGoogleCredential({
+        action: 'google_sign_in',
+        reason: authErrorReasons.betaInvitationRequired,
       });
     }
 

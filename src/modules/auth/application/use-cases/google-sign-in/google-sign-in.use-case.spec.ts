@@ -3,12 +3,14 @@ import { invalidGoogleCredential } from '@auth/application/errors/auth-errors';
 import { authProviderCodes } from '@auth/domain/auth-provider';
 import { InMemoryAccountsRepository } from '@auth/infrastructure/persistence/in-memory/in-memory-accounts.repository';
 import { InMemoryAuthSessionsRepository } from '@auth/infrastructure/persistence/in-memory/in-memory-auth-sessions.repository';
+import { InMemoryBetaInvitationsRepository } from '@auth/infrastructure/persistence/in-memory/in-memory-beta-invitations.repository';
 import { InMemoryExternalIdentitiesRepository } from '@auth/infrastructure/persistence/in-memory/in-memory-external-identities.repository';
 import { buildTestAuthConfig } from '@test-support/auth/build-test-auth-config';
 import type { GoogleIdTokenVerifier } from '../../ports/google-id-token-verifier';
 import type { VerifiedGoogleIdentity } from '../../ports/google-id-token-verifier.types';
 import { RefreshTokenHasher } from '../../services/tokens/refresh-token-hasher';
 import { TokenService } from '../../services/tokens/token.service';
+import { BetaAccessPolicy } from '../../services/beta-access/beta-access-policy';
 import { CreateAuthSessionUseCase } from '../create-auth-session/create-auth-session.use-case';
 import { GoogleSignInUseCase } from './google-sign-in.use-case';
 
@@ -35,6 +37,8 @@ describe('GoogleSignInUseCase', () => {
     };
     const accountsRepository = new InMemoryAccountsRepository();
     const authSessionsRepository = new InMemoryAuthSessionsRepository();
+    const betaInvitationsRepository = new InMemoryBetaInvitationsRepository();
+    betaInvitationsRepository.invite(googleIdentity.email.toLowerCase());
     const externalIdentitiesRepository =
       new InMemoryExternalIdentitiesRepository();
     const createAuthSession = new CreateAuthSessionUseCase(
@@ -48,12 +52,14 @@ describe('GoogleSignInUseCase', () => {
       googleIdTokenVerifier,
       externalIdentitiesRepository,
       accountsRepository,
+      new BetaAccessPolicy(betaInvitationsRepository),
       createAuthSession,
     );
 
     return {
       accountsRepository,
       authSessionsRepository,
+      betaInvitationsRepository,
       externalIdentitiesRepository,
       googleIdTokenVerifier,
       useCase,
@@ -96,6 +102,27 @@ describe('GoogleSignInUseCase', () => {
     ).rejects.toMatchObject({
       code: 'invalid_google_credential',
     });
+    expect(externalIdentitiesRepository.externalIdentities).toHaveLength(0);
+    expect(authSessionsRepository.authSessions).toHaveLength(0);
+  });
+
+  it('rejects a non-invited identity before creating an account', async () => {
+    const {
+      accountsRepository,
+      authSessionsRepository,
+      betaInvitationsRepository,
+      externalIdentitiesRepository,
+      useCase,
+    } = makeSut();
+    betaInvitationsRepository.revoke('player@example.com');
+
+    await expect(
+      useCase.execute({ credential: 'valid-google-token' }),
+    ).rejects.toMatchObject({
+      code: 'invalid_google_credential',
+      message: 'Invalid authentication credentials',
+    });
+    expect(accountsRepository.accounts).toHaveLength(0);
     expect(externalIdentitiesRepository.externalIdentities).toHaveLength(0);
     expect(authSessionsRepository.authSessions).toHaveLength(0);
   });

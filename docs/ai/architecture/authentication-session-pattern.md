@@ -263,6 +263,32 @@ Expected failure:
 
 - invalid credentials -> `unauthorized`
 
+## Invite-Only Beta Access
+
+While the product is in closed Beta, authentication eligibility comes from
+active `BetaInvitation` records in PostgreSQL. The lookup key is the normalized
+email. Invitation lists must not be stored in Git, application configuration,
+public environment variables, or operational logs.
+
+Rules:
+
+- validate eligibility before creating an account or linking an external
+  identity
+- apply the same eligibility source to Google and magic link authentication
+- keep public responses generic so they do not reveal whether an email has an
+  account or an active invitation
+- validate eligibility again when consuming a magic link because access may be
+  removed after the link was issued
+- revoking an invitation also revokes pending magic link challenges, active
+  sessions, and active refresh tokens for the matching account
+- reactivating an invitation permits future authentication but does not restore
+  revoked sessions or challenges
+- use the controlled operational procedure to locate or delete Beta data after
+  a privacy request
+
+The operational procedure is
+`docs/ai/operations/beta-tester-access.md`.
+
 ## Magic Link Sign-In
 
 Endpoint shapes:
@@ -284,6 +310,8 @@ Request rules:
 - rate-limit by IP for the current single-instance MVP foundation
 - create a one-time challenge if sign-in is allowed
 - send a short-lived link by email
+- for a non-invited email, create no challenge and send no email while returning
+  the same `202 Accepted` body used for invited emails
 
 Challenge rules:
 
@@ -304,7 +332,9 @@ Consume rules:
 - return `409 magic_link_already_used` for a consumed challenge
 - return `409 magic_link_superseded` when a newer request replaced the link
 - mark challenge as used before or atomically with session creation
-- create account on first successful magic link only if product allows passwordless sign-up
+- revalidate the active Beta invitation before resolving or creating an account
+- create account on first successful magic link only when the invitation remains
+  active
 
 Reason for `POST` consumption:
 
@@ -345,12 +375,15 @@ Google Sign-In button or Google One Tap prompt. The backend must validate:
 - signature
 - subject
 - email verification state
+- active Beta invitation for the verified email
 
 Rules:
 
 - use Google's stable `sub` as provider identity
 - do not use email as the provider identity key
 - store Google identity in `ExternalIdentity`
+- reject a missing or revoked Beta invitation before account creation or
+  provider linking with the generic invalid-credential response
 - if the same verified email already exists locally, link Google identity according to the account-linking policy
 - create an internal Sandicts session after success
 - keep Google Sign-In and Google One Tap on the same backend endpoint unless a
@@ -502,4 +535,3 @@ This document follows:
 - OWASP Forgot Password Cheat Sheet
 - OAuth 2.0 Security Best Current Practice, RFC 9700
 - Google OpenID Connect documentation
-

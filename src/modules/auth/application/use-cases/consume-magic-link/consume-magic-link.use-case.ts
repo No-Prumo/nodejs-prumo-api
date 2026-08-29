@@ -15,6 +15,7 @@ import {
   type MagicLinkChallengesRepository,
 } from '../../ports/magic-link-challenges.repository';
 import { MagicLinkTokenService } from '../../services/tokens/magic-link-token.service';
+import { BetaAccessPolicy } from '../../services/beta-access/beta-access-policy';
 import { CreateAuthSessionUseCase } from '../create-auth-session/create-auth-session.use-case';
 import type {
   ConsumeMagicLinkUseCaseRequest,
@@ -29,6 +30,7 @@ class ConsumeMagicLinkUseCase {
     @Inject(ACCOUNTS_REPOSITORY)
     private readonly accountsRepository: AccountsRepository,
     private readonly magicLinkTokenService: MagicLinkTokenService,
+    private readonly betaAccessPolicy: BetaAccessPolicy,
     private readonly createAuthSession: CreateAuthSessionUseCase,
   ) {}
 
@@ -70,6 +72,14 @@ class ConsumeMagicLinkUseCase {
     }
 
     const { challenge } = consumeResult;
+
+    if (!(await this.betaAccessPolicy.isEligible(challenge.email))) {
+      throw invalidMagicLinkToken({
+        action: 'consume_magic_link',
+        reason: authErrorReasons.betaInvitationRequired,
+      });
+    }
+
     const account = await this.accountsRepository.resolveOrCreateByEmail({
       email: challenge.email,
       normalizedEmail: challenge.email,
