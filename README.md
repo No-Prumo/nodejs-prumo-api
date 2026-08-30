@@ -449,7 +449,7 @@ Main responsibilities:
 | `.codex/skills` | Repository-owned Codex instructions for this project. |
 | `.github/workflows` | CI/CD workflows. |
 | `docs/ai` | Durable project context and source-of-truth technical/product docs. |
-| `docs/frontend` | Pointer to frontend docs now owned by `sandicts/reactjs-sandicts-web`. |
+| `docs/frontend` | Pointer to frontend docs now owned by `fradelli/reactjs-sandicts-web`. |
 | `openapi/sandicts-api.json` | Canonical generated OpenAPI artifact consumed by frontend code generation. |
 | `prisma/schema.prisma` | Main Prisma generator and datasource configuration. |
 | `prisma/models` | Domain-grouped Prisma models. |
@@ -1242,8 +1242,8 @@ CI uses:
 
 ### Add A New Feature Module
 
-1. Read `sandicts/sandicts-docs:docs/product/sandicts-product-context.md`.
-2. Read `sandicts/sandicts-docs:docs/business-rules/sandicts-business-rules.md`.
+1. Read `fradelli/sandicts-docs:docs/product/sandicts-product-context.md`.
+2. Read `fradelli/sandicts-docs:docs/business-rules/sandicts-business-rules.md`.
 3. Read `docs/ai/architecture/backend-architecture-overview.md`.
 4. Read `docs/ai/architecture/module-pattern.md`.
 5. Create the module under `src/modules/<feature>`.
@@ -1278,7 +1278,7 @@ CI uses:
 
 ### Change Business Rules
 
-1. Read `sandicts/sandicts-docs:docs/business-rules/sandicts-business-rules.md`.
+1. Read `fradelli/sandicts-docs:docs/business-rules/sandicts-business-rules.md`.
 2. Read the relevant product or architecture docs linked from `docs/ai/index.md`.
 3. Implement the backend behavior.
 4. Use `business_rule_violation` for valid requests that break domain policy.
@@ -1319,7 +1319,7 @@ Current source-of-truth docs:
 - `docs/ai/architecture/repository-pattern.md`
 - `docs/ai/architecture/transactional-email-provider-decision.md`
 - `docs/ai/architecture/use-case-pattern.md`
-- `sandicts/sandicts-docs:docs/business-rules/sandicts-business-rules.md`
+- `fradelli/sandicts-docs:docs/business-rules/sandicts-business-rules.md`
 - `docs/ai/config/configuration-foundation.md`
 - `docs/ai/config/typescript-module-resolution.md`
 - `docs/ai/ci-cd/ci-governance.md`
@@ -1327,7 +1327,7 @@ Current source-of-truth docs:
 - `docs/ai/codex-skills-strategy.md`
 - `docs/ai/logging/logging-foundation.md`
 - `docs/ai/operations/beta-tester-access.md`
-- `sandicts/sandicts-docs:docs/product/sandicts-product-context.md`
+- `fradelli/sandicts-docs:docs/product/sandicts-product-context.md`
 
 Repository-owned Codex skills live under `.codex/skills`:
 

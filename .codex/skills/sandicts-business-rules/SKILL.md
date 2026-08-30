@@ -9,14 +9,14 @@ description: Use when working in the Sandicts API repository and the task involv
 
 Keep Sandicts domain rules consistent across product documentation, backend behavior, API contracts, and error handling.
 
-This skill is the Codex operating workflow. The source of truth is the shared documentation repository under `sandicts/sandicts-docs`.
+This skill is the Codex operating workflow. The source of truth is the shared documentation repository under `fradelli/sandicts-docs`.
 
 ## Required Context
 
 Read these files when the task touches Sandicts business behavior:
 
-- `sandicts/sandicts-docs:docs/business-rules/sandicts-business-rules.md`
-- `sandicts/sandicts-docs:docs/product/sandicts-product-context.md`
+- `fradelli/sandicts-docs:docs/business-rules/sandicts-business-rules.md`
+- `fradelli/sandicts-docs:docs/product/sandicts-product-context.md`
 - `docs/ai/api/error-handling-foundation.md` when mapping business failures to API errors
 - `docs/ai/api/zod-swagger-foundation.md` when changing request/response contracts
 
@@ -24,11 +24,11 @@ Read these files when the task touches Sandicts business behavior:
 
 1. Identify whether the task is backend/domain, frontend-only, or mixed product scope.
 2. Read the required context files before changing rules, API behavior, or backend implementation.
-3. Treat `sandicts/sandicts-docs:docs/business-rules/sandicts-business-rules.md` as the canonical backend-facing rule document.
+3. Treat `fradelli/sandicts-docs:docs/business-rules/sandicts-business-rules.md` as the canonical backend-facing rule document.
 4. Keep rules operational: affected entity, allowed state, forbidden transition, and expected API error when relevant.
 5. Separate current MVP decisions from future options such as Web3, advanced rankings, recommendation engines, full Organization management, or full Academy management.
 6. Preserve uncertain rules as open questions instead of inventing hidden policy.
-7. When implementation changes a business rule, update the relevant shared document in `sandicts/sandicts-docs` in the same change.
+7. When implementation changes a business rule, update the relevant shared document in `fradelli/sandicts-docs` in the same change.
 
 ## Rule Style
 

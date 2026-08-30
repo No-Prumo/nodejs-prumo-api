@@ -47,7 +47,7 @@ Project-specific Codex skills should live in `.codex/skills/`.
 Durable backend-specific AI-facing project documentation should live in `docs/ai/`.
 
 Shared product, business-rule, glossary, MVP scope, and Jira planning
-documentation should live in `sandicts/sandicts-docs`.
+documentation should live in `fradelli/sandicts-docs`.
 
 This keeps Codex behavior versioned with the code, reviewable in pull requests, reproducible across computers, and aligned with project changes.
 
@@ -66,7 +66,7 @@ Store these in the repository:
 When a backend rule changes, update the related skill or `docs/ai/` document in the same pull request when relevant.
 
 When a shared product or business rule changes, update the relevant document in
-`sandicts/sandicts-docs` instead of copying that rule into this repository.
+`fradelli/sandicts-docs` instead of copying that rule into this repository.
 
 ## Local-Only Content
 
@@ -122,7 +122,7 @@ Do not create placeholder skills. Add a new project skill only when it captures 
 - Move only project-specific, shareable skills into `.codex/skills/`.
 - Remove secrets, local paths, and personal preferences before committing.
 - Link project skills to the relevant backend `docs/ai/` source-of-truth documents.
-- Link shared product and business-rule work to `sandicts/sandicts-docs`.
+- Link shared product and business-rule work to `fradelli/sandicts-docs`.
 - Update `docs/ai/index.md` when adding durable project context.
 - Test from the second computer or a clean clone.
 - Keep the external shared folder only for global or personal skills.

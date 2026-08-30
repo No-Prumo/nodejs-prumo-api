@@ -5,8 +5,8 @@ role: source-of-truth
 priority: high
 canonical: docs/ai/task-finalization-workflow.md
 related:
-  - sandicts/sandicts-docs:docs/ai/dependency-security-remediation.md
-  - sandicts/sandicts-docs:docs/ai/pull-request-standard.md
+  - fradelli/sandicts-docs:docs/ai/dependency-security-remediation.md
+  - fradelli/sandicts-docs:docs/ai/pull-request-standard.md
   - .codex/skills/jira-pr-commit-writer/SKILL.md
   - .github/pull_request_template.md
   - docs/ai/ci-cd/ci-governance.md
@@ -133,7 +133,7 @@ Jira key rule:
 
 ## Pull Request Title Standard
 
-Follow `sandicts/sandicts-docs:docs/ai/pull-request-standard.md`.
+Follow `fradelli/sandicts-docs:docs/ai/pull-request-standard.md`.
 
 Use the Jira key first:
 
@@ -173,7 +173,7 @@ Rules:
 
 ## Pull Request Description Standard
 
-Follow `sandicts/sandicts-docs:docs/ai/pull-request-standard.md` and always
+Follow `fradelli/sandicts-docs:docs/ai/pull-request-standard.md` and always
 use `.github/pull_request_template.md`.
 
 Rules:
@@ -208,7 +208,7 @@ Validation should match risk:
 - Security/dependency changes: run the repository dependency audit command or
   document why it was not applicable.
 - Frontend repository changes: follow
-  `sandicts/reactjs-sandicts-web:docs/ai/task-finalization-workflow.md`.
+  `fradelli/reactjs-sandicts-web:docs/ai/task-finalization-workflow.md`.
 - Shared docs repository changes: run `git diff --check` and inspect changed
   docs or skill metadata; do not mark lint, typecheck, tests, build, or
   dependency audit complete unless that repository has those commands configured
@@ -219,7 +219,7 @@ Do not mark a validation as complete in the PR unless it actually ran.
 ## Security Remediation Rule
 
 When a task fixes dependency vulnerabilities, follow
-`sandicts/sandicts-docs:docs/ai/dependency-security-remediation.md` and the
+`fradelli/sandicts-docs:docs/ai/dependency-security-remediation.md` and the
 backend-specific workflow in
 `docs/ai/ci-cd/security-audit-remediation.md`.
 

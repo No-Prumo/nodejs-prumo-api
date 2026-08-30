@@ -17,11 +17,11 @@ The canonical project context lives in `docs/ai/index.md` and the documents link
 2. Read only the documents whose frontmatter `read-when` entries match the current task.
 3. Prefer smaller context docs before large functional, screen, roadmap, or Jira specs.
 4. Treat backend `docs/ai/` source-of-truth documents as the backend implementation baseline.
-5. Treat `sandicts/sandicts-docs` as the source of truth for shared product, entity, scope, Jira, and business-rule context.
+5. Treat `fradelli/sandicts-docs` as the source of truth for shared product, entity, scope, Jira, and business-rule context.
 6. If code and docs disagree, surface the conflict and update the owning document in the same change when the task changes the rule.
 7. When a change alters behavior, setup, commands, environment variables, API contracts, architecture, database models, auth/session behavior, logging, CI/CD, or docs links that `README.md` explicitly describes, update `README.md` in the same change or state why no README change is needed.
 8. Keep `.codex/skills/` for Codex operating instructions and `docs/ai/` for durable backend context and decisions.
-9. Keep shared product and business-rule content in `sandicts/sandicts-docs`, not duplicated in this repository.
+9. Keep shared product and business-rule content in `fradelli/sandicts-docs`, not duplicated in this repository.
 10. When changing repository skills, validate the edited skill folder with the skill validation script when available.
 11. For dependency audit failures or vulnerability remediation, read `docs/ai/ci-cd/security-audit-remediation.md`.
 
@@ -157,7 +157,7 @@ issue, page, or JQL filter is not already known.
 
 - Do not store tokens, credentials, secrets, private config, local absolute paths, or personal preferences in this repository.
 - Keep personal and generic skills outside this repository.
-- Avoid copying full project rules into this skill when backend `docs/ai/` or shared `sandicts/sandicts-docs` already owns them.
+- Avoid copying full project rules into this skill when backend `docs/ai/` or shared `fradelli/sandicts-docs` already owns them.
 - Prefer small, task-focused project skills over broad generic instructions when this repository needs new Codex behavior.
 - Do not read long specs just because they are related; read them only when the task needs their detailed sections.
 
@@ -174,8 +174,8 @@ Use `docs/ai/index.md` as the canonical catalog and reading router.
 Main roots:
 
 - `docs/ai/`: durable backend architecture, API, config, CI/CD, testing, and AI-routing context.
-- `sandicts/sandicts-docs:docs/`: shared product, business-rule, glossary, scope, and Jira planning context.
+- `fradelli/sandicts-docs:docs/`: shared product, business-rule, glossary, scope, and Jira planning context.
 - `docs/frontend/`: pointer to frontend docs now owned by the sibling
-  `sandicts/reactjs-sandicts-web` repository.
+  `fradelli/reactjs-sandicts-web` repository.
 - Frontend planning, stack, page, screen, delivery, and discovery docs are
-  canonical in `sandicts/reactjs-sandicts-web:docs/frontend`.
+  canonical in `fradelli/reactjs-sandicts-web:docs/frontend`.

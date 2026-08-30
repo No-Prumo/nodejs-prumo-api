@@ -4,7 +4,7 @@ The canonical Sandicts frontend documentation now lives in the frontend
 repository:
 
 ```text
-sandicts/reactjs-sandicts-web
+fradelli/reactjs-sandicts-web
 ```
 
 Use that repository for frontend planning, app-shell, page, UX, and delivery
@@ -17,7 +17,7 @@ docs/frontend
 Shared product scope, business rules, glossary, and Jira planning now live in:
 
 ```text
-sandicts/sandicts-docs
+fradelli/sandicts-docs
 ```
 
 This backend repository remains the source of truth for backend architecture,

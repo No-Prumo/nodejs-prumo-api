@@ -20,7 +20,7 @@ The hosting target is intentionally portable:
 
 | Concern     | Preview resource                                                      | Region / branch                         |
 | ----------- | --------------------------------------------------------------------- | --------------------------------------- |
-| Source      | `sandicts/nodejs-sandicts-api`                                        | Git branch `staging`                    |
+| Source      | `fradelli/nodejs-sandicts-api`                                        | Git branch `staging`                    |
 | CI/CD       | GitHub Actions environment `preview`                                  | deployments allowed only from `staging` |
 | API runtime | planned Render Free Web Service `sandicts-api-preview`                | Virginia                                |
 | Database    | Neon Free project `sandicts-api-preview`, database `sandicts_preview` | AWS US East 1, PostgreSQL 18            |
@@ -134,7 +134,7 @@ before the first `developer -> staging` promotion.
 | Field             | Value                          |
 | ----------------- | ------------------------------ |
 | Name              | `sandicts-api-preview`         |
-| Source            | `sandicts/nodejs-sandicts-api` |
+| Source            | `fradelli/nodejs-sandicts-api` |
 | Runtime           | Docker                         |
 | Dockerfile        | repository root `Dockerfile`   |
 | Branch            | `staging`                      |

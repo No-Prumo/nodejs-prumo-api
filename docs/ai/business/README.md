@@ -3,7 +3,7 @@ title: Backend Business Rules Pointer
 doc-type: pointer
 role: pointer
 priority: high
-canonical: sandicts/sandicts-docs:docs/business-rules/sandicts-business-rules.md
+canonical: fradelli/sandicts-docs:docs/business-rules/sandicts-business-rules.md
 scope: business-rules, shared-docs, backend-routing
 read-when:
   - a backend task needs Sandicts business rules
@@ -16,7 +16,7 @@ do-not-read-when:
 
 Shared Sandicts business rules moved to:
 
-- `sandicts/sandicts-docs:docs/business-rules/sandicts-business-rules.md`
+- `fradelli/sandicts-docs:docs/business-rules/sandicts-business-rules.md`
 
 Do not duplicate business-rule content in this backend repository. Backend docs
 should describe backend implementation only.
