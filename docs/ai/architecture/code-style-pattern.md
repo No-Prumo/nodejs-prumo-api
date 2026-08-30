@@ -7,7 +7,7 @@ canonical: docs/ai/architecture/code-style-pattern.md
 related:
   - docs/ai/index.md
   - docs/ai/config/typescript-module-resolution.md
-  - sandicts/reactjs-sandicts-web:docs/frontend/sandicts-frontend-tech-decisions.md
+  - fradelli/reactjs-sandicts-web:docs/frontend/sandicts-frontend-tech-decisions.md
 scope: backend, frontend, code-style, maintainability
 read-when:
   - adding reusable constants or helpers

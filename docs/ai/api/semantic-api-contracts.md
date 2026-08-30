@@ -7,8 +7,8 @@ canonical: docs/ai/api/semantic-api-contracts.md
 related:
   - docs/ai/api/error-handling-foundation.md
   - docs/ai/api/zod-swagger-foundation.md
-  - sandicts/sandicts-docs:docs/decisions/api-contract-governance.md
-  - sandicts/reactjs-sandicts-web:docs/frontend/sandicts-frontend-tech-decisions.md
+  - fradelli/sandicts-docs:docs/decisions/api-contract-governance.md
+  - fradelli/reactjs-sandicts-web:docs/frontend/sandicts-frontend-tech-decisions.md
 scope: http-status, public-errors, openapi, compatibility, contract-testing
 read-when:
   - adding or changing an endpoint

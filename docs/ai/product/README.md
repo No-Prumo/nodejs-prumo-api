@@ -3,7 +3,7 @@ title: Backend Product Docs Pointer
 doc-type: pointer
 role: pointer
 priority: high
-canonical: sandicts/sandicts-docs:docs/ai/index.md
+canonical: fradelli/sandicts-docs:docs/ai/index.md
 scope: product, shared-docs, backend-routing
 read-when:
   - a backend task needs shared product, scope, glossary, or Jira planning docs
@@ -16,11 +16,11 @@ do-not-read-when:
 
 Shared Sandicts product documentation moved to:
 
-- `sandicts/sandicts-docs:docs/ai/index.md`
-- `sandicts/sandicts-docs:docs/product/sandicts-product-context.md`
-- `sandicts/sandicts-docs:docs/product/sandicts-mvp-scope.md`
-- `sandicts/sandicts-docs:docs/business-rules/sandicts-business-rules.md`
-- `sandicts/sandicts-docs:docs/glossary/domain-glossary.md`
+- `fradelli/sandicts-docs:docs/ai/index.md`
+- `fradelli/sandicts-docs:docs/product/sandicts-product-context.md`
+- `fradelli/sandicts-docs:docs/product/sandicts-mvp-scope.md`
+- `fradelli/sandicts-docs:docs/business-rules/sandicts-business-rules.md`
+- `fradelli/sandicts-docs:docs/glossary/domain-glossary.md`
 
 Do not duplicate shared product rules in this backend repository. Backend docs
 should describe backend implementation, generated API contracts, and backend
